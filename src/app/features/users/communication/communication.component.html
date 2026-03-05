@@ -1,0 +1,212 @@
+<div class="communication-container">
+  <!-- Stats Header -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon sent">
+        <i class="pi pi-send"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().totalSent | number }}</span>
+        <span class="stat-label">Total Sent</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon open">
+        <i class="pi pi-envelope-open"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().openRate }}%</span>
+        <span class="stat-label">Open Rate</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon click">
+        <i class="pi pi-external-link"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().clickRate }}%</span>
+        <span class="stat-label">Click Rate</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon pending">
+        <i class="pi pi-clock"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().pending }}</span>
+        <span class="stat-label">Pending</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header Actions -->
+  <div class="page-header">
+    <h1>Communication</h1>
+    <button pButton label="Compose Message" icon="pi pi-plus" (click)="openCompose()"></button>
+  </div>
+
+  <!-- Tabs -->
+  <p-tabs [(value)]="activeTab">
+    <p-tablist>
+      <p-tab [value]="0"><i class="pi pi-envelope mr-2"></i> Messages</p-tab>
+      <p-tab [value]="1"><i class="pi pi-file mr-2"></i> Templates</p-tab>
+    </p-tablist>
+    <p-tabpanels>
+      <!-- Messages Tab -->
+      <p-tabpanel [value]="0">
+        <p-table 
+          [value]="messages()" 
+          [paginator]="true" 
+          [rows]="10"
+          styleClass="p-datatable-sm"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Subject</th>
+              <th>Type</th>
+              <th>Recipients</th>
+              <th>Status</th>
+              <th>Sent/Scheduled</th>
+              <th>Open Rate</th>
+              <th>Actions</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-message>
+            <tr>
+              <td>
+                <span class="message-subject">{{ message.subject }}</span>
+              </td>
+              <td>
+                <p-tag [value]="message.type | titlecase" [severity]="getTypeSeverity(message.type)"></p-tag>
+              </td>
+              <td>
+                <span class="recipients">{{ message.recipients.join(', ') }}</span>
+              </td>
+              <td>
+                <p-tag [value]="message.status | titlecase" [severity]="getStatusSeverity(message.status)"></p-tag>
+              </td>
+              <td>
+                @if (message.sentAt) {
+                  <span>{{ message.sentAt | date:'short' }}</span>
+                } @else if (message.scheduledAt) {
+                  <span class="scheduled">
+                    <i class="pi pi-clock"></i>
+                    {{ message.scheduledAt | date:'short' }}
+                  </span>
+                } @else {
+                  <span class="draft">-</span>
+                }
+              </td>
+              <td>
+                @if (message.status === 'sent') {
+                  <span class="open-rate">{{ message.openRate }}%</span>
+                } @else {
+                  <span>-</span>
+                }
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button pButton icon="pi pi-copy" class="p-button-text p-button-sm" pTooltip="Duplicate" (click)="duplicateMessage(message)"></button>
+                  <button pButton icon="pi pi-trash" class="p-button-text p-button-danger p-button-sm" pTooltip="Delete" (click)="deleteMessage(message.id)"></button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="7" class="empty-message">
+                <i class="pi pi-inbox"></i>
+                <p>No messages found</p>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-tabpanel>
+
+      <!-- Templates Tab -->
+      <p-tabpanel [value]="1">
+        <div class="templates-grid">
+          @for (template of templates(); track template.id) {
+            <p-card styleClass="template-card">
+              <ng-template pTemplate="header">
+                <div class="template-header">
+                  <p-tag [value]="template.type | titlecase" [severity]="getTypeSeverity(template.type)"></p-tag>
+                  <span class="usage-count">
+                    <i class="pi pi-copy"></i>
+                    {{ template.usageCount }}
+                  </span>
+                </div>
+              </ng-template>
+              <div class="template-content">
+                <h3>{{ template.name }}</h3>
+                <p class="template-subject">{{ template.subject }}</p>
+              </div>
+              <ng-template pTemplate="footer">
+                <div class="template-actions">
+                  <button pButton label="Use Template" icon="pi pi-send" class="p-button-sm" (click)="useTemplate(template)"></button>
+                  <button pButton icon="pi pi-pencil" class="p-button-text p-button-sm" pTooltip="Edit"></button>
+                </div>
+              </ng-template>
+            </p-card>
+          }
+
+          <!-- Add Template Card -->
+          <div class="add-template-card" (click)="showTemplateDialog.set(true)">
+            <i class="pi pi-plus"></i>
+            <span>Create Template</span>
+          </div>
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>
+
+<!-- Compose Dialog -->
+<p-dialog 
+  header="Compose Message" 
+  [(visible)]="showComposeDialog" 
+  [modal]="true"
+  [style]="{width: '700px'}"
+  styleClass="compose-dialog"
+>
+  <div class="compose-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Message Type</label>
+        <p-select 
+          [options]="messageTypes"
+          [(ngModel)]="composeForm().type"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+      <div class="form-group">
+        <label>Recipients</label>
+        <p-select 
+          [options]="recipientGroups"
+          [(ngModel)]="composeForm().recipients"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Subject</label>
+      <input type="text" pInputText [(ngModel)]="composeForm().subject" placeholder="Enter subject..." class="w-full">
+    </div>
+
+    <div class="form-group">
+      <label>Content</label>
+      <p-editor [(ngModel)]="composeForm().content" [style]="{'height':'250px'}"></p-editor>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Save Draft" icon="pi pi-save" class="p-button-outlined" (click)="saveDraft()"></button>
+    <button pButton label="Schedule" icon="pi pi-clock" class="p-button-secondary"></button>
+    <button pButton label="Send Now" icon="pi pi-send" (click)="sendMessage()"></button>
+  </ng-template>
+</p-dialog>

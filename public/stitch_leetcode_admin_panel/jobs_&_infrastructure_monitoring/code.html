@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>InfraMonitor - Infrastructure &amp; Jobs</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                        "card-dark": "#1b1f27",
+                        "border-dark": "#282e39",
+                        "text-secondary": "#9ca6ba",
+                        "success": "#0bda5e",
+                        "warning": "#ffb020",
+                        "danger": "#fa6238",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        /* Custom scrollbar for dense data tables */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #111318; }
+        ::-webkit-scrollbar-thumb { background: #282e39; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b4354; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white overflow-x-hidden min-h-screen flex flex-col">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-border-dark px-6 py-3 bg-[#111318] sticky top-0 z-50">
+<div class="flex items-center gap-4 text-white">
+<div class="size-6 text-primary">
+<span class="material-symbols-outlined !text-[28px]">monitoring</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">InfraMonitor</h2>
+</div>
+<div class="flex flex-1 justify-end gap-6">
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Workers</a>
+<a class="text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Databases</a>
+<a class="text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Alerts</a>
+</nav>
+<div class="flex gap-2 items-center pl-4 border-l border-border-dark">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded bg-success/10 border border-success/20">
+<span class="material-symbols-outlined text-success !text-[16px]">check_circle</span>
+<span class="text-success text-xs font-bold uppercase tracking-wide">System Healthy</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded bg-card-dark border border-border-dark">
+<span class="material-symbols-outlined text-text-secondary !text-[16px]">schedule</span>
+<span class="text-text-secondary text-xs font-medium">Updated: Just now</span>
+</div>
+</div>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-9 border border-border-dark" data-alt="User Avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBBMp5n19vlgacsyvxjyW4pHEieuJcxVon4UAYPkNDuBnYpkwTs0AWr0nFgtdg2bVIOdGMqWTHKSkctXwEN5GAg_6hVEroEy4qNQnux97oWWSBoDoFCSPJKOHEo33KA6CyeFSZArntXeP0yVJEZas0JcFw00hJ_y-PI2zk8CY9Yn6xyyR1vehVlkhBvjufW7OI0SqSM7GVMjzfM37QBwzcS_HdzFR55_HBTz1Yd9y_Ha_b0bI2bDBNvCrKX1MDTx0rM06otp8haTwj3");'></div>
+</div>
+</header>
+<!-- Main Layout -->
+<main class="flex-1 w-full max-w-[1440px] mx-auto p-4 md:p-6 lg:p-8 flex flex-col gap-6">
+<!-- Page Heading -->
+<div class="flex flex-wrap justify-between items-end gap-4 pb-4 border-b border-border-dark">
+<div class="flex flex-col gap-1">
+<h1 class="text-white tracking-tight text-2xl md:text-3xl font-bold">Infrastructure &amp; Jobs</h1>
+<div class="flex items-center gap-2 text-text-secondary text-sm font-mono">
+<span class="material-symbols-outlined !text-[16px]">dns</span>
+<span>Environment: Production</span>
+<span class="mx-1 text-border-dark">|</span>
+<span>Region: us-east-1</span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center justify-center gap-2 rounded-lg h-9 px-4 bg-card-dark border border-border-dark hover:bg-border-dark text-white text-sm font-medium transition-colors">
+<span class="material-symbols-outlined !text-[18px]">tune</span>
+<span>Configure</span>
+</button>
+<button class="flex items-center justify-center gap-2 rounded-lg h-9 px-4 bg-primary hover:bg-primary/90 text-white text-sm font-bold transition-colors shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined !text-[18px]">add_alert</span>
+<span>Manage Alerts</span>
+</button>
+</div>
+</div>
+<!-- Dashboard Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left Column: Workers (7 cols) -->
+<div class="lg:col-span-7 flex flex-col gap-6">
+<!-- Worker Stats -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<div class="flex flex-col gap-1 rounded-xl p-5 border border-border-dark bg-card-dark relative overflow-hidden group hover:border-primary/50 transition-colors">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined !text-[48px] text-white">memory</span>
+</div>
+<p class="text-text-secondary text-xs font-medium uppercase tracking-wider">Running Jobs</p>
+<div class="flex items-baseline gap-2 mt-1">
+<p class="text-white text-2xl font-bold font-mono">4,203</p>
+<span class="text-success text-xs font-medium flex items-center">
+<span class="material-symbols-outlined !text-[14px]">trending_up</span> 2.4%
+                            </span>
+</div>
+<div class="w-full bg-border-dark h-1 rounded-full mt-3 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 75%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1 rounded-xl p-5 border border-border-dark bg-card-dark relative overflow-hidden group hover:border-warning/50 transition-colors">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined !text-[48px] text-warning">hourglass_top</span>
+</div>
+<p class="text-text-secondary text-xs font-medium uppercase tracking-wider">Queued Jobs</p>
+<div class="flex items-baseline gap-2 mt-1">
+<p class="text-white text-2xl font-bold font-mono">12</p>
+<span class="text-success text-xs font-medium flex items-center">
+<span class="material-symbols-outlined !text-[14px]">remove</span> 0%
+                            </span>
+</div>
+<div class="w-full bg-border-dark h-1 rounded-full mt-3 overflow-hidden">
+<div class="bg-warning h-full rounded-full" style="width: 5%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1 rounded-xl p-5 border border-border-dark bg-card-dark relative overflow-hidden group hover:border-danger/50 transition-colors">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined !text-[48px] text-danger">error</span>
+</div>
+<p class="text-text-secondary text-xs font-medium uppercase tracking-wider">Failed Jobs</p>
+<div class="flex items-baseline gap-2 mt-1">
+<p class="text-white text-2xl font-bold font-mono">5</p>
+<span class="text-danger text-xs font-medium flex items-center">
+<span class="material-symbols-outlined !text-[14px]">trending_down</span> 12%
+                            </span>
+</div>
+<div class="w-full bg-border-dark h-1 rounded-full mt-3 overflow-hidden">
+<div class="bg-danger h-full rounded-full" style="width: 15%"></div>
+</div>
+</div>
+</div>
+<!-- Workers List -->
+<div class="flex flex-col rounded-xl border border-border-dark bg-card-dark overflow-hidden flex-1">
+<div class="flex items-center justify-between p-5 border-b border-border-dark">
+<div>
+<h3 class="text-white text-lg font-bold">Worker Nodes Health</h3>
+<p class="text-text-secondary text-sm mt-0.5">Evaluation worker pool status</p>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center justify-center h-8 w-8 rounded bg-border-dark hover:bg-[#3b4354] text-white transition-colors">
+<span class="material-symbols-outlined !text-[18px]">refresh</span>
+</button>
+<button class="flex items-center gap-2 h-8 px-3 rounded bg-primary/10 hover:bg-primary/20 text-primary text-sm font-semibold transition-colors border border-primary/20">
+                                View All Nodes
+                            </button>
+</div>
+</div>
+<div class="flex flex-col divide-y divide-border-dark">
+<!-- Header Row -->
+<div class="grid grid-cols-12 px-5 py-3 bg-[#161920] text-xs font-medium uppercase text-text-secondary tracking-wider">
+<div class="col-span-4">Node ID</div>
+<div class="col-span-2">Status</div>
+<div class="col-span-3">Load (CPU/RAM)</div>
+<div class="col-span-3 text-right">Actions</div>
+</div>
+<!-- Row 1 -->
+<div class="grid grid-cols-12 px-5 py-4 items-center hover:bg-[#222730] transition-colors group">
+<div class="col-span-4 flex items-center gap-3">
+<div class="p-1.5 rounded bg-blue-500/10 text-blue-400">
+<span class="material-symbols-outlined !text-[20px]">terminal</span>
+</div>
+<div>
+<p class="text-white text-sm font-semibold font-mono">worker-us-east-1a</p>
+<p class="text-text-secondary text-xs">v4.2.0 • 24d uptime</p>
+</div>
+</div>
+<div class="col-span-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10 text-success text-xs font-bold border border-success/20">
+<span class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></span>
+                                    Active
+                                </span>
+</div>
+<div class="col-span-3 flex flex-col gap-1.5 pr-4">
+<div class="flex items-center justify-between text-xs text-text-secondary">
+<span>CPU</span>
+<span class="text-white font-mono">45%</span>
+</div>
+<div class="w-full bg-border-dark h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 45%"></div>
+</div>
+</div>
+<div class="col-span-3 flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-border-dark rounded text-text-secondary hover:text-white" title="View Logs">
+<span class="material-symbols-outlined !text-[18px]">description</span>
+</button>
+<button class="p-1.5 hover:bg-border-dark rounded text-text-secondary hover:text-white" title="Restart">
+<span class="material-symbols-outlined !text-[18px]">restart_alt</span>
+</button>
+<button class="p-1.5 hover:bg-danger/10 rounded text-text-secondary hover:text-danger" title="Terminate">
+<span class="material-symbols-outlined !text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-12 px-5 py-4 items-center hover:bg-[#222730] transition-colors group">
+<div class="col-span-4 flex items-center gap-3">
+<div class="p-1.5 rounded bg-blue-500/10 text-blue-400">
+<span class="material-symbols-outlined !text-[20px]">terminal</span>
+</div>
+<div>
+<p class="text-white text-sm font-semibold font-mono">worker-us-east-1b</p>
+<p class="text-text-secondary text-xs">v4.2.0 • 12h uptime</p>
+</div>
+</div>
+<div class="col-span-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-warning/10 text-warning text-xs font-bold border border-warning/20">
+<span class="w-1.5 h-1.5 rounded-full bg-warning"></span>
+                                    High Load
+                                </span>
+</div>
+<div class="col-span-3 flex flex-col gap-1.5 pr-4">
+<div class="flex items-center justify-between text-xs text-text-secondary">
+<span>CPU</span>
+<span class="text-warning font-mono">88%</span>
+</div>
+<div class="w-full bg-border-dark h-1.5 rounded-full overflow-hidden">
+<div class="bg-warning h-full rounded-full" style="width: 88%"></div>
+</div>
+</div>
+<div class="col-span-3 flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-border-dark rounded text-text-secondary hover:text-white">
+<span class="material-symbols-outlined !text-[18px]">description</span>
+</button>
+<button class="p-1.5 hover:bg-border-dark rounded text-text-secondary hover:text-white">
+<span class="material-symbols-outlined !text-[18px]">restart_alt</span>
+</button>
+<button class="p-1.5 hover:bg-danger/10 rounded text-text-secondary hover:text-danger">
+<span class="material-symbols-outlined !text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="grid grid-cols-12 px-5 py-4 items-center hover:bg-[#222730] transition-colors group">
+<div class="col-span-4 flex items-center gap-3">
+<div class="p-1.5 rounded bg-blue-500/10 text-blue-400">
+<span class="material-symbols-outlined !text-[20px]">terminal</span>
+</div>
+<div>
+<p class="text-white text-sm font-semibold font-mono">worker-us-east-1c</p>
+<p class="text-text-secondary text-xs">v4.2.0 • 2d uptime</p>
+</div>
+</div>
+<div class="col-span-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#3b4354]/30 text-text-secondary text-xs font-bold border border-border-dark">
+<span class="w-1.5 h-1.5 rounded-full bg-text-secondary"></span>
+                                    Idle
+                                </span>
+</div>
+<div class="col-span-3 flex flex-col gap-1.5 pr-4">
+<div class="flex items-center justify-between text-xs text-text-secondary">
+<span>CPU</span>
+<span class="text-white font-mono">12%</span>
+</div>
+<div class="w-full bg-border-dark h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 12%"></div>
+</div>
+</div>
+<div class="col-span-3 flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-border-dark rounded text-text-secondary hover:text-white">
+<span class="material-symbols-outlined !text-[18px]">description</span>
+</button>
+<button class="p-1.5 hover:bg-border-dark rounded text-text-secondary hover:text-white">
+<span class="material-symbols-outlined !text-[18px]">restart_alt</span>
+</button>
+<button class="p-1.5 hover:bg-danger/10 rounded text-text-secondary hover:text-danger">
+<span class="material-symbols-outlined !text-[18px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Redis (5 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-6">
+<div class="flex flex-col h-full rounded-xl border border-border-dark bg-card-dark overflow-hidden">
+<div class="p-5 border-b border-border-dark">
+<div class="flex items-center gap-3 mb-2">
+<div class="p-1.5 bg-red-500/10 rounded text-red-500">
+<span class="material-symbols-outlined !text-[20px]">database</span>
+</div>
+<h2 class="text-white text-lg font-bold">Redis Cluster Performance</h2>
+</div>
+<p class="text-text-secondary text-sm">Main Cache • 16GB Cluster</p>
+</div>
+<div class="p-6 flex flex-col gap-8">
+<!-- Hit Rate Donut Context -->
+<div class="flex items-center justify-between gap-6">
+<div class="relative size-32 flex-shrink-0">
+<svg class="size-full -rotate-90" viewbox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+<!-- Background Circle -->
+<circle class="stroke-border-dark" cx="18" cy="18" fill="none" r="16" stroke-width="3"></circle>
+<!-- Progress Circle -->
+<circle class="stroke-primary" cx="18" cy="18" fill="none" r="16" stroke-dasharray="94 100" stroke-width="3"></circle>
+</svg>
+<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+<span class="text-2xl font-bold text-white font-mono">94%</span>
+<span class="block text-[10px] uppercase text-text-secondary font-bold tracking-wider mt-[-2px]">Hit Rate</span>
+</div>
+</div>
+<div class="flex flex-col gap-4 flex-1">
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-xs font-medium uppercase text-text-secondary tracking-wider">
+<span>Hits</span>
+<span class="text-white font-mono">1.2M/s</span>
+</div>
+<div class="w-full bg-border-dark h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 94%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-xs font-medium uppercase text-text-secondary tracking-wider">
+<span>Misses</span>
+<span class="text-white font-mono">76K/s</span>
+</div>
+<div class="w-full bg-border-dark h-1.5 rounded-full overflow-hidden">
+<div class="bg-[#3b4354] h-full rounded-full" style="width: 6%"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="h-px bg-border-dark w-full"></div>
+<!-- Stat Grid -->
+<div class="grid grid-cols-2 gap-4">
+<div class="p-3 rounded-lg bg-[#161920] border border-border-dark">
+<p class="text-text-secondary text-xs font-medium uppercase mb-1">Memory Usage</p>
+<p class="text-white text-lg font-bold font-mono">14.2 GB</p>
+<div class="flex items-center gap-2 mt-1">
+<div class="w-full bg-border-dark h-1 rounded-full overflow-hidden">
+<div class="bg-warning h-full rounded-full" style="width: 88%"></div>
+</div>
+<span class="text-[10px] text-text-secondary font-mono">88%</span>
+</div>
+</div>
+<div class="p-3 rounded-lg bg-[#161920] border border-border-dark">
+<p class="text-text-secondary text-xs font-medium uppercase mb-1">Eviction Rate</p>
+<p class="text-white text-lg font-bold font-mono">0 <span class="text-xs font-normal text-text-secondary">ev/s</span></p>
+<div class="w-full bg-border-dark h-1 rounded-full overflow-hidden mt-2">
+<div class="bg-success h-full rounded-full" style="width: 0%"></div>
+</div>
+</div>
+<div class="p-3 rounded-lg bg-[#161920] border border-border-dark col-span-2">
+<div class="flex justify-between items-center mb-1">
+<p class="text-text-secondary text-xs font-medium uppercase">Latency Spike (1h)</p>
+<span class="text-[10px] text-success bg-success/10 px-1.5 py-0.5 rounded font-mono">Avg: 0.8ms</span>
+</div>
+<!-- CSS-only simple chart approximation -->
+<div class="h-16 flex items-end justify-between gap-1 pt-2">
+<div class="w-full bg-primary/20 h-[20%] rounded-t-sm"></div>
+<div class="w-full bg-primary/20 h-[30%] rounded-t-sm"></div>
+<div class="w-full bg-primary/20 h-[25%] rounded-t-sm"></div>
+<div class="w-full bg-primary/20 h-[40%] rounded-t-sm"></div>
+<div class="w-full bg-warning h-[80%] rounded-t-sm relative group cursor-pointer">
+<div class="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-1 py-0.5 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">24ms</div>
+</div>
+<div class="w-full bg-primary/20 h-[35%] rounded-t-sm"></div>
+<div class="w-full bg-primary/20 h-[20%] rounded-t-sm"></div>
+<div class="w-full bg-primary/20 h-[15%] rounded-t-sm"></div>
+<div class="w-full bg-primary/20 h-[25%] rounded-t-sm"></div>
+<div class="w-full bg-primary/20 h-[30%] rounded-t-sm"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Full Width: Anomaly Feed -->
+<div class="lg:col-span-12">
+<div class="flex flex-col rounded-xl border border-border-dark bg-card-dark overflow-hidden">
+<div class="flex flex-wrap items-center justify-between p-5 border-b border-border-dark gap-4">
+<div class="flex items-center gap-3">
+<h2 class="text-white text-lg font-bold">Anomaly Feed</h2>
+<span class="px-2 py-0.5 rounded bg-danger/10 text-danger text-xs font-bold border border-danger/20">2 New</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-text-secondary text-xs font-medium mr-1">Filter:</span>
+<button class="px-3 py-1.5 rounded-full bg-danger/10 text-danger text-xs font-bold border border-danger/20 hover:bg-danger/20 transition-colors">Critical</button>
+<button class="px-3 py-1.5 rounded-full bg-border-dark text-text-secondary text-xs font-medium border border-transparent hover:text-white transition-colors">Warning</button>
+<button class="px-3 py-1.5 rounded-full bg-border-dark text-text-secondary text-xs font-medium border border-transparent hover:text-white transition-colors">Info</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#161920] text-xs uppercase tracking-wider text-text-secondary border-b border-border-dark">
+<th class="p-4 font-medium w-32">Timestamp</th>
+<th class="p-4 font-medium w-24">Severity</th>
+<th class="p-4 font-medium w-40">Service</th>
+<th class="p-4 font-medium">Error Message</th>
+<th class="p-4 font-medium w-24 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-dark">
+<!-- Row 1 -->
+<tr class="hover:bg-[#222730] transition-colors group">
+<td class="p-4 text-text-secondary text-sm font-mono">10:42:05 AM</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-danger/10 text-danger border border-danger/20 tracking-wider">Critical</span>
+</td>
+<td class="p-4 text-white text-sm font-medium">evaluator-service</td>
+<td class="p-4 text-white text-sm">Submission Timeout - Evaluation took &gt; 5000ms</td>
+<td class="p-4 text-right">
+<button class="text-primary hover:text-white text-xs font-bold uppercase tracking-wide transition-colors">Trace</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-[#222730] transition-colors group">
+<td class="p-4 text-text-secondary text-sm font-mono">10:41:52 AM</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-warning/10 text-warning border border-warning/20 tracking-wider">Warning</span>
+</td>
+<td class="p-4 text-white text-sm font-medium">redis-pool</td>
+<td class="p-4 text-white text-sm">Redis connection pool nearing capacity (92%)</td>
+<td class="p-4 text-right">
+<button class="text-primary hover:text-white text-xs font-bold uppercase tracking-wide transition-colors">Trace</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-[#222730] transition-colors group">
+<td class="p-4 text-text-secondary text-sm font-mono">10:38:12 AM</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-warning/10 text-warning border border-warning/20 tracking-wider">Warning</span>
+</td>
+<td class="p-4 text-white text-sm font-medium">worker-us-east-1b</td>
+<td class="p-4 text-white text-sm">High CPU load sustained for &gt; 5min</td>
+<td class="p-4 text-right">
+<button class="text-primary hover:text-white text-xs font-bold uppercase tracking-wide transition-colors">Trace</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-3 border-t border-border-dark text-center">
+<button class="text-text-secondary hover:text-white text-xs font-medium transition-colors flex items-center justify-center gap-1 mx-auto">
+                            View all logs
+                            <span class="material-symbols-outlined !text-[16px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

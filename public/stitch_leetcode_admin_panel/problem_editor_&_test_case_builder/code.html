@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Problem Editor &amp; Test Case Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#111318",
+                        "surface-dark": "#1b1f27",
+                        "border-dark": "#282e39",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for dark mode */
+        .dark ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #111318;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #3b4354;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+        
+        /* Code editor line numbers */
+        .line-numbers {
+            counter-reset: line;
+        }
+        .line-numbers > div::before {
+            counter-increment: line;
+            content: counter(line);
+            display: inline-block;
+            width: 2rem;
+            margin-right: 1rem;
+            text-align: right;
+            color: #4b5563;
+            user-select: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display h-screen flex flex-col overflow-hidden">
+<!-- Top Navigation -->
+<header class="flex-none flex items-center justify-between border-b border-solid border-border-dark bg-surface-dark px-6 py-3">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-8 rounded bg-primary/20 text-primary">
+<span class="material-symbols-outlined">terminal</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Admin Console</h2>
+<!-- Breadcrumbs -->
+<div class="hidden md:flex items-center gap-2 ml-8 border-l border-border-dark pl-8">
+<a class="text-[#9ca6ba] text-sm font-medium hover:text-white transition-colors" href="#">Dashboard</a>
+<span class="material-symbols-outlined text-[#9ca6ba] text-base">chevron_right</span>
+<a class="text-[#9ca6ba] text-sm font-medium hover:text-white transition-colors" href="#">Problems</a>
+<span class="material-symbols-outlined text-[#9ca6ba] text-base">chevron_right</span>
+<span class="text-white text-sm font-medium">Edit Problem #102</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg h-9 px-4 bg-transparent border border-border-dark text-[#9ca6ba] hover:text-white hover:bg-border-dark transition-all text-sm font-bold">
+<span class="material-symbols-outlined text-lg mr-2">save</span>
+<span>Save Draft</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-9 px-4 bg-transparent border border-border-dark text-[#9ca6ba] hover:text-white hover:bg-border-dark transition-all text-sm font-bold">
+<span class="material-symbols-outlined text-lg mr-2">visibility</span>
+<span>Preview</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-9 px-4 bg-primary text-white hover:bg-primary/90 transition-all text-sm font-bold shadow-[0_0_15px_rgba(13,89,242,0.4)]">
+<span class="material-symbols-outlined text-lg mr-2">publish</span>
+<span>Publish</span>
+</button>
+</div>
+<div class="h-8 w-px bg-border-dark mx-2"></div>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-9 ring-2 ring-border-dark" data-alt="User profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC3PB-9TlOw9amrQp_L921tN9Mqo0lepMP_JxR5t13brbYR-QVr3ABOdElXw9-y358yuHIv9kSJMrbMaSBoR0F7UzBN9Y7atwnCTsR0rPwwo8dtfUD0q5bK9Nw6a9C2HWM-v3JAooWKlvYtqV623b2brNYxJLp2Gm_OtlgCyd4jbYF9cLmFL2sxMpIubRjqjnkERoc9mXX36i0Y9YCDiRk1LPqleMbGxNpOSAlEkAzkwu3ZuCMfIBMMpcqE88-KNPbbLBAa26O3sc-S");'></div>
+</div>
+</header>
+<!-- Metadata Ribbon -->
+<div class="flex-none bg-background-dark border-b border-border-dark px-6 py-4">
+<div class="flex flex-wrap items-end gap-6">
+<!-- Title -->
+<div class="flex flex-col flex-1 min-w-[240px]">
+<label class="text-[#9ca6ba] text-xs font-medium uppercase tracking-wider mb-1.5">Problem Title</label>
+<input class="w-full bg-surface-dark border border-border-dark rounded-lg px-3 py-2 text-white placeholder-[#5a6478] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors font-medium" type="text" value="Two Sum"/>
+</div>
+<!-- Slug -->
+<div class="flex flex-col w-[200px]">
+<label class="text-[#9ca6ba] text-xs font-medium uppercase tracking-wider mb-1.5">Slug URL</label>
+<div class="relative">
+<span class="absolute left-3 top-2.5 text-[#5a6478] select-none text-sm">/problems/</span>
+<input class="w-full bg-surface-dark border border-border-dark rounded-lg pl-[88px] pr-3 py-2 text-white placeholder-[#5a6478] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-sm font-mono" type="text" value="two-sum"/>
+</div>
+</div>
+<!-- Difficulty -->
+<div class="flex flex-col w-[140px]">
+<label class="text-[#9ca6ba] text-xs font-medium uppercase tracking-wider mb-1.5">Difficulty</label>
+<div class="relative">
+<select class="w-full bg-surface-dark border border-border-dark rounded-lg px-3 py-2 text-white appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors cursor-pointer text-sm">
+<option value="easy">Easy</option>
+<option selected="" value="medium">Medium</option>
+<option value="hard">Hard</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2 text-[#9ca6ba] pointer-events-none text-lg">expand_more</span>
+</div>
+</div>
+<!-- Limits -->
+<div class="flex gap-4">
+<div class="flex flex-col w-[100px]">
+<label class="text-[#9ca6ba] text-xs font-medium uppercase tracking-wider mb-1.5">Time (ms)</label>
+<input class="w-full bg-surface-dark border border-border-dark rounded-lg px-3 py-2 text-white text-right focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-sm font-mono" type="number" value="1000"/>
+</div>
+<div class="flex flex-col w-[100px]">
+<label class="text-[#9ca6ba] text-xs font-medium uppercase tracking-wider mb-1.5">Mem (MB)</label>
+<input class="w-full bg-surface-dark border border-border-dark rounded-lg px-3 py-2 text-white text-right focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-sm font-mono" type="number" value="256"/>
+</div>
+</div>
+<!-- Tags -->
+<div class="flex flex-col flex-1 min-w-[200px]">
+<label class="text-[#9ca6ba] text-xs font-medium uppercase tracking-wider mb-1.5">Tags</label>
+<div class="flex items-center bg-surface-dark border border-border-dark rounded-lg px-2 py-1.5 gap-2 h-[38px] overflow-hidden">
+<span class="bg-primary/20 text-primary px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap">Array</span>
+<span class="bg-primary/20 text-primary px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap">Hash Table</span>
+<input class="bg-transparent border-none p-0 text-sm text-white focus:ring-0 placeholder-[#5a6478] min-w-[60px]" placeholder="+ Add tag" type="text"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Workspace -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Left Pane: Markdown Editor -->
+<div class="flex-1 flex flex-col min-w-[400px] border-r border-border-dark bg-[#0d1117]">
+<!-- Toolbar -->
+<div class="flex items-center justify-between px-4 py-2 border-b border-border-dark bg-surface-dark/50">
+<div class="flex items-center gap-1">
+<button class="p-1.5 rounded hover:bg-white/5 text-[#9ca6ba] hover:text-white transition-colors"><span class="material-symbols-outlined text-lg">format_bold</span></button>
+<button class="p-1.5 rounded hover:bg-white/5 text-[#9ca6ba] hover:text-white transition-colors"><span class="material-symbols-outlined text-lg">format_italic</span></button>
+<div class="w-px h-4 bg-white/10 mx-1"></div>
+<button class="p-1.5 rounded hover:bg-white/5 text-[#9ca6ba] hover:text-white transition-colors"><span class="material-symbols-outlined text-lg">code</span></button>
+<button class="p-1.5 rounded hover:bg-white/5 text-[#9ca6ba] hover:text-white transition-colors"><span class="material-symbols-outlined text-lg">link</span></button>
+<button class="p-1.5 rounded hover:bg-white/5 text-[#9ca6ba] hover:text-white transition-colors"><span class="material-symbols-outlined text-lg">image</span></button>
+<div class="w-px h-4 bg-white/10 mx-1"></div>
+<button class="p-1.5 rounded hover:bg-white/5 text-[#9ca6ba] hover:text-white transition-colors"><span class="material-symbols-outlined text-lg">list</span></button>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs text-[#9ca6ba]">Markdown Supported</span>
+<button class="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 px-2 py-1 rounded bg-primary/10">
+<span class="material-symbols-outlined text-sm">visibility</span> Preview
+                    </button>
+</div>
+</div>
+<!-- Editor Area -->
+<div class="flex-1 overflow-y-auto p-6 font-mono text-sm leading-relaxed text-gray-300">
+<textarea class="w-full h-full bg-transparent border-none resize-none focus:ring-0 p-0 text-gray-300 font-mono" spellcheck="false"># Two Sum
+
+Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`.
+
+You may assume that each input would have **exactly one solution**, and you may not use the same element twice.
+
+You can return the answer in any order.
+
+## Example 1:</textarea></div></div></div></body></html>

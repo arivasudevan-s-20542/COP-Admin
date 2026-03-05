@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Jobs Monitoring - Tablet View</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622", // Deep dark blue-gray
+                        "surface-dark": "#1f2937",    // Slightly lighter for cards
+                        "border-dark": "#282e39",     // Borders
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem", 
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for clean look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-white font-display overflow-hidden selection:bg-primary selection:text-white">
+<div class="flex h-screen w-full">
+<!-- Slim Navigation Rail (Tablet Optimized) -->
+<nav class="hidden md:flex flex-col items-center w-20 py-6 border-r border-border-dark bg-[#111318] z-20 shrink-0">
+<div class="mb-8 text-primary">
+<span class="material-symbols-outlined text-3xl">code_blocks</span>
+</div>
+<div class="flex flex-col gap-6 w-full px-2">
+<button aria-label="Dashboard" class="flex items-center justify-center w-full aspect-square rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors group relative">
+<span class="material-symbols-outlined text-2xl">home</span>
+<div class="absolute left-14 bg-gray-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Dashboard</div>
+</button>
+<button aria-label="Jobs" class="flex items-center justify-center w-full aspect-square rounded-xl bg-primary text-white shadow-lg shadow-primary/20 transition-all">
+<span class="material-symbols-outlined text-2xl">monitoring</span>
+</button>
+<button aria-label="Infrastructure" class="flex items-center justify-center w-full aspect-square rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors group relative">
+<span class="material-symbols-outlined text-2xl">dns</span>
+<div class="absolute left-14 bg-gray-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Nodes</div>
+</button>
+<button aria-label="Users" class="flex items-center justify-center w-full aspect-square rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors group relative">
+<span class="material-symbols-outlined text-2xl">group</span>
+<div class="absolute left-14 bg-gray-800 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Users</div>
+</button>
+</div>
+<div class="mt-auto flex flex-col gap-6 w-full px-2">
+<button aria-label="Settings" class="flex items-center justify-center w-full aspect-square rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined text-2xl">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-cover bg-center mx-auto ring-2 ring-gray-700" data-alt="User profile avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAtGAJr2gUKlutLryLRQL3XO70Mb8fn0ICa6u7Ficy7p7Tga4wivTnzXtVkFEDNqNpQCWaupPefwoikyqzkGh5CZ0t5h5EpIcLVzRT9fWnDv33VIlFD7l1Buzmgcff1RCfCu9mxi9LX2ZIrLjhkH_yDyHN6Q6hcBI0P_rnlf3zVsoxalvyVkBUkVghlfx49rb-BM7ZtheztWAVpm2HNRSaK1L-FN-C9nFuwaRjRiySdpsY-iGE7qWnljpvzluUlHlwF79721vJse3Dp')"></div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<!-- Sticky Header -->
+<header class="flex items-center justify-between px-6 py-4 border-b border-border-dark bg-background-dark/95 backdrop-blur z-10">
+<div class="flex items-center gap-3">
+<button class="md:hidden text-gray-400">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div>
+<h1 class="text-xl font-bold tracking-tight">System Monitor</h1>
+<p class="text-xs text-gray-400 font-medium">US-East-1 Cluster</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center w-10 h-10 rounded-full bg-surface-dark hover:bg-gray-700 text-gray-300 transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 border-2 border-surface-dark rounded-full"></span>
+</button>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 space-y-6 pb-20">
+<!-- Status Banner (Sticky-ish feel) -->
+<div class="w-full bg-gradient-to-r from-emerald-900/40 to-background-dark border border-emerald-500/30 rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg shadow-emerald-900/10">
+<div class="flex items-center gap-3">
+<div class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+</div>
+<div>
+<p class="text-white font-semibold text-sm">Real-time via WebSocket</p>
+<p class="text-emerald-400 text-xs font-mono mt-0.5">Latency: 14ms | Sync: Active</p>
+</div>
+</div>
+<div class="text-xs text-gray-400 font-mono bg-black/20 px-3 py-1.5 rounded">
+                        Last heartbeat: 2s ago
+                    </div>
+</div>
+<!-- Stats Grid (Reflows to 2 columns on tablet) -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="bg-surface-dark border border-border-dark p-5 rounded-xl flex flex-col justify-between h-32 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-primary">hourglass_top</span>
+</div>
+<p class="text-gray-400 text-sm font-medium">Total Queued</p>
+<div>
+<p class="text-3xl font-bold text-white tabular-nums tracking-tight">1,240</p>
+<p class="text-xs text-emerald-400 mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_down</span>
+                                -4.2% from last hr
+                            </p>
+</div>
+</div>
+<div class="bg-surface-dark border border-border-dark p-5 rounded-xl flex flex-col justify-between h-32 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-blue-400">memory</span>
+</div>
+<p class="text-gray-400 text-sm font-medium">Processing</p>
+<div>
+<p class="text-3xl font-bold text-white tabular-nums tracking-tight">850</p>
+<p class="text-xs text-gray-500 mt-1">Capacity: 92%</p>
+</div>
+</div>
+<div class="bg-surface-dark border border-red-900/30 p-5 rounded-xl flex flex-col justify-between h-32 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-red-500">error</span>
+</div>
+<p class="text-gray-400 text-sm font-medium">Failed (1h)</p>
+<div>
+<p class="text-3xl font-bold text-red-400 tabular-nums tracking-tight">24</p>
+<p class="text-xs text-red-400/80 mt-1">Requires Attention</p>
+</div>
+</div>
+<div class="bg-surface-dark border border-border-dark p-5 rounded-xl flex flex-col justify-between h-32 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-purple-400">speed</span>
+</div>
+<p class="text-gray-400 text-sm font-medium">Avg Latency</p>
+<div>
+<p class="text-3xl font-bold text-white tabular-nums tracking-tight">124ms</p>
+<p class="text-xs text-gray-500 mt-1">p99: 450ms</p>
+</div>
+</div>
+</div>
+<!-- Main Chart Area -->
+<div class="bg-surface-dark border border-border-dark rounded-xl p-5 shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h3 class="text-lg font-bold text-white">Job Throughput</h3>
+<p class="text-sm text-gray-400">Submission processing rate (Jobs/min)</p>
+</div>
+<select class="bg-background-dark border border-border-dark text-white text-sm rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-primary/50">
+<option>Last Hour</option>
+<option>Last 24h</option>
+<option>Last 7 Days</option>
+</select>
+</div>
+<div class="relative w-full h-48 sm:h-64">
+<!-- Simulated Chart -->
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 100 50">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#0d59f2" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#0d59f2" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Grid Lines -->
+<line stroke="#282e39" stroke-width="0.5" x1="0" x2="100" y1="40" y2="40"></line>
+<line stroke="#282e39" stroke-width="0.5" x1="0" x2="100" y1="30" y2="30"></line>
+<line stroke="#282e39" stroke-width="0.5" x1="0" x2="100" y1="20" y2="20"></line>
+<line stroke="#282e39" stroke-width="0.5" x1="0" x2="100" y1="10" y2="10"></line>
+<!-- Area -->
+<path d="M0,45 Q10,40 20,35 T40,20 T60,25 T80,10 T100,30 V50 H0 Z" fill="url(#chartGradient)"></path>
+<!-- Line -->
+<path d="M0,45 Q10,40 20,35 T40,20 T60,25 T80,10 T100,30" fill="none" stroke="#0d59f2" stroke-linecap="round" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
+<!-- Active Point -->
+<circle cx="80" cy="10" fill="#fff" r="1.5" stroke="#0d59f2" stroke-width="0.5"></circle>
+</svg>
+<!-- Tooltip Simulation -->
+<div class="absolute top-[10%] left-[75%] bg-gray-800 border border-gray-700 text-xs rounded px-2 py-1 shadow-xl transform -translate-x-1/2 -translate-y-full pointer-events-none">
+<span class="font-bold text-white">4.2k Jobs</span>
+<div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-gray-800 border-r border-b border-gray-700"></div>
+</div>
+</div>
+</div>
+<!-- Two Column Lower Section (Stacks on smaller tablet, side-by-side on larger) -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+<!-- Worker Nodes List -->
+<div class="xl:col-span-1 flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-bold text-white">Worker Nodes</h3>
+<button class="text-primary text-sm font-medium hover:text-primary/80">Manage</button>
+</div>
+<!-- Node Card 1 -->
+<div class="bg-surface-dark border border-border-dark rounded-xl p-4 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center text-green-500">
+<span class="material-symbols-outlined">dns</span>
+</div>
+<div>
+<p class="text-white font-medium">Node-Alpha-01</p>
+<p class="text-xs text-gray-400">AWS us-east-1a</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-mono text-white">82% CPU</p>
+<div class="w-16 h-1.5 bg-gray-700 rounded-full mt-1 overflow-hidden">
+<div class="h-full bg-yellow-500 w-[82%] rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Node Card 2 -->
+<div class="bg-surface-dark border border-border-dark rounded-xl p-4 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center text-green-500">
+<span class="material-symbols-outlined">dns</span>
+</div>
+<div>
+<p class="text-white font-medium">Node-Beta-02</p>
+<p class="text-xs text-gray-400">AWS us-east-1b</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-mono text-white">45% CPU</p>
+<div class="w-16 h-1.5 bg-gray-700 rounded-full mt-1 overflow-hidden">
+<div class="h-full bg-green-500 w-[45%] rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Node Card 3 (Issue) -->
+<div class="bg-surface-dark border border-red-900/40 rounded-xl p-4 flex items-center justify-between shadow-sm relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-red-500"></div>
+<div class="flex items-center gap-4 pl-2">
+<div class="w-12 h-12 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<div>
+<p class="text-white font-medium">Node-Gamma-03</p>
+<p class="text-xs text-red-400">High Memory Usage</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-mono text-white">98% RAM</p>
+<div class="w-16 h-1.5 bg-gray-700 rounded-full mt-1 overflow-hidden">
+<div class="h-full bg-red-500 w-[98%] rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Failures (Main Focus) -->
+<div class="xl:col-span-2 flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                Recent Failures 
+                                <span class="bg-red-500/20 text-red-400 text-xs px-2 py-0.5 rounded-full">4 New</span>
+</h3>
+<button class="text-primary text-sm font-medium hover:text-primary/80">View All</button>
+</div>
+<!-- Failure Card 1 (Large Touch Targets) -->
+<div class="bg-surface-dark border border-border-dark rounded-xl p-5 shadow-sm">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+<div class="flex items-start gap-3">
+<div class="mt-1">
+<div class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></div>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h4 class="text-white font-semibold">Submission #99281</h4>
+<span class="bg-gray-700 text-gray-300 text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">C++</span>
+</div>
+<p class="text-red-400 text-sm mt-1 font-mono">Error: Time Limit Exceeded (TLE)</p>
+<p class="text-gray-500 text-xs mt-1">2 minutes ago • Node-Alpha-01</p>
+</div>
+</div>
+<div class="flex items-center gap-4 text-sm text-gray-400">
+<div class="flex flex-col items-end">
+<span>User: <span class="text-white">alex_code</span></span>
+<span>Duration: <span class="text-white">2005ms</span></span>
+</div>
+</div>
+</div>
+<!-- Action Buttons Grid -->
+<div class="grid grid-cols-2 gap-3 mt-2">
+<button class="flex items-center justify-center gap-2 h-11 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-medium transition-colors">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+                                    View Logs
+                                </button>
+<button class="flex items-center justify-center gap-2 h-11 rounded-lg bg-primary hover:bg-primary/90 text-white font-medium transition-colors shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-[18px]">refresh</span>
+                                    Retry Job
+                                </button>
+</div>
+</div>
+<!-- Failure Card 2 -->
+<div class="bg-surface-dark border border-border-dark rounded-xl p-5 shadow-sm opacity-75 hover:opacity-100 transition-opacity">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+<div class="flex items-start gap-3">
+<div class="mt-1">
+<div class="w-2 h-2 rounded-full bg-orange-500"></div>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h4 class="text-white font-semibold">Submission #99245</h4>
+<span class="bg-gray-700 text-gray-300 text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">Python3</span>
+</div>
+<p class="text-orange-400 text-sm mt-1 font-mono">Error: Runtime Error (SIGSEGV)</p>
+<p class="text-gray-500 text-xs mt-1">14 minutes ago • Node-Beta-02</p>
+</div>
+</div>
+<div class="flex items-center gap-4 text-sm text-gray-400">
+<div class="flex flex-col items-end">
+<span>User: <span class="text-white">dev_guru</span></span>
+<span>Duration: <span class="text-white">120ms</span></span>
+</div>
+</div>
+</div>
+<!-- Action Buttons Grid -->
+<div class="grid grid-cols-2 gap-3 mt-2">
+<button class="flex items-center justify-center gap-2 h-11 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-medium transition-colors">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+                                    View Logs
+                                </button>
+<button class="flex items-center justify-center gap-2 h-11 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-medium transition-colors">
+<span class="material-symbols-outlined text-[18px]">notifications_off</span>
+                                    Mute Alert
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Mobile Bottom Nav (Visible only on very small screens, though prompt said tablet/desktop, useful for responsive) -->
+<div class="md:hidden fixed bottom-0 w-full bg-[#111318] border-t border-gray-800 flex justify-around py-3 px-2 z-50">
+<button class="flex flex-col items-center gap-1 text-gray-400">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px]">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="text-[10px]">Jobs</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400">
+<span class="material-symbols-outlined">dns</span>
+<span class="text-[10px]">Nodes</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px]">Settings</span>
+</button>
+</div>
+</body></html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Management &amp; Group Actions</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3B82F6", // Blue-500 equivalent, common for SaaS primary actions
+                        "background-light": "#F3F4F6",
+                        "background-dark": "#111827", // Gray-900
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1F2937", // Gray-800
+                        "border-light": "#E5E7EB",
+                        "border-dark": "#374151",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.375rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; 
+        }
+        .checkbox-indeterminate:checked + div {
+             background-color: #3B82F6;
+             border-color: #3B82F6;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100 font-sans h-screen flex overflow-hidden">
+<aside class="w-16 md:w-64 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex-col hidden md:flex">
+<div class="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-border-light dark:border-border-dark">
+<div class="h-8 w-8 bg-primary rounded flex items-center justify-center text-white font-bold text-lg">CP</div>
+<span class="ml-3 font-semibold text-lg hidden md:block">CodePlatform</span>
+</div>
+<nav class="flex-1 overflow-y-auto py-4">
+<ul class="space-y-1 px-3">
+<li>
+<a class="flex items-center px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors" href="#">
+<span class="material-icons-outlined">dashboard</span>
+<span class="ml-3 hidden md:block">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center px-3 py-2 bg-blue-50 dark:bg-blue-900/20 text-primary rounded-md transition-colors" href="#">
+<span class="material-icons-outlined">people</span>
+<span class="ml-3 hidden md:block font-medium">User Management</span>
+</a>
+</li>
+<li>
+<a class="flex items-center px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors" href="#">
+<span class="material-icons-outlined">code</span>
+<span class="ml-3 hidden md:block">Problems</span>
+</a>
+</li>
+<li>
+<a class="flex items-center px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors" href="#">
+<span class="material-icons-outlined">analytics</span>
+<span class="ml-3 hidden md:block">Analytics</span>
+</a>
+</li>
+<li>
+<a class="flex items-center px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors" href="#">
+<span class="material-icons-outlined">settings</span>
+<span class="ml-3 hidden md:block">Settings</span>
+</a>
+</li>
+</ul>
+</nav>
+<div class="p-4 border-t border-border-light dark:border-border-dark">
+<div class="flex items-center">
+<img alt="Admin Profile" class="h-8 w-8 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8L9eisCRdczTk9UCu0iz33tGEdFLD2f-oL4s_16zWNKOtvlrpTN_CB53s5ZbYNT57iG57zYZIJz6BHhQ0f45Uvw41ojeYW-nkf_zkhl5ortAGCe-2kYdnGgAE2l8pQGed_MAu3jq_svRAMys1x3VTklVPYlxp-uMwn0m1iVTE1oXQCuT5PZ1w9V216v698AQTyyZfrTJS1do5mf7KNIXBlCD_0VZ9-TpevSKD_pFjQohBaKlbHwkotfybI45M7FUszO1rN1HKXB8J"/>
+<div class="ml-3 hidden md:block">
+<p class="text-sm font-medium">Admin User</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Super Admin</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<header class="h-16 bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark flex items-center justify-between px-6">
+<h1 class="text-xl font-semibold text-gray-800 dark:text-white">User Management</h1>
+<div class="flex items-center space-x-4">
+<button class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+<span class="material-icons-outlined">notifications</span>
+</button>
+<button class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+<span class="material-icons-outlined">help_outline</span>
+</button>
+</div>
+</header>
+<div class="p-6 pb-2">
+<div class="flex flex-col xl:flex-row gap-4 justify-between xl:items-center bg-surface-light dark:bg-surface-dark p-4 rounded-lg shadow-sm border border-border-light dark:border-border-dark">
+<div class="flex flex-1 gap-3 items-center w-full xl:w-auto">
+<div class="relative w-full xl:w-96">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-icons-outlined text-gray-400 text-lg">search</span>
+</span>
+<input class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm" placeholder="Search by name, email, or user ID..." type="text"/>
+</div>
+<button class="flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+<span class="material-icons-outlined text-lg mr-2">filter_list</span>
+                        Filters
+                    </button>
+<div class="hidden md:flex space-x-2">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 cursor-pointer">
+                            Role: User <span class="material-icons-outlined text-xs ml-1">close</span>
+</span>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 cursor-pointer">
+                            Status: Active <span class="material-icons-outlined text-xs ml-1">close</span>
+</span>
+</div>
+</div>
+<div class="flex items-center gap-3 w-full xl:w-auto overflow-x-auto pb-2 xl:pb-0">
+<div class="flex items-center border-l border-gray-300 dark:border-gray-600 pl-4 space-x-3 whitespace-nowrap">
+<span class="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">2 selected</span>
+<div class="relative group inline-block text-left">
+<button class="inline-flex justify-center items-center w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none" type="button">
+<span class="material-icons-outlined mr-2 text-lg">manage_accounts</span>
+                                Assign Role
+                                <span class="material-icons-outlined ml-2 text-lg">expand_more</span>
+</button>
+<div class="hidden group-hover:block absolute right-0 mt-0 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+<div class="py-1" role="menu">
+<a class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" href="#" role="menuitem">Admin</a>
+<a class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" href="#" role="menuitem">Moderator</a>
+<a class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" href="#" role="menuitem">SRE</a>
+<a class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" href="#" role="menuitem">Viewer</a>
+</div>
+</div>
+</div>
+<button class="inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" type="button">
+<span class="material-icons-outlined mr-2 text-lg">block</span>
+                            Ban Users
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-auto px-6 pb-6">
+<div class="align-middle inline-block min-w-full shadow overflow-hidden border-b border-gray-200 dark:border-gray-700 sm:rounded-lg">
+<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+<thead class="bg-gray-50 dark:bg-gray-800">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-10" scope="col">
+<input class="h-4 w-4 text-primary focus:ring-primary border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700" type="checkbox"/>
+</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">
+                                User
+                            </th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">
+                                Role
+                            </th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">
+                                Solved / Rank
+                            </th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">
+                                Last Active
+                            </th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">
+                                Status
+                            </th>
+<th class="relative px-6 py-3" scope="col">
+<span class="sr-only">Actions</span>
+</th>
+</tr>
+</thead>
+<tbody class="bg-white dark:bg-surface-dark divide-y divide-gray-200 dark:divide-gray-700">
+<tr class="bg-blue-50 dark:bg-blue-900/10 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<input checked="" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700" type="checkbox"/>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-10 w-10">
+<img alt="User Avatar" class="h-10 w-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiirmUsiqXFGAa_-usqRd3v1h9DuUFssQ6uMMD_9LsX40Yhf3W6CcoflmThOOSEFiiZp1qsQO9G-AZYW2ZjHxgCpSmogTK2F0fFCelrmram8tuHYFF-icAk9Vk7MClxdhzXGcdE4QGgl85poD9GSl06WFO8eg5Oho8AbohGihDjXMQjo_d8tw-j27-7ISX3vv1zE_dqEOpuRi8XROimrDm28cK5mWP0jsJa7mAJMZ8kD0tx7YmWS15yRXXvmpfv8QjHlAN10yNnqG9"/>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Sarah Chen</div>
+<div class="text-sm text-gray-500 dark:text-gray-400">sarah.chen@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 dark:text-white">Contributor</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Level 4</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 dark:text-white">452 Solved</div>
+<div class="text-xs text-yellow-500">Global Rank: #1,204</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                2 mins ago
+                            </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                    Active
+                                </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-primary hover:text-blue-400 flex items-center justify-end gap-1">
+                                    Check Info <span class="material-icons-outlined text-sm">visibility</span>
+</button>
+</td>
+</tr>
+<tr class="bg-blue-50 dark:bg-blue-900/10 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<input checked="" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700" type="checkbox"/>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-10 w-10">
+<img alt="User Avatar" class="h-10 w-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-oDQ3JVIwNVyXB61R5bZwRP88YrAV2IpNsmnYCpMmg_XbVqbRBhjJqyws1oZj0lS0nYCpunQtzVkZOVOuta2UbUbiH5dyy8saUBAZtlOn2dKYtZUUUdIrhJroVXJnOfvL_Yhe4h7BtO8X3zh_XR7RJyIMBUvtaOkT81R0MZ673ridoLq0bqSxqlJnz6MYkiLr5sIw8WfIxFSEImvONusjJWrffRQch2fJaeXF2zS4y09Jtic2RnYIzo4R5sRftLJ-RY-nckGoevF2"/>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Michael Torres</div>
+<div class="text-sm text-gray-500 dark:text-gray-400">m.torres99@gmail.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 dark:text-white">User</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Basic</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 dark:text-white">89 Solved</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Global Rank: #45,201</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                4 hours ago
+                            </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                    Flagged
+                                </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-primary hover:text-blue-400 flex items-center justify-end gap-1">
+                                    Check Info <span class="material-icons-outlined text-sm">visibility</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<input class="h-4 w-4 text-primary focus:ring-primary border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700" type="checkbox"/>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-10 w-10">
+<img alt="User Avatar" class="h-10 w-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRJu1EnFZGXouGPtIo5Rp_Db6GDafGwkSU8pdfRNfvilEp52bhPSv8gpoGrcVissnIA9ykwRAx52neTZGxRW5aFCXsrDcglZPBnggcAu5B3JlPh54lkfbZJM2NHSynCXp80-ZvUWat4UzLpeSTCQIVky98exHy1ErzW0tJEd46f8eqoYKXKWpc1l5h5Oshm4WdGuyE8ezhuq9nGRgtqN66iRFBcJIpUIELDwge4SPztlIgRSrKwXTtFtq8GajBfv6wEo6UUKHmtF-5"/>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Arjun Patel</div>
+<div class="text-sm text-gray-500 dark:text-gray-400">arjun.p@tech.io</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 dark:text-white">Moderator</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Forum Lead</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 dark:text-white">1,204 Solved</div>
+<div class="text-xs text-yellow-500">Global Rank: #52</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                1 day ago
+                            </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                    Active
+                                </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-primary hover:text-blue-400 flex items-center justify-end gap-1">
+                                    Check Info <span class="material-icons-outlined text-sm">visibility</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<input class="h-4 w-4 text-primary focus:ring-primary border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700" type="checkbox"/>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-10 w-10">
+<img alt="User Avatar" class="h-10 w-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6QQvJkfbCUSCY3NK98m6kOBPfWI0cM8gHgEafUHEVNqeLSkoZIkk4OXtBDaEjbGtM4IY9m7qcuWREMk2C8-m1EHFQqxnvQro-7ZH-0iPxqOtEaD1lP3HR4dlV0Zxgx1XWz3qZu1LORdxGl492t9DR9Y-sEbYNRIEH4zQ74ehpDv6HdEdhCGBHKgFTBABggG-SPtA_PAdicnjGV8zwA-gZPRDp1jzgdr6Pepjaki40PHoFJ87s8IDjp75eRo-uJ_pTrk-qjOYYirOY"/>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Emma Wilson</div>
+<div class="text-sm text-gray-500 dark:text-gray-400">emma.wilson@edu.org</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 dark:text-white">User</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Pro Plan</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 dark:text-white">210 Solved</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Global Rank: #12,400</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                3 days ago
+                            </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                    Suspended
+                                </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-primary hover:text-blue-400 flex items-center justify-end gap-1">
+                                    Check Info <span class="material-icons-outlined text-sm">visibility</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<input class="h-4 w-4 text-primary focus:ring-primary border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700" type="checkbox"/>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-10 w-10">
+<img alt="User Avatar" class="h-10 w-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIMXinOopllfxHE_p8P_h4UEgJHp80Bb9XLqkjBMFkK7QxYZRmyUDrYK6RDaNfqxKZvga_pd3ZV-8YS7XsKpvNI5y2Rx3P9OKvRjE-oqTT929jViBmK2lZqn1D15g6VdOh23i51uVWb7pzVRJZp8hI-PgKJjCSVpPo373M8cR_HSEh0JtD2z5LGgeWhafx-6mOy3IgnNkWDsCKqjsQDSgKeBHF9p6Pf13W1pAtdg75p2BkwnlVcCDvSrxKEK18lODfmga8DUC_JCjg"/>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900 dark:text-white">David Kim</div>
+<div class="text-sm text-gray-500 dark:text-gray-400">david.kim@uni.edu</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 dark:text-white">User</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Basic</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 dark:text-white">12 Solved</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Global Rank: #98,102</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                1 week ago
+                            </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                    Inactive
+                                </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-primary hover:text-blue-400 flex items-center justify-end gap-1">
+                                    Check Info <span class="material-icons-outlined text-sm">visibility</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="bg-white dark:bg-surface-dark px-4 py-3 border-t border-gray-200 dark:border-gray-700 sm:px-6 mt-4 rounded-lg shadow-sm">
+<div class="flex items-center justify-between">
+<div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+<div>
+<p class="text-sm text-gray-700 dark:text-gray-300">
+                                Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">97</span> results
+                            </p>
+</div>
+<div>
+<nav aria-label="Pagination" class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+<a class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700" href="#">
+<span class="sr-only">Previous</span>
+<span class="material-icons-outlined text-sm">chevron_left</span>
+</a>
+<a aria-current="page" class="z-10 bg-blue-50 dark:bg-blue-900 border-primary text-primary relative inline-flex items-center px-4 py-2 border text-sm font-medium" href="#"> 1 </a>
+<a class="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 relative inline-flex items-center px-4 py-2 border text-sm font-medium" href="#"> 2 </a>
+<a class="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium" href="#"> 3 </a>
+<span class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-400"> ... </span>
+<a class="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium" href="#"> 8 </a>
+<a class="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium" href="#"> 9 </a>
+<a class="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 relative inline-flex items-center px-4 py-2 border text-sm font-medium" href="#"> 10 </a>
+<a class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700" href="#">
+<span class="sr-only">Next</span>
+<span class="material-icons-outlined text-sm">chevron_right</span>
+</a>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="absolute inset-y-0 right-0 w-96 bg-surface-light dark:bg-surface-dark shadow-2xl transform transition-transform duration-300 ease-in-out border-l border-border-light dark:border-border-dark flex flex-col z-50">
+<div class="px-6 py-4 border-b border-border-light dark:border-border-dark flex items-center justify-between bg-gray-50 dark:bg-gray-800">
+<h2 class="text-lg font-medium text-gray-900 dark:text-white">User Details</h2>
+<button class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+<span class="material-icons-outlined">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-6">
+<div class="flex flex-col items-center mb-6">
+<img alt="Profile" class="h-24 w-24 rounded-full border-4 border-white dark:border-gray-700 shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZmpttCZN1_WWpKBJpMm9Qj2sg8D6GAQL15ol1RaWBlXQbiaOQMhLhtiHhSVCVzT9RUtbqG6pgIIc3v7LwZATWbv6xx15gEaB0vZysVEKiBOfCWndKOVMq5RlAkVPqf4O64SpSglZrojKiGtVJ_K9h8OmOlYY9LQ7u4Trev5br8mrSBBoX5Igq68zMWk_uyGUMMvvD9iB0FKmmyAZy_vD3hqKJQrE1Qpr9z0wZ8ohtp6PrC8W8KbId1xjhhn3avzADHHQlEgg3uhSA"/>
+<h3 class="mt-4 text-xl font-bold text-gray-900 dark:text-white">Sarah Chen</h3>
+<p class="text-sm text-gray-500 dark:text-gray-400">sarah.chen@example.com</p>
+<div class="mt-3 flex space-x-2">
+<span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs rounded-full font-medium">Active</span>
+<span class="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs rounded-full font-medium">Contributor</span>
+</div>
+</div>
+<div class="space-y-6">
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-center">
+<span class="block text-2xl font-bold text-gray-900 dark:text-white">452</span>
+<span class="text-xs text-gray-500 uppercase tracking-wide">Problems Solved</span>
+</div>
+<div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-center">
+<span class="block text-2xl font-bold text-gray-900 dark:text-white">87%</span>
+<span class="text-xs text-gray-500 uppercase tracking-wide">Acceptance Rate</span>
+</div>
+<div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-center">
+<span class="block text-2xl font-bold text-gray-900 dark:text-white">12</span>
+<span class="text-xs text-gray-500 uppercase tracking-wide">Contests Won</span>
+</div>
+<div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-center">
+<span class="block text-2xl font-bold text-gray-900 dark:text-white">18d</span>
+<span class="text-xs text-gray-500 uppercase tracking-wide">Streak</span>
+</div>
+</div>
+<div>
+<h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Account Info</h4>
+<div class="space-y-3">
+<div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+<span class="text-sm text-gray-600 dark:text-gray-400">User ID</span>
+<span class="text-sm font-mono text-gray-900 dark:text-white">#8839201</span>
+</div>
+<div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+<span class="text-sm text-gray-600 dark:text-gray-400">Joined</span>
+<span class="text-sm text-gray-900 dark:text-white">Oct 24, 2022</span>
+</div>
+<div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+<span class="text-sm text-gray-600 dark:text-gray-400">Last IP</span>
+<span class="text-sm font-mono text-gray-900 dark:text-white">192.168.1.1</span>
+</div>
+<div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+<span class="text-sm text-gray-600 dark:text-gray-400">Subscription</span>
+<span class="text-sm text-yellow-600 dark:text-yellow-400 font-medium">Premium</span>
+</div>
+</div>
+</div>
+<div>
+<h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Recent Activity</h4>
+<ul class="space-y-3">
+<li class="flex items-start">
+<span class="material-icons-outlined text-green-500 text-sm mt-0.5 mr-2">check_circle</span>
+<div>
+<p class="text-sm text-gray-900 dark:text-white">Solved "Two Sum"</p>
+<p class="text-xs text-gray-500">2 hours ago</p>
+</div>
+</li>
+<li class="flex items-start">
+<span class="material-icons-outlined text-blue-500 text-sm mt-0.5 mr-2">forum</span>
+<div>
+<p class="text-sm text-gray-900 dark:text-white">Commented on Discussion</p>
+<p class="text-xs text-gray-500">5 hours ago</p>
+</div>
+</li>
+<li class="flex items-start">
+<span class="material-icons-outlined text-red-500 text-sm mt-0.5 mr-2">bug_report</span>
+<div>
+<p class="text-sm text-gray-900 dark:text-white">Reported a Bug</p>
+<p class="text-xs text-gray-500">1 day ago</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-border-light dark:border-border-dark bg-gray-50 dark:bg-gray-800">
+<button class="w-full bg-primary text-white py-2 rounded-md hover:bg-blue-600 transition-colors font-medium">
+                Edit User Profile
+            </button>
+</div>
+</div>
+
+</body></html>

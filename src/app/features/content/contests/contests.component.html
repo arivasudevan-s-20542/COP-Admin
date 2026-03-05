@@ -1,0 +1,457 @@
+<div class="contests-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>
+        <i class="pi pi-trophy"></i>
+        Contest Management
+      </h1>
+      <p>Create and manage coding contests and events</p>
+    </div>
+    <div class="header-actions">
+      <button pButton label="Create Contest" icon="pi pi-plus" (click)="openContestDialog()"></button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon total">
+        <i class="pi pi-calendar"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().totalContests }}</span>
+        <span class="stat-label">Total Contests</span>
+      </div>
+    </div>
+    <div class="stat-card live">
+      <div class="stat-icon live">
+        <i class="pi pi-play-circle"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().liveNow }}</span>
+        <span class="stat-label">Live Now</span>
+      </div>
+      <span class="live-indicator"></span>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon upcoming">
+        <i class="pi pi-clock"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().upcoming }}</span>
+        <span class="stat-label">Upcoming</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon participants">
+        <i class="pi pi-users"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ formatNumber(stats().totalParticipants) }}</span>
+        <span class="stat-label">Total Participants</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Bar -->
+  <div class="filters-bar">
+    <div class="status-filters">
+      @for (status of statusFilters; track status) {
+        <button 
+          class="filter-btn"
+          [class.active]="selectedStatus() === status"
+          (click)="onStatusFilter(status)"
+        >
+          @if (status === 'live') {
+            <span class="live-dot"></span>
+          }
+          {{ status | titlecase }}
+        </button>
+      }
+    </div>
+    <div class="search-box">
+      <i class="pi pi-search"></i>
+      <input 
+        type="text" 
+        placeholder="Search contests..." 
+        [value]="searchQuery()"
+        (input)="onSearchChange($event)"
+      />
+    </div>
+  </div>
+
+  <!-- Contests Grid -->
+  <div class="contests-grid">
+    @if (filteredContests.length === 0) {
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <span>No contests found</span>
+        <button pButton label="Create Contest" (click)="openContestDialog()"></button>
+      </div>
+    } @else {
+      @for (contest of filteredContests; track contest.id) {
+        <div class="contest-card" [class]="contest.status">
+          <div class="contest-header">
+            <div class="contest-type">
+              <p-tag [value]="contest.type | titlecase" [severity]="getTypeSeverity(contest.type)"></p-tag>
+              <p-tag [value]="contest.status | titlecase" [severity]="getStatusSeverity(contest.status)"></p-tag>
+            </div>
+            <div class="contest-actions">
+              <button pButton icon="pi pi-ellipsis-v" class="p-button-text p-button-sm" pTooltip="More actions"></button>
+            </div>
+          </div>
+          
+          <div class="contest-body">
+            <h3 class="contest-title">{{ contest.title }}</h3>
+            <p class="contest-description">{{ contest.description }}</p>
+            
+            <div class="contest-meta">
+              <div class="meta-item">
+                <i class="pi pi-clock"></i>
+                <span>{{ contest.duration }} min</span>
+              </div>
+              <div class="meta-item">
+                <i class="pi pi-list"></i>
+                <span>{{ contest.problems }} problems</span>
+              </div>
+              <div class="meta-item">
+                <p-tag [value]="contest.difficulty | titlecase" [severity]="getDifficultySeverity(contest.difficulty)" [rounded]="true"></p-tag>
+              </div>
+            </div>
+            
+            @if (contest.status === 'live' || contest.status === 'scheduled') {
+              <div class="contest-time">
+                <i class="pi pi-clock"></i>
+                <span>{{ getTimeRemaining(contest) }}</span>
+              </div>
+            }
+            
+            <div class="registration-progress">
+              <div class="progress-header">
+                <span>Registrations</span>
+                <span>{{ formatNumber(contest.registeredUsers) }} / {{ formatNumber(contest.maxParticipants) }}</span>
+              </div>
+              <p-progressBar 
+                [value]="getRegistrationProgress(contest)" 
+                [showValue]="false"
+                styleClass="registration-bar"
+              ></p-progressBar>
+            </div>
+            
+            @if (contest.prizes.length > 0) {
+              <div class="prizes">
+                <span class="prizes-label">Prizes:</span>
+                <div class="prizes-list">
+                  @for (prize of contest.prizes.slice(0, 3); track prize) {
+                    <span class="prize-badge">{{ prize }}</span>
+                  }
+                  @if (contest.prizes.length > 3) {
+                    <span class="more-prizes">+{{ contest.prizes.length - 3 }} more</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+          
+          <div class="contest-footer">
+            @switch (contest.status) {
+              @case ('live') {
+                <button pButton label="View Live" icon="pi pi-eye" class="p-button-success"></button>
+              }
+              @case ('scheduled') {
+                <button pButton label="Edit" icon="pi pi-pencil" class="p-button-outlined" (click)="openContestDialog(contest)"></button>
+              }
+              @case ('ended') {
+                <button pButton label="View Results" icon="pi pi-chart-bar" class="p-button-outlined" (click)="viewResults(contest)"></button>
+              }
+              @case ('draft') {
+                <button pButton label="Edit" icon="pi pi-pencil" class="p-button-outlined" (click)="openContestDialog(contest)"></button>
+                <button pButton label="Publish" icon="pi pi-check" class="p-button-success"></button>
+              }
+            }
+            <button pButton icon="pi pi-copy" class="p-button-text" pTooltip="Duplicate" (click)="duplicateContest(contest)"></button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Toast for notifications -->
+  <p-toast></p-toast>
+
+  <!-- Create/Edit Contest Dialog -->
+  <p-dialog 
+    header="{{editingContest() ? 'Edit' : 'Create'}} Contest" 
+    [(visible)]="showContestDialog" 
+    [modal]="true"
+    [style]="{ width: '900px', maxHeight: '90vh' }"
+    styleClass="dark-dialog contest-dialog"
+  >
+    <p-tabs [(value)]="activeDialogTab">
+      <p-tablist>
+        <p-tab [value]="0">
+          <i class="pi pi-info-circle"></i>
+          Basic Info
+        </p-tab>
+        <p-tab [value]="1">
+          <i class="pi pi-list"></i>
+          Problems
+          @if (selectedProblems().length > 0) {
+            <span class="tab-badge">{{ selectedProblems().length }}</span>
+          }
+        </p-tab>
+        <p-tab [value]="2">
+          <i class="pi pi-gift"></i>
+          Prizes
+        </p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <!-- Basic Info Tab -->
+        <p-tabpanel [value]="0">
+          <div class="dialog-form">
+            <div class="form-group">
+              <label>Contest Title <span class="required">*</span></label>
+              <input pInputText [(ngModel)]="newContest.title" placeholder="e.g., Weekly Contest 348" />
+            </div>
+            
+            <div class="form-group">
+              <label>Description</label>
+              <textarea pInputText [(ngModel)]="newContest.description" rows="3" placeholder="Contest description..."></textarea>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Contest Type</label>
+                <p-select 
+                  [options]="contestTypes"
+                  [(ngModel)]="newContest.type"
+                  optionLabel="label"
+                  optionValue="value"
+                  styleClass="w-full"
+                ></p-select>
+              </div>
+              <div class="form-group">
+                <label>Difficulty</label>
+                <p-select 
+                  [options]="difficulties"
+                  [(ngModel)]="newContest.difficulty"
+                  optionLabel="label"
+                  optionValue="value"
+                  styleClass="w-full"
+                ></p-select>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Start Time</label>
+                <p-datepicker 
+                  [(ngModel)]="newContest.startTime" 
+                  [showTime]="true"
+                  styleClass="w-full"
+                ></p-datepicker>
+              </div>
+              <div class="form-group">
+                <label>Duration (minutes)</label>
+                <p-inputNumber 
+                  [(ngModel)]="newContest.duration"
+                  [min]="30"
+                  [max]="480"
+                  suffix=" min"
+                  styleClass="w-full"
+                ></p-inputNumber>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Max Participants</label>
+              <p-inputNumber 
+                [(ngModel)]="newContest.maxParticipants"
+                [min]="100"
+                [max]="1000000"
+                styleClass="w-full"
+              ></p-inputNumber>
+            </div>
+          </div>
+        </p-tabpanel>
+
+        <!-- Problems Tab -->
+        <p-tabpanel [value]="1">
+          <div class="problems-tab">
+            <div class="problem-search-section">
+              <label>Add Problems</label>
+              <p-autoComplete 
+                [(ngModel)]="problemSearchQuery"
+                [suggestions]="filteredProblems()"
+                (completeMethod)="searchProblems($event)"
+                (onSelect)="addProblem($event.value)"
+                field="title"
+                placeholder="Search problems by title, category, or difficulty..."
+                [dropdown]="true"
+                styleClass="w-full"
+              >
+                <ng-template let-problem pTemplate="item">
+                  <div class="problem-suggestion">
+                    <span class="problem-title">{{ problem.title }}</span>
+                    <div class="problem-meta">
+                      <p-tag [value]="problem.difficulty | titlecase" [severity]="getDifficultySeverity(problem.difficulty)" [rounded]="true"></p-tag>
+                      <span class="problem-category">{{ problem.category }}</span>
+                      <span class="problem-points">{{ problem.points }} pts</span>
+                    </div>
+                  </div>
+                </ng-template>
+              </p-autoComplete>
+            </div>
+
+            <p-divider></p-divider>
+
+            <div class="selected-problems-section">
+              <div class="section-header">
+                <h4>Selected Problems ({{ selectedProblems().length }})</h4>
+                @if (selectedProblems().length > 0) {
+                  <span class="total-points">Total: {{ getTotalPoints() }} points</span>
+                }
+              </div>
+
+              @if (selectedProblems().length === 0) {
+                <div class="empty-problems">
+                  <i class="pi pi-inbox"></i>
+                  <span>No problems added yet</span>
+                  <p>Search and add problems above</p>
+                </div>
+              } @else {
+                <div class="problems-list">
+                  @for (problem of selectedProblems(); track problem.id; let i = $index) {
+                    <div class="problem-item">
+                      <div class="problem-order">
+                        <span class="order-number">{{ i + 1 }}</span>
+                        <div class="order-controls">
+                          <button 
+                            pButton 
+                            icon="pi pi-chevron-up" 
+                            class="p-button-text p-button-sm"
+                            [disabled]="i === 0"
+                            (click)="moveProblemUp(i)"
+                            pTooltip="Move up"
+                          ></button>
+                          <button 
+                            pButton 
+                            icon="pi pi-chevron-down" 
+                            class="p-button-text p-button-sm"
+                            [disabled]="i === selectedProblems().length - 1"
+                            (click)="moveProblemDown(i)"
+                            pTooltip="Move down"
+                          ></button>
+                        </div>
+                      </div>
+                      <div class="problem-info">
+                        <span class="problem-title">{{ problem.title }}</span>
+                        <div class="problem-details">
+                          <span class="difficulty-dot" [style.background]="getProblemDifficultyColor(problem.difficulty)"></span>
+                          <span>{{ problem.difficulty | titlecase }}</span>
+                          <span class="separator">•</span>
+                          <span>{{ problem.category }}</span>
+                          <span class="separator">•</span>
+                          <span>{{ problem.acceptanceRate }}% acceptance</span>
+                        </div>
+                      </div>
+                      <div class="problem-points-badge">
+                        {{ problem.points }} pts
+                      </div>
+                      <button 
+                        pButton 
+                        icon="pi pi-times" 
+                        class="p-button-text p-button-danger p-button-sm"
+                        (click)="removeProblem(problem)"
+                        pTooltip="Remove"
+                      ></button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </p-tabpanel>
+
+        <!-- Prizes Tab -->
+        <p-tabpanel [value]="2">
+          <div class="prizes-tab">
+            <div class="add-prize-section">
+              <label>Add Prize</label>
+              <div class="prize-input-row">
+                <input 
+                  pInputText 
+                  [(ngModel)]="newPrize" 
+                  placeholder="e.g., $500, T-shirt, Premium Subscription"
+                  (keyup.enter)="addPrize()"
+                />
+                <button pButton icon="pi pi-plus" label="Add" (click)="addPrize()" [disabled]="!newPrize.trim()"></button>
+              </div>
+            </div>
+
+            <p-divider></p-divider>
+
+            <div class="prizes-list-section">
+              <h4>Prize Distribution</h4>
+              @if (!newContest.prizes || newContest.prizes.length === 0) {
+                <div class="empty-prizes">
+                  <i class="pi pi-gift"></i>
+                  <span>No prizes added yet</span>
+                  <p>Add prizes for top performers</p>
+                </div>
+              } @else {
+                <div class="prizes-list">
+                  @for (prize of newContest.prizes; track prize; let i = $index) {
+                    <div class="prize-item">
+                      <span class="prize-rank">
+                        @switch (i) {
+                          @case (0) { 🥇 1st }
+                          @case (1) { 🥈 2nd }
+                          @case (2) { 🥉 3rd }
+                          @default { {{ i + 1 }}th }
+                        }
+                      </span>
+                      <span class="prize-value">{{ prize }}</span>
+                      <button 
+                        pButton 
+                        icon="pi pi-times" 
+                        class="p-button-text p-button-danger p-button-sm"
+                        (click)="removePrize(i)"
+                      ></button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+
+    <ng-template pTemplate="footer">
+      <div class="dialog-footer">
+        <div class="footer-info">
+          @if (selectedProblems().length > 0) {
+            <span class="info-badge">
+              <i class="pi pi-list"></i>
+              {{ selectedProblems().length }} problems
+            </span>
+          }
+          @if (newContest.prizes && newContest.prizes.length > 0) {
+            <span class="info-badge">
+              <i class="pi pi-gift"></i>
+              {{ newContest.prizes.length }} prizes
+            </span>
+          }
+        </div>
+        <div class="footer-actions">
+          <button pButton label="Cancel" class="p-button-text" (click)="showContestDialog.set(false)"></button>
+          <button pButton label="Save as Draft" class="p-button-outlined" (click)="saveContest()"></button>
+          <button pButton label="Publish" icon="pi pi-check" (click)="saveContest()"></button>
+        </div>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>

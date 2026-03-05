@@ -1,0 +1,358 @@
+$bg-primary: #0f172a;
+$bg-secondary: #1e293b;
+$bg-tertiary: #334155;
+$text-primary: #f8fafc;
+$text-secondary: #94a3b8;
+$text-muted: #64748b;
+$border-color: #334155;
+$primary-color: #0d59f2;
+$success-color: #22c55e;
+$warning-color: #f59e0b;
+$danger-color: #ef4444;
+$info-color: #3b82f6;
+
+.communication-container {
+  padding: 1.5rem;
+}
+
+// Stats Grid
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-card {
+  background: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 1.25rem;
+      color: white;
+    }
+
+    &.sent { background: linear-gradient(135deg, $primary-color, lighten($primary-color, 10%)); }
+    &.open { background: linear-gradient(135deg, $success-color, lighten($success-color, 10%)); }
+    &.click { background: linear-gradient(135deg, $info-color, lighten($info-color, 10%)); }
+    &.pending { background: linear-gradient(135deg, $warning-color, lighten($warning-color, 10%)); }
+  }
+
+  .stat-content {
+    display: flex;
+    flex-direction: column;
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+
+    .stat-label {
+      font-size: 0.8125rem;
+      color: $text-muted;
+    }
+  }
+}
+
+// Page Header
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+  }
+}
+
+// Table Styles
+::ng-deep {
+  .p-datatable {
+    .p-datatable-header {
+      background: $bg-secondary;
+      border-color: $border-color;
+    }
+
+    .p-datatable-thead > tr > th {
+      background: $bg-secondary;
+      color: $text-secondary;
+      border-color: $border-color;
+      font-weight: 500;
+    }
+
+    .p-datatable-tbody > tr {
+      background: $bg-secondary;
+      border-color: $border-color;
+
+      &:hover {
+        background: $bg-tertiary;
+      }
+
+      > td {
+        border-color: $border-color;
+        color: $text-primary;
+      }
+    }
+  }
+
+  .p-tabview {
+    .p-tabview-nav {
+      background: transparent;
+      border-color: $border-color;
+
+      li {
+        .p-tabview-nav-link {
+          background: transparent;
+          color: $text-secondary;
+          border-color: transparent;
+
+          &:hover {
+            color: $text-primary;
+          }
+        }
+
+        &.p-highlight .p-tabview-nav-link {
+          color: $primary-color;
+          border-color: $primary-color;
+        }
+      }
+    }
+
+    .p-tabview-panels {
+      background: transparent;
+      padding: 1rem 0;
+    }
+  }
+}
+
+.message-subject {
+  font-weight: 500;
+}
+
+.recipients {
+  font-size: 0.875rem;
+  color: $text-secondary;
+}
+
+.scheduled {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: $info-color;
+  font-size: 0.875rem;
+
+  i {
+    font-size: 0.75rem;
+  }
+}
+
+.draft {
+  color: $text-muted;
+}
+
+.open-rate {
+  font-weight: 500;
+  color: $success-color;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 3rem !important;
+  color: $text-muted;
+
+  i {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+// Templates Grid
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+::ng-deep .template-card {
+  .p-card {
+    background: $bg-secondary;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    height: 100%;
+  }
+
+  .p-card-header {
+    padding: 1rem;
+    border-bottom: 1px solid $border-color;
+  }
+
+  .p-card-body {
+    padding: 1rem;
+  }
+
+  .p-card-footer {
+    padding: 1rem;
+    border-top: 1px solid $border-color;
+  }
+}
+
+.template-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .usage-count {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8125rem;
+    color: $text-muted;
+
+    i {
+      font-size: 0.75rem;
+    }
+  }
+}
+
+.template-content {
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .template-subject {
+    font-size: 0.875rem;
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+.template-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.add-template-card {
+  background: $bg-tertiary;
+  border: 2px dashed $border-color;
+  border-radius: 12px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  i {
+    font-size: 1.5rem;
+    color: $text-muted;
+  }
+
+  span {
+    color: $text-secondary;
+    font-weight: 500;
+  }
+
+  &:hover {
+    border-color: $primary-color;
+    background: rgba($primary-color, 0.05);
+
+    i, span {
+      color: $primary-color;
+    }
+  }
+}
+
+// Compose Dialog
+::ng-deep .compose-dialog {
+  .p-dialog-header {
+    background: $bg-secondary;
+    color: $text-primary;
+    border-bottom: 1px solid $border-color;
+  }
+
+  .p-dialog-content {
+    background: $bg-secondary;
+    color: $text-primary;
+  }
+
+  .p-dialog-footer {
+    background: $bg-secondary;
+    border-top: 1px solid $border-color;
+  }
+}
+
+.compose-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: $text-secondary;
+    }
+
+    input, textarea {
+      background: $bg-tertiary;
+      border-color: $border-color;
+      color: $text-primary;
+
+      &:focus {
+        border-color: $primary-color;
+      }
+    }
+  }
+}

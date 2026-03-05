@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Global Search &amp; Cross-Reference Results</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                        "surface-dark": "#1e232e",
+                        "surface-dark-lighter": "#282e39",
+                        "border-dark": "#2d3646",
+                        "text-secondary": "#9ca6ba",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen text-slate-900 dark:text-white overflow-x-hidden selection:bg-primary/30">
+<div class="flex flex-col h-screen overflow-hidden">
+<!-- Top Navigation -->
+<header class="flex-none flex items-center justify-between whitespace-nowrap border-b border-solid border-border-dark bg-background-dark px-6 py-3 z-20">
+<div class="flex items-center gap-4 text-white">
+<div class="size-8 text-primary">
+<svg class="w-full h-full" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M8.57829 8.57829C5.52816 11.6284 3.451 15.5145 2.60947 19.7452C1.76794 23.9758 2.19984 28.361 3.85056 32.3462C5.50128 36.3314 8.29667 39.7376 11.8832 42.134C15.4698 44.5305 19.6865 45.8096 24 45.8096C28.3135 45.8096 32.5302 44.5305 36.1168 42.134C39.7033 39.7375 42.4987 36.3314 44.1494 32.3462C45.8002 28.361 46.2321 23.9758 45.3905 19.7452C44.549 15.5145 42.4718 11.6284 39.4217 8.57829L24 24L8.57829 8.57829Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Admin Console</h2>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<div class="hidden md:flex items-center gap-2 mr-4">
+<span class="text-xs font-mono text-text-secondary bg-surface-dark-lighter px-2 py-1 rounded border border-border-dark">v2.4.0-prod</span>
+<span class="flex h-2 w-2 rounded-full bg-green-500"></span>
+<span class="text-xs font-medium text-text-secondary">Systems Operational</span>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg size-10 bg-surface-dark-lighter hover:bg-border-dark text-white transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-lg size-10 bg-surface-dark-lighter hover:bg-border-dark text-white transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 border-2 border-surface-dark-lighter cursor-pointer" data-alt="User avatar showing a generic person profile" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDV8qaKQTzV5KbhEUuFq1GlQtvxipLq32kqyggLojqQuIxnr8vitK2LQwMxgfM3UM8X0ajpLhBjzBHFQdS-LGsJesUiHidCSIhOxFNBwFagpfmqKBD9Qrmt5VsyjFxSCcCVDXJ-hGP_q1KMmUbwGB8L5IQ_Egeto7qQHp3qlsOP48HpsfLQ4eN-Ixdd0-uJt2P0S16mI9doo9m1DZjWwB17IjrSLIjw5zqgwyGGXIrDKypUwbVtAHo3gZoFtECzCyFNu_4nYW1NPcJ1");'>
+</div>
+</div>
+</header>
+<!-- Search & Filter Bar (Sticky) -->
+<div class="flex-none bg-background-dark border-b border-border-dark z-10">
+<div class="px-6 pt-4 pb-0">
+<!-- Breadcrumbs -->
+<div class="flex flex-wrap gap-2 items-center text-sm mb-4">
+<a class="text-text-secondary hover:text-white transition-colors" href="#">Dashboard</a>
+<span class="text-text-secondary">/</span>
+<a class="text-text-secondary hover:text-white transition-colors" href="#">Global Search</a>
+<span class="text-text-secondary">/</span>
+<span class="text-primary font-medium">req_id: 9948-22-AC</span>
+</div>
+<!-- Search Input & Chips -->
+<div class="flex flex-col xl:flex-row gap-4 mb-4">
+<!-- Search Bar -->
+<div class="flex-1 max-w-3xl">
+<label class="flex w-full items-center h-12 rounded-lg bg-surface-dark-lighter border border-transparent focus-within:border-primary transition-colors overflow-hidden">
+<div class="flex items-center justify-center pl-4 text-text-secondary">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="w-full bg-transparent border-none text-white placeholder:text-text-secondary focus:ring-0 px-4 text-base font-mono" placeholder="Search by User ID, Request ID, or Email..." value="req_id: 9948-22-AC"/>
+<div class="pr-2">
+<button class="p-2 text-text-secondary hover:text-white rounded-full">
+<span class="material-symbols-outlined text-[20px]">cancel</span>
+</button>
+</div>
+</label>
+</div>
+<!-- Filters/Chips -->
+<div class="flex items-center gap-3 overflow-x-auto scrollbar-hide">
+<button class="flex h-9 shrink-0 items-center gap-x-2 rounded-lg bg-surface-dark-lighter border border-border-dark px-3 hover:bg-border-dark transition-colors">
+<span class="text-xs font-medium text-text-secondary uppercase tracking-wider">Env</span>
+<span class="text-white text-sm">Production</span>
+<span class="material-symbols-outlined text-text-secondary text-[18px]">arrow_drop_down</span>
+</button>
+<button class="flex h-9 shrink-0 items-center gap-x-2 rounded-lg bg-surface-dark-lighter border border-border-dark px-3 hover:bg-border-dark transition-colors">
+<span class="text-xs font-medium text-text-secondary uppercase tracking-wider">Time</span>
+<span class="text-white text-sm">Last 24h</span>
+<span class="material-symbols-outlined text-text-secondary text-[18px]">arrow_drop_down</span>
+</button>
+<button class="flex h-9 shrink-0 items-center gap-x-2 rounded-lg bg-primary/20 border border-primary/30 px-3 hover:bg-primary/30 transition-colors">
+<span class="material-symbols-outlined text-primary text-[18px]">filter_list</span>
+<span class="text-primary text-sm font-medium">Advanced Filters</span>
+</button>
+</div>
+</div>
+<!-- Tabs -->
+<div class="flex gap-8 border-b border-border-dark">
+<a class="relative flex items-center justify-center py-3 px-1 text-sm font-medium text-text-secondary hover:text-white transition-colors" href="#">
+                        All Results
+                    </a>
+<a class="relative flex items-center justify-center py-3 px-1 text-sm font-medium text-text-secondary hover:text-white transition-colors" href="#">
+                        Users
+                        <span class="ml-2 rounded-full bg-surface-dark-lighter px-2 py-0.5 text-[10px] text-white">1</span>
+</a>
+<a class="relative flex items-center justify-center py-3 px-1 text-sm font-bold text-white transition-colors border-b-[3px] border-primary" href="#">
+                        Logs
+                        <span class="ml-2 rounded-full bg-primary text-white px-2 py-0.5 text-[10px]">42</span>
+</a>
+<a class="relative flex items-center justify-center py-3 px-1 text-sm font-medium text-text-secondary hover:text-white transition-colors" href="#">
+                        Problems
+                    </a>
+<a class="relative flex items-center justify-center py-3 px-1 text-sm font-medium text-text-secondary hover:text-white transition-colors" href="#">
+                        Submissions
+                        <span class="ml-2 rounded-full bg-surface-dark-lighter px-2 py-0.5 text-[10px] text-white">3</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Main Content (Scrollable) -->
+<main class="flex-1 overflow-hidden flex flex-col md:flex-row relative">
+<!-- Left Column: Detailed Results (Scrollable) -->
+<div class="flex-1 overflow-y-auto p-6 scrollbar-hide">
+<div class="max-w-5xl mx-auto flex flex-col gap-6">
+<!-- User Summary Card (Context) -->
+<div class="rounded-xl bg-surface-dark border border-border-dark p-5 shadow-lg">
+<div class="flex flex-col md:flex-row gap-6 items-start">
+<div class="flex items-center gap-4">
+<div class="size-16 rounded-full bg-cover bg-center border-2 border-primary" data-alt="Profile picture of the user AlexDev" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDi8PT7_1SEBoaEm5Z7tc3zDgNk2rXp2gG5gD5_BiivrppNU7a0ZKxdlSdsPjeWbI0IY1jPE50RhpDaHCQrueK24SVdvmUj0TIso1naUpaxG27KoM56xTNEiam5njoUPqprERyPQcw6VR1I9IfbP_oS5fbhtW-y3eW4Rrh9bj68ZTQzKGwYxr63_D7wX7y0YD99LKzJLAA3Swg16bXGScw9XuS9ydvMN12x9KqcNkozP_CfxJDq2-09SHE2kvtirxfYm86LMKdqFqh_");'>
+</div>
+<div>
+<h3 class="text-xl font-bold text-white flex items-center gap-2">
+                                        AlexDev
+                                        <span class="material-symbols-outlined text-yellow-500" title="Premium User">verified</span>
+</h3>
+<p class="text-text-secondary text-sm">ID: <span class="font-mono text-white">u_882910</span></p>
+<p class="text-text-secondary text-sm">alex.developer@example.com</p>
+</div>
+</div>
+<div class="h-auto w-px bg-border-dark hidden md:block self-stretch"></div>
+<div class="flex flex-1 w-full justify-between gap-4 flex-wrap">
+<div>
+<p class="text-xs text-text-secondary uppercase tracking-wider mb-1">Subscription</p>
+<span class="inline-flex items-center rounded-md bg-yellow-500/10 px-2 py-1 text-xs font-medium text-yellow-500 ring-1 ring-inset ring-yellow-500/20">Annual Premium</span>
+</div>
+<div>
+<p class="text-xs text-text-secondary uppercase tracking-wider mb-1">Rank</p>
+<p class="text-sm font-medium text-white">Top 2.5%</p>
+</div>
+<div>
+<p class="text-xs text-text-secondary uppercase tracking-wider mb-1">Solved</p>
+<p class="text-sm font-medium text-white">452 Problems</p>
+</div>
+<div>
+<p class="text-xs text-text-secondary uppercase tracking-wider mb-1">Recent IP</p>
+<p class="text-sm font-mono text-text-secondary">192.168.42.12</p>
+</div>
+<div class="flex items-center">
+<button class="text-sm text-primary hover:text-primary/80 font-medium flex items-center gap-1">
+                                        View Full Profile <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Filtered Logs Section -->
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-bold text-white">Associated Logs</h3>
+<div class="flex gap-2">
+<div class="relative">
+<input class="bg-surface-dark border border-border-dark text-sm rounded-md px-3 py-1.5 text-white focus:border-primary focus:ring-0 w-64 pl-8" placeholder="Filter logs..." type="text"/>
+<span class="material-symbols-outlined absolute left-2 top-1.5 text-text-secondary text-[18px]">filter_alt</span>
+</div>
+<button class="bg-surface-dark hover:bg-surface-dark-lighter border border-border-dark text-white rounded-md px-3 py-1.5 text-sm font-medium flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">download</span> Export
+                                </button>
+</div>
+</div>
+<!-- Logs Table -->
+<div class="bg-surface-dark border border-border-dark rounded-xl overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm whitespace-nowrap">
+<thead class="bg-surface-dark-lighter border-b border-border-dark text-xs uppercase text-text-secondary font-medium">
+<tr>
+<th class="px-4 py-3 w-48">Timestamp (UTC)</th>
+<th class="px-4 py-3 w-24">Level</th>
+<th class="px-4 py-3 w-32">Service</th>
+<th class="px-4 py-3">Message / Payload</th>
+<th class="px-4 py-3 w-16 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-dark font-mono text-xs md:text-sm">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-dark-lighter/50 transition-colors group">
+<td class="px-4 py-3 text-text-secondary">2023-10-24 10:15:02.442</td>
+<td class="px-4 py-3"><span class="inline-flex items-center rounded bg-red-400/10 px-2 py-1 text-xs font-medium text-red-400 ring-1 ring-inset ring-red-400/20">ERROR</span></td>
+<td class="px-4 py-3 text-blue-400">submission-svc</td>
+<td class="px-4 py-3 text-white max-w-md truncate">
+<span class="text-red-400 font-bold">500 Internal Server Error</span>: Timeout waiting for judge...
+                                            </td>
+<td class="px-4 py-3 text-right">
+<button class="text-text-secondary hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">data_object</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-dark-lighter/50 transition-colors group">
+<td class="px-4 py-3 text-text-secondary">2023-10-24 10:15:00.105</td>
+<td class="px-4 py-3"><span class="inline-flex items-center rounded bg-blue-400/10 px-2 py-1 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-400/20">INFO</span></td>
+<td class="px-4 py-3 text-blue-400">gateway-api</td>
+<td class="px-4 py-3 text-text-secondary max-w-md truncate">
+                                                POST /api/problems/two-sum/submit <span class="text-primary bg-primary/10 px-1 rounded">req_9948-22-AC</span>
+</td>
+<td class="px-4 py-3 text-right">
+<button class="text-text-secondary hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">data_object</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-dark-lighter/50 transition-colors group">
+<td class="px-4 py-3 text-text-secondary">2023-10-24 10:14:58.220</td>
+<td class="px-4 py-3"><span class="inline-flex items-center rounded bg-blue-400/10 px-2 py-1 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-400/20">INFO</span></td>
+<td class="px-4 py-3 text-blue-400">editor-svc</td>
+<td class="px-4 py-3 text-text-secondary max-w-md truncate">User autosave triggered. Length: 402 chars.</td>
+<td class="px-4 py-3 text-right">
+<button class="text-text-secondary hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">data_object</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-dark-lighter/50 transition-colors group">
+<td class="px-4 py-3 text-text-secondary">2023-10-24 10:12:30.551</td>
+<td class="px-4 py-3"><span class="inline-flex items-center rounded bg-yellow-400/10 px-2 py-1 text-xs font-medium text-yellow-400 ring-1 ring-inset ring-yellow-400/20">WARN</span></td>
+<td class="px-4 py-3 text-blue-400">auth-svc</td>
+<td class="px-4 py-3 text-text-secondary max-w-md truncate">Token refresh latency high (450ms).</td>
+<td class="px-4 py-3 text-right">
+<button class="text-text-secondary hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">data_object</span>
+</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-dark-lighter/50 transition-colors group">
+<td class="px-4 py-3 text-text-secondary">2023-10-24 10:05:22.001</td>
+<td class="px-4 py-3"><span class="inline-flex items-center rounded bg-blue-400/10 px-2 py-1 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-400/20">INFO</span></td>
+<td class="px-4 py-3 text-blue-400">gateway-api</td>
+<td class="px-4 py-3 text-text-secondary max-w-md truncate">GET /problems/two-sum/description</td>
+<td class="px-4 py-3 text-right">
+<button class="text-text-secondary hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">data_object</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-4 py-3 border-t border-border-dark flex items-center justify-between">
+<span class="text-xs text-text-secondary">Showing 5 of 42 logs</span>
+<div class="flex gap-1">
+<button class="size-6 flex items-center justify-center rounded hover:bg-surface-dark-lighter text-text-secondary disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<button class="size-6 flex items-center justify-center rounded hover:bg-surface-dark-lighter text-text-secondary">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Code Snippet / Context Panel -->
+<div class="rounded-xl bg-surface-dark border border-border-dark p-0 shadow-lg overflow-hidden">
+<div class="px-4 py-3 border-b border-border-dark bg-surface-dark-lighter flex justify-between items-center">
+<h4 class="text-sm font-bold text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">code</span>
+                                Submission Payload (req_9948-22-AC)
+                            </h4>
+<div class="flex gap-2">
+<button class="text-xs text-text-secondary hover:text-white">Copy JSON</button>
+<button class="text-xs text-primary hover:text-primary/80">Open in Editor</button>
+</div>
+</div>
+<div class="p-4 bg-[#0d1117]">
+<pre class="font-mono text-xs leading-relaxed text-gray-300 overflow-x-auto">{
+  "problem_id": 1,
+  "lang": "python3",
+  "question_id": "1",
+  "typed_code": "class Solution:\n    def twoSum(self, nums: List[int], target: int) -&gt; List[int]:\n        seen = {}\n        for i, num in enumerate(nums):\n            if target - num in seen:\n                return [seen[target - num], i]\n            seen[num] = i\n        return []",
+  <span class="text-yellow-500">"runtime_env"</span>: "v2023.4.1",
+  <span class="text-yellow-500">"timestamp"</span>: 1698142500
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Timeline (Fixed Width) -->
+<aside class="w-full md:w-80 lg:w-96 flex-none bg-surface-dark border-l border-border-dark overflow-y-auto z-10">
+<div class="p-5">
+<h3 class="text-sm font-bold text-text-secondary uppercase tracking-wider mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">timeline</span>
+                        Session Timeline
+                    </h3>
+<div class="relative pl-2">
+<!-- Vertical Line -->
+<div class="absolute left-[7px] top-2 bottom-0 w-0.5 bg-border-dark"></div>
+<!-- Timeline Item: Error -->
+<div class="relative pl-8 pb-8 group">
+<!-- Dot -->
+<div class="absolute left-0 top-1 size-4 rounded-full bg-red-500 border-4 border-surface-dark z-10 shadow-[0_0_0_2px_rgba(239,68,68,0.2)]"></div>
+<div class="flex flex-col gap-1">
+<span class="text-xs font-mono text-red-400">10:15:02 AM</span>
+<h4 class="text-sm font-bold text-white group-hover:text-primary transition-colors cursor-pointer">Internal Server Error</h4>
+<p class="text-xs text-text-secondary">Submission failed due to timeout in judge queue.</p>
+<div class="mt-2 inline-flex">
+<span class="inline-flex items-center rounded bg-red-400/10 px-2 py-0.5 text-[10px] font-medium text-red-400 border border-red-400/20">HTTP 500</span>
+</div>
+</div>
+</div>
+<!-- Timeline Item: Submission -->
+<div class="relative pl-8 pb-8 group">
+<!-- Connector Highlight -->
+<div class="absolute left-[7px] top-[-30px] bottom-[20px] w-0.5 bg-gradient-to-b from-border-dark to-primary opacity-50"></div>
+<!-- Dot -->
+<div class="absolute left-0 top-1 size-4 rounded-full bg-primary border-4 border-surface-dark z-10"></div>
+<div class="flex flex-col gap-1">
+<span class="text-xs font-mono text-text-secondary">10:15:00 AM</span>
+<h4 class="text-sm font-bold text-white group-hover:text-primary transition-colors cursor-pointer">Code Submission</h4>
+<p class="text-xs text-text-secondary">Python3 solution for "Two Sum".</p>
+</div>
+</div>
+<!-- Timeline Item: Auto-Save -->
+<div class="relative pl-8 pb-8 group">
+<!-- Dot -->
+<div class="absolute left-[2px] top-1.5 size-3 rounded-full bg-border-dark border-2 border-surface-dark z-10"></div>
+<div class="flex flex-col gap-1">
+<span class="text-xs font-mono text-text-secondary">10:14:58 AM</span>
+<h4 class="text-sm font-medium text-gray-300">Auto-Save</h4>
+<p class="text-xs text-text-secondary">Editor state saved.</p>
+</div>
+</div>
+<!-- Timeline Item: View Problem -->
+<div class="relative pl-8 pb-8 group">
+<!-- Dot -->
+<div class="absolute left-0 top-1 size-4 rounded-full bg-green-500 border-4 border-surface-dark z-10"></div>
+<div class="flex flex-col gap-1">
+<span class="text-xs font-mono text-text-secondary">10:05:22 AM</span>
+<h4 class="text-sm font-bold text-white group-hover:text-primary transition-colors cursor-pointer">Viewed Problem</h4>
+<p class="text-xs text-text-secondary">Accessed "Two Sum" description.</p>
+</div>
+</div>
+<!-- Timeline Item: Login -->
+<div class="relative pl-8 pb-2 group">
+<!-- Dot -->
+<div class="absolute left-[2px] top-1.5 size-3 rounded-full bg-border-dark border-2 border-surface-dark z-10"></div>
+<div class="flex flex-col gap-1">
+<span class="text-xs font-mono text-text-secondary">10:00:01 AM</span>
+<h4 class="text-sm font-medium text-gray-300">User Login</h4>
+<p class="text-xs text-text-secondary">Successful login via GitHub OAuth.</p>
+</div>
+</div>
+</div>
+<div class="mt-8 p-4 rounded-lg bg-surface-dark-lighter border border-border-dark">
+<h4 class="text-xs font-bold text-white mb-2">Debugging Insights</h4>
+<p class="text-xs text-text-secondary leading-relaxed">
+                            The timeout at 10:15:02 correlates with a spike in Judge Service #4 latency. Check <a class="text-primary hover:underline" href="#">System Health</a> dashboard.
+                        </p>
+</div>
+</div>
+</aside>
+</main>
+</div>
+</body></html>

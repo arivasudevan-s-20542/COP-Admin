@@ -1,0 +1,273 @@
+<div class="cache-monitoring">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-info">
+      <div class="title-row">
+        <h1>Redis Cluster: production-us-east-1</h1>
+        @if (stats()?.status === 'UP') {
+          <p-tag severity="success" value="Stable" />
+        } @else if (stats()?.status === 'DEGRADED') {
+          <p-tag severity="warn" value="Degraded" />
+        } @else {
+          <p-tag severity="danger" value="Down" />
+        }
+      </div>
+      <p class="subtitle">Master Node: r-001.cache.aws.internal</p>
+    </div>
+    <div class="header-actions">
+      <div class="live-indicator" [class.active]="isLive()">
+        <span class="pulse"></span>
+        <span class="label">{{ isLive() ? 'Live Updates' : 'Paused' }}</span>
+      </div>
+      <p-button 
+        [icon]="isLive() ? 'pi pi-pause' : 'pi pi-play'" 
+        [label]="isLive() ? 'Pause' : 'Resume'"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="toggleLive()"
+      />
+      <p-button 
+        icon="pi pi-refresh" 
+        label="Refresh"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="manualRefresh()"
+      />
+    </div>
+  </header>
+
+  @if (isLoading()) {
+    <!-- Loading Skeletons -->
+    <div class="stats-grid">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="stat-card">
+          <p-skeleton height="80px" />
+        </div>
+      }
+    </div>
+  } @else {
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <!-- Redis Health -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">Redis Health</span>
+          <i class="pi pi-check-circle text-success"></i>
+        </div>
+        <div class="stat-value">{{ stats()?.status }}</div>
+        <div class="stat-detail success">Uptime: {{ stats()?.uptime }}</div>
+      </div>
+
+      <!-- Memory Usage -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">Memory Usage</span>
+          <i class="pi pi-database text-warning"></i>
+        </div>
+        <div class="stat-value">
+          {{ stats()?.memoryUsed?.toFixed(1) }}
+          <span class="stat-unit">/ {{ stats()?.memoryMax }} GB</span>
+        </div>
+        <p-progressBar 
+          [value]="memoryPercentage()" 
+          [showValue]="false"
+          styleClass="memory-bar"
+        />
+        <div class="stat-detail" [class.warning]="memoryPercentage() >= 75" [class.danger]="memoryPercentage() >= 90">
+          {{ memoryPercentage() }}% used (Warning > 85%)
+        </div>
+      </div>
+
+      <!-- Hit/Miss Ratio -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">Hit/Miss Ratio</span>
+          <i class="pi pi-bullseye text-primary"></i>
+        </div>
+        <div class="stat-value">{{ stats()?.hitRatio?.toFixed(1) }}%</div>
+        <div class="stat-detail success">High Efficiency</div>
+      </div>
+
+      <!-- Connected Clients -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">Connected Clients</span>
+          <i class="pi pi-sitemap text-secondary"></i>
+        </div>
+        <div class="stat-value">{{ formatNumber(stats()?.connectedClients || 0) }}</div>
+        <div class="stat-detail" [class.danger]="(stats()?.clientChange || 0) < 0" [class.success]="(stats()?.clientChange || 0) > 0">
+          {{ (stats()?.clientChange || 0) > 0 ? '+' : '' }}{{ stats()?.clientChange }} clients
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="main-content">
+      <!-- Left Column: Charts & Table -->
+      <div class="charts-section">
+        <!-- Charts Row -->
+        <div class="charts-grid">
+          <!-- Memory Usage Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <h3>Memory Usage & Eviction Rate</h3>
+                <p>Last 1 Hour • Peaks correlate with eviction spikes</p>
+              </div>
+              <span class="chart-value">{{ stats()?.memoryUsed?.toFixed(1) }} GB</span>
+            </div>
+            <div class="chart-container">
+              @if (memoryChartData()) {
+                <p-chart type="line" [data]="memoryChartData()" [options]="lineChartOptions" height="180" />
+              }
+            </div>
+          </div>
+
+          <!-- Throughput vs Latency Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <h3>Throughput vs Latency</h3>
+                <p>Ops/sec (Bars) vs Latency ms (Line)</p>
+              </div>
+              <span class="chart-value">{{ (stats()?.opsPerSecond || 0) / 1000 | number:'1.0-0' }}k Ops</span>
+            </div>
+            <div class="chart-container">
+              @if (throughputChartData()) {
+                <p-chart type="bar" [data]="throughputChartData()" [options]="barChartOptions" height="180" />
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Slow Log Table -->
+        <div class="table-card">
+          <div class="table-header">
+            <h3>Slow Log (Last 100 Commands)</h3>
+            <p-button 
+              label="Export CSV" 
+              icon="pi pi-download"
+              severity="secondary"
+              [text]="true"
+              size="small"
+              (onClick)="exportCsv()"
+            />
+          </div>
+          <p-table 
+            [value]="slowLogs()" 
+            [scrollable]="true"
+            scrollHeight="280px"
+            styleClass="p-datatable-sm"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Timestamp</th>
+                <th>Command</th>
+                <th>Duration</th>
+                <th>Client IP</th>
+                <th class="text-right">Details</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-log>
+              <tr>
+                <td class="mono">{{ log.timestamp }}</td>
+                <td class="mono command">{{ log.command }}</td>
+                <td>
+                  <p-tag 
+                    [severity]="getDurationSeverity(log.duration)" 
+                    [value]="formatDuration(log.duration)"
+                  />
+                </td>
+                <td class="mono">{{ log.clientIp }}</td>
+                <td class="text-right">
+                  <p-button icon="pi pi-info-circle" [rounded]="true" [text]="true" severity="secondary" />
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+
+      <!-- Right Sidebar -->
+      <aside class="sidebar-section">
+        <!-- Replication Topology -->
+        <div class="sidebar-card">
+          <div class="card-header">
+            <h3>Replication Topology</h3>
+            <p-tag severity="success" value="Synced" />
+          </div>
+          <div class="topology">
+            @for (node of replicas(); track node.name; let i = $index) {
+              <div class="topology-node" [class.master]="node.role === 'master'" [class.syncing]="node.status === 'syncing'">
+                <div class="node-indicator" [class.master]="node.role === 'master'" [class.syncing]="node.status === 'syncing'"></div>
+                <div class="node-info">
+                  <div class="node-header">
+                    <span class="node-name">{{ node.name }}</span>
+                    <span class="node-zone">{{ node.zone }}</span>
+                  </div>
+                  <span class="node-ip">{{ node.ip }}</span>
+                  <div class="node-status">
+                    @if (node.status === 'healthy') {
+                      <span class="text-success">Health: OK</span>
+                    } @else if (node.status === 'syncing') {
+                      <span class="text-warning">Syncing ({{ node.syncProgress }}%)</span>
+                    } @else {
+                      <span class="text-danger">Error</span>
+                    }
+                    @if (node.offset !== undefined) {
+                      <span class="text-success">Offset: {{ node.offset }}</span>
+                    }
+                  </div>
+                </div>
+              </div>
+              @if (i < replicas().length - 1) {
+                <div class="topology-connector"></div>
+              }
+            }
+          </div>
+        </div>
+
+        <!-- TTL Distribution -->
+        <div class="sidebar-card">
+          <div class="card-header">
+            <h3>TTL Distribution</h3>
+          </div>
+          <p class="card-subtitle">Keys expiring soon</p>
+          <div class="ttl-list">
+            @for (bucket of ttlDistribution(); track bucket.label) {
+              <div class="ttl-item">
+                <div class="ttl-header">
+                  <span class="ttl-label">{{ bucket.label }}</span>
+                  <span class="ttl-count">{{ formatNumber(bucket.count) }}</span>
+                </div>
+                <p-progressBar 
+                  [value]="bucket.percentage" 
+                  [showValue]="false"
+                  [styleClass]="'ttl-bar ' + bucket.color"
+                />
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Alert Widget -->
+        <div class="alert-card danger">
+          <i class="pi pi-exclamation-triangle"></i>
+          <div class="alert-content">
+            <h4>High Fragmentation</h4>
+            <p>Mem fragmentation ratio > 1.5. Consider compacting.</p>
+            <p-button 
+              label="Run Defrag" 
+              severity="danger"
+              size="small"
+              [outlined]="true"
+              (onClick)="runDefrag()"
+            />
+          </div>
+        </div>
+      </aside>
+    </div>
+  }
+</div>

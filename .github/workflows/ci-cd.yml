@@ -1,0 +1,89 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# CI/CD — zcop-admin (Angular 21 / Node 22)
+#
+# Builds the admin console and deploys the dist/ folder to the VPS.
+#
+# Secrets required:
+#   DEPLOY_SSH_KEY       — private key of the deploy user on the VPS
+#   VPS_HOST             — hostname / IP of the production VPS
+#   VPS_USER             — SSH username (e.g. deploy)
+#   VPS_ADMIN_WEB_DIR    — absolute path on VPS served by nginx/apache
+#                          e.g. /var/www/zcop-admin
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: CI/CD — zcop-admin
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── 1. Build ──────────────────────────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Angular 21 requires Node 22+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      # npm@11 ships with Node 22 but corepack ensures exact version matches packageManager field
+      - name: Enable corepack (npm@11.6.2)
+        run: corepack enable
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production bundle
+        run: npm run build -- --configuration production
+
+      - name: Upload dist artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: zcop-admin-dist
+          path: dist/
+          retention-days: 1
+
+  # ── 2. Deploy to VPS (main branch only) ─────────────────────────────────
+  deploy:
+    name: Deploy to VPS
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: zcop-admin-dist
+          path: dist/
+
+      - name: Copy dist to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: "dist/"
+          target: "${{ secrets.VPS_ADMIN_WEB_DIR }}"
+          strip_components: 1   # upload contents of dist/ directly
+
+      - name: Reload nginx on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            sudo systemctl reload nginx || sudo nginx -s reload
+            echo "zcop-admin deployed ✓"

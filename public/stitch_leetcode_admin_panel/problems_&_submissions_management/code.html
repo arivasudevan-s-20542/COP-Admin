@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Problems &amp; Submissions Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.375rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display overflow-x-hidden">
+<div class="flex min-h-screen w-full">
+<!-- Side Navigation -->
+<aside class="hidden lg:flex w-72 flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111318]">
+<div class="flex h-full flex-col justify-between p-4">
+<div class="flex flex-col gap-6">
+<!-- User Profile -->
+<div class="flex items-center gap-3 px-2">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Admin avatar profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCObdLHml85Kf7xgMPn2KAzPV1jW3hJtK6DSS6Pzo56XELMceBQC9s50g8syqt086w1Vx2TLNPxG3GiTvTZPRuA2XLTkEkUnXXka-qoVj1KslCnNwH1IXE41notI9Jj3LC6fQfpfOv5VFwB-Z5jx80weiEqWWXa9AD_iGkqphrfXnyXRDt_SU8yYu3o3Udb_VIl5euZSWC-QblOpvUix4ODWaJmPXXSZoX8WRrZc2I3BddAuvothdrBeLXrAg-7pIx-EqWHmjObSrsa");'></div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-base font-bold leading-tight">Admin Console</h1>
+<p class="text-slate-500 dark:text-[#9ca6ba] text-xs font-medium">Super Admin</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#1f2530] transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">pie_chart</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary dark:text-white dark:bg-[#282e39]" href="#">
+<span class="material-symbols-outlined text-[20px] filled">code</span>
+<span class="text-sm font-medium">Problems</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#1f2530] transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span class="text-sm font-medium">Users</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#1f2530] transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">emoji_events</span>
+<span class="text-sm font-medium">Contests</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#1f2530] transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+</div>
+<div class="px-2 pb-4">
+<button class="flex items-center gap-3 w-full px-3 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+<span class="text-sm font-medium">Sign Out</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 bg-background-light dark:bg-background-dark">
+<div class="flex-1 px-6 py-8 md:px-12 md:py-10 max-w-[1440px] mx-auto w-full">
+<!-- Page Heading -->
+<div class="flex flex-wrap justify-between items-end gap-4 mb-8">
+<div class="flex flex-col gap-1">
+<h1 class="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">Problems &amp; Submissions</h1>
+<p class="text-slate-500 dark:text-[#9ca6ba] text-sm">Real-time overview of system performance and problem statistics.</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+</span>
+<p class="text-slate-500 dark:text-[#9ca6ba] text-xs font-medium">Live updates active</p>
+</div>
+</div>
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+<div class="flex flex-col gap-3 rounded-xl p-5 border border-slate-200 dark:border-[#3b4354] bg-white dark:bg-[#1a1d23] shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-slate-500 dark:text-[#9ca6ba] text-sm font-medium">Total Submissions (24h)</p>
+<span class="bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs px-2 py-0.5 rounded-full font-bold">+12%</span>
+</div>
+<p class="text-slate-900 dark:text-white text-3xl font-bold tracking-tight">1.2M</p>
+</div>
+<div class="flex flex-col gap-3 rounded-xl p-5 border border-slate-200 dark:border-[#3b4354] bg-white dark:bg-[#1a1d23] shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-slate-500 dark:text-[#9ca6ba] text-sm font-medium">Avg. Acceptance Rate</p>
+<span class="bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs px-2 py-0.5 rounded-full font-bold">+2.4%</span>
+</div>
+<p class="text-slate-900 dark:text-white text-3xl font-bold tracking-tight">42.8%</p>
+</div>
+<div class="flex flex-col gap-3 rounded-xl p-5 border border-slate-200 dark:border-[#3b4354] bg-white dark:bg-[#1a1d23] shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-slate-500 dark:text-[#9ca6ba] text-sm font-medium">95th %ile Runtime</p>
+<span class="bg-orange-100 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 text-xs px-2 py-0.5 rounded-full font-bold">-15ms</span>
+</div>
+<p class="text-slate-900 dark:text-white text-3xl font-bold tracking-tight">320ms</p>
+</div>
+</div>
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+<!-- Submission Outcomes -->
+<div class="rounded-xl border border-slate-200 dark:border-[#3b4354] bg-white dark:bg-[#1a1d23] p-6 shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-slate-900 dark:text-white text-lg font-bold">Submission Outcomes</h3>
+<select class="bg-slate-100 dark:bg-[#282e39] border-none text-xs rounded px-2 py-1 text-slate-700 dark:text-slate-300 focus:ring-0">
+<option>Last 24 Hours</option>
+<option>Last 7 Days</option>
+</select>
+</div>
+<div class="flex flex-col gap-4">
+<div class="grid grid-cols-[120px_1fr_60px] items-center gap-4 text-sm">
+<span class="text-slate-500 dark:text-[#9ca6ba] font-medium">Accepted</span>
+<div class="h-3 w-full bg-slate-100 dark:bg-[#282e39] rounded-full overflow-hidden">
+<div class="h-full bg-emerald-500 rounded-full" style="width: 42%"></div>
+</div>
+<span class="text-right text-slate-900 dark:text-white font-bold">42%</span>
+</div>
+<div class="grid grid-cols-[120px_1fr_60px] items-center gap-4 text-sm">
+<span class="text-slate-500 dark:text-[#9ca6ba] font-medium">Wrong Answer</span>
+<div class="h-3 w-full bg-slate-100 dark:bg-[#282e39] rounded-full overflow-hidden">
+<div class="h-full bg-red-500 rounded-full" style="width: 35%"></div>
+</div>
+<span class="text-right text-slate-900 dark:text-white font-bold">35%</span>
+</div>
+<div class="grid grid-cols-[120px_1fr_60px] items-center gap-4 text-sm">
+<span class="text-slate-500 dark:text-[#9ca6ba] font-medium">Time Limit</span>
+<div class="h-3 w-full bg-slate-100 dark:bg-[#282e39] rounded-full overflow-hidden">
+<div class="h-full bg-orange-500 rounded-full" style="width: 15%"></div>
+</div>
+<span class="text-right text-slate-900 dark:text-white font-bold">15%</span>
+</div>
+<div class="grid grid-cols-[120px_1fr_60px] items-center gap-4 text-sm">
+<span class="text-slate-500 dark:text-[#9ca6ba] font-medium">Runtime Error</span>
+<div class="h-3 w-full bg-slate-100 dark:bg-[#282e39] rounded-full overflow-hidden">
+<div class="h-full bg-purple-500 rounded-full" style="width: 8%"></div>
+</div>
+<span class="text-right text-slate-900 dark:text-white font-bold">8%</span>
+</div>
+</div>
+</div>
+<!-- Execution Time Dist -->
+<div class="rounded-xl border border-slate-200 dark:border-[#3b4354] bg-white dark:bg-[#1a1d23] p-6 shadow-sm flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-slate-900 dark:text-white text-lg font-bold">Execution Time (ms)</h3>
+<span class="text-primary text-xs font-bold bg-primary/10 px-2 py-1 rounded">Avg: 45ms</span>
+</div>
+<div class="flex-1 flex items-end gap-2 h-40">
+<!-- Histogram Bars -->
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary/20 dark:bg-primary/20 h-full relative rounded-t-sm group-hover:bg-primary/40 transition-colors">
+<div class="absolute bottom-0 w-full bg-primary rounded-t-sm" style="height: 25%"></div>
+</div>
+<span class="text-[10px] text-slate-400 dark:text-[#9ca6ba]">0-10</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary/20 dark:bg-primary/20 h-full relative rounded-t-sm group-hover:bg-primary/40 transition-colors">
+<div class="absolute bottom-0 w-full bg-primary rounded-t-sm" style="height: 45%"></div>
+</div>
+<span class="text-[10px] text-slate-400 dark:text-[#9ca6ba]">10-50</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary/20 dark:bg-primary/20 h-full relative rounded-t-sm group-hover:bg-primary/40 transition-colors">
+<div class="absolute bottom-0 w-full bg-primary rounded-t-sm" style="height: 60%"></div>
+</div>
+<span class="text-[10px] text-slate-400 dark:text-[#9ca6ba]">50-100</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary/20 dark:bg-primary/20 h-full relative rounded-t-sm group-hover:bg-primary/40 transition-colors">
+<div class="absolute bottom-0 w-full bg-primary rounded-t-sm" style="height: 30%"></div>
+</div>
+<span class="text-[10px] text-slate-400 dark:text-[#9ca6ba]">100-300</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary/20 dark:bg-primary/20 h-full relative rounded-t-sm group-hover:bg-primary/40 transition-colors">
+<div class="absolute bottom-0 w-full bg-primary rounded-t-sm" style="height: 10%"></div>
+</div>
+<span class="text-[10px] text-slate-400 dark:text-[#9ca6ba]">300+</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Table Controls -->
+<div class="sticky top-2 z-10 bg-background-light dark:bg-background-dark/95 backdrop-blur-sm py-4 mb-4 border-y border-transparent transition-all">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex flex-1 items-stretch gap-3">
+<!-- Search -->
+<div class="relative flex-1 max-w-md">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-slate-400 dark:text-[#9ca6ba]">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-2.5 border-none rounded-lg bg-white dark:bg-[#282e39] text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-[#9ca6ba] focus:ring-2 focus:ring-primary sm:text-sm" placeholder="Search by Problem ID or Title" type="text"/>
+</div>
+<!-- Filters -->
+<div class="hidden sm:flex gap-3">
+<select class="bg-white dark:bg-[#282e39] border-none text-slate-700 dark:text-white text-sm rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary cursor-pointer">
+<option>All Difficulties</option>
+<option>Easy</option>
+<option>Medium</option>
+<option>Hard</option>
+</select>
+<select class="bg-white dark:bg-[#282e39] border-none text-slate-700 dark:text-white text-sm rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-primary cursor-pointer">
+<option>All Languages</option>
+<option>Python</option>
+<option>C++</option>
+<option>Java</option>
+<option>JavaScript</option>
+</select>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="bg-primary hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                                New Problem
+                            </button>
+<button class="bg-white dark:bg-[#282e39] text-slate-700 dark:text-white px-3 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-[#323945] transition-colors border border-slate-200 dark:border-transparent">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Data Table -->
+<div class="bg-white dark:bg-[#1a1d23] rounded-xl border border-slate-200 dark:border-[#3b4354] overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-[#20252e] border-b border-slate-200 dark:border-[#3b4354]">
+<th class="py-3 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-[#9ca6ba] w-[35%]">Problem</th>
+<th class="py-3 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-[#9ca6ba]">Difficulty</th>
+<th class="py-3 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-[#9ca6ba]">Volume (24h)</th>
+<th class="py-3 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-[#9ca6ba]">Acceptance</th>
+<th class="py-3 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-[#9ca6ba] text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 dark:divide-[#2e3541]">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-[#20252e] transition-colors group">
+<td class="py-4 px-6">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="text-slate-900 dark:text-white font-semibold text-sm">Two Sum</span>
+<span class="material-symbols-outlined text-[14px] text-slate-400 opacity-0 group-hover:opacity-100 cursor-pointer">open_in_new</span>
+</div>
+<span class="text-xs text-slate-500 dark:text-[#9ca6ba]">ID: #1</span>
+</div>
+</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50">
+                                            Easy
+                                        </span>
+</td>
+<td class="py-4 px-6">
+<div class="w-24 h-8 flex items-end gap-0.5" title="Peak: 4,200 submissions">
+<!-- Fake Sparkline using divs -->
+<div class="w-1 bg-primary/40 h-[20%] rounded-sm"></div>
+<div class="w-1 bg-primary/60 h-[40%] rounded-sm"></div>
+<div class="w-1 bg-primary h-[80%] rounded-sm"></div>
+<div class="w-1 bg-primary/80 h-[60%] rounded-sm"></div>
+<div class="w-1 bg-primary/50 h-[30%] rounded-sm"></div>
+<div class="w-1 bg-primary/40 h-[45%] rounded-sm"></div>
+<div class="w-1 bg-primary/30 h-[25%] rounded-sm"></div>
+<div class="w-1 bg-primary/60 h-[50%] rounded-sm"></div>
+</div>
+<span class="text-[10px] text-slate-400 dark:text-[#6b7280]">12.5k today</span>
+</td>
+<td class="py-4 px-6">
+<div class="flex flex-col gap-1 w-28">
+<div class="flex justify-between text-xs">
+<span class="text-slate-900 dark:text-white font-medium tabular-nums">48.2%</span>
+</div>
+<div class="h-1.5 w-full bg-slate-100 dark:bg-[#282e39] rounded-full overflow-hidden">
+<div class="h-full bg-orange-400 rounded-full" style="width: 48.2%"></div>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-full hover:bg-slate-100 dark:hover:bg-[#282e39] transition-all">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-[#20252e] transition-colors group">
+<td class="py-4 px-6">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="text-slate-900 dark:text-white font-semibold text-sm">Add Two Numbers</span>
+<span class="material-symbols-outlined text-[14px] text-slate-400 opacity-0 group-hover:opacity-100 cursor-pointer">open_in_new</span>
+</div>
+<span class="text-xs text-slate-500 dark:text-[#9ca6ba]">ID: #2</span>
+</div>
+</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50">
+                                            Medium
+                                        </span>
+</td>
+<td class="py-4 px-6">
+<div class="w-24 h-8 flex items-end gap-0.5">
+<div class="w-1 bg-primary/40 h-[30%] rounded-sm"></div>
+<div class="w-1 bg-primary/50 h-[40%] rounded-sm"></div>
+<div class="w-1 bg-primary/30 h-[20%] rounded-sm"></div>
+<div class="w-1 bg-primary/60 h-[50%] rounded-sm"></div>
+<div class="w-1 bg-primary h-[70%] rounded-sm"></div>
+<div class="w-1 bg-primary/70 h-[55%] rounded-sm"></div>
+<div class="w-1 bg-primary/40 h-[35%] rounded-sm"></div>
+<div class="w-1 bg-primary/30 h-[25%] rounded-sm"></div>
+</div>
+<span class="text-[10px] text-slate-400 dark:text-[#6b7280]">8.2k today</span>
+</td>
+<td class="py-4 px-6">
+<div class="flex flex-col gap-1 w-28">
+<div class="flex justify-between text-xs">
+<span class="text-slate-900 dark:text-white font-medium tabular-nums">39.1%</span>
+</div>
+<div class="h-1.5 w-full bg-slate-100 dark:bg-[#282e39] rounded-full overflow-hidden">
+<div class="h-full bg-amber-500 rounded-full" style="width: 39.1%"></div>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-full hover:bg-slate-100 dark:hover:bg-[#282e39] transition-all">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-[#20252e] transition-colors group">
+<td class="py-4 px-6">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="text-slate-900 dark:text-white font-semibold text-sm">Median of Two Sorted Arrays</span>
+<span class="material-symbols-outlined text-[14px] text-slate-400 opacity-0 group-hover:opacity-100 cursor-pointer">open_in_new</span>
+</div>
+<span class="text-xs text-slate-500 dark:text-[#9ca6ba]">ID: #4</span>
+</div>
+</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-900/50">
+                                            Hard
+                                        </span>
+</td>
+<td class="py-4 px-6">
+<div class="w-24 h-8 flex items-end gap-0.5">
+<div class="w-1 bg-primary/30 h-[10%] rounded-sm"></div>
+<div class="w-1 bg-primary/30 h-[15%] rounded-sm"></div>
+<div class="w-1 bg-primary/40 h-[20%] rounded-sm"></div>
+<div class="w-1 bg-primary/50 h-[30%] rounded-sm"></div>
+<div class="w-1 bg-primary/60 h-[40%] rounded-sm"></div>
+<div class="w-1 bg-primary h-[50%] rounded-sm"></div>
+<div class="w-1 bg-primary/50 h-[30%] rounded-sm"></div>
+<div class="w-1 bg-primary/30 h-[20%] rounded-sm"></div>
+</div>
+<span class="text-[10px] text-slate-400 dark:text-[#6b7280]">2.1k today</span>
+</td>
+<td class="py-4 px-6">
+<div class="flex flex-col gap-1 w-28">
+<div class="flex justify-between text-xs">
+<span class="text-slate-900 dark:text-white font-medium tabular-nums">35.6%</span>
+</div>
+<div class="h-1.5 w-full bg-slate-100 dark:bg-[#282e39] rounded-full overflow-hidden">
+<div class="h-full bg-red-500 rounded-full" style="width: 35.6%"></div>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-full hover:bg-slate-100 dark:hover:bg-[#282e39] transition-all">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-[#20252e] transition-colors group">
+<td class="py-4 px-6">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="text-slate-900 dark:text-white font-semibold text-sm">Valid Parentheses</span>
+<span class="material-symbols-outlined text-[14px] text-slate-400 opacity-0 group-hover:opacity-100 cursor-pointer">open_in_new</span>
+</div>
+<span class="text-xs text-slate-500 dark:text-[#9ca6ba]">ID: #20</span>
+</div>
+</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50">
+                                            Easy
+                                        </span>
+</td>
+<td class="py-4 px-6">
+<div class="w-24 h-8 flex items-end gap-0.5">
+<div class="w-1 bg-primary/60 h-[60%] rounded-sm"></div>
+<div class="w-1 bg-primary/80 h-[80%] rounded-sm"></div>
+<div class="w-1 bg-primary h-[90%] rounded-sm"></div>
+<div class="w-1 bg-primary/90 h-[85%] rounded-sm"></div>
+<div class="w-1 bg-primary/70 h-[70%] rounded-sm"></div>
+<div class="w-1 bg-primary/60 h-[60%] rounded-sm"></div>
+<div class="w-1 bg-primary/50 h-[50%] rounded-sm"></div>
+<div class="w-1 bg-primary/40 h-[40%] rounded-sm"></div>
+</div>
+<span class="text-[10px] text-slate-400 dark:text-[#6b7280]">18.9k today</span>
+</td>
+<td class="py-4 px-6">
+<div class="flex flex-col gap-1 w-28">
+<div class="flex justify-between text-xs">
+<span class="text-slate-900 dark:text-white font-medium tabular-nums">40.3%</span>
+</div>
+<div class="h-1.5 w-full bg-slate-100 dark:bg-[#282e39] rounded-full overflow-hidden">
+<div class="h-full bg-amber-500 rounded-full" style="width: 40.3%"></div>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-full hover:bg-slate-100 dark:hover:bg-[#282e39] transition-all">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-[#20252e] transition-colors group">
+<td class="py-4 px-6">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="text-slate-900 dark:text-white font-semibold text-sm">Trapping Rain Water</span>
+<span class="material-symbols-outlined text-[14px] text-slate-400 opacity-0 group-hover:opacity-100 cursor-pointer">open_in_new</span>
+</div>
+<span class="text-xs text-slate-500 dark:text-[#9ca6ba]">ID: #42</span>
+</div>
+</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-900/50">
+                                            Hard
+                                        </span>
+</td>
+<td class="py-4 px-6">
+<div class="w-24 h-8 flex items-end gap-0.5">
+<div class="w-1 bg-primary/50 h-[50%] rounded-sm"></div>
+<div class="w-1 bg-primary/40 h-[40%] rounded-sm"></div>
+<div class="w-1 bg-primary/50 h-[45%] rounded-sm"></div>
+<div class="w-1 bg-primary h-[80%] rounded-sm"></div>
+<div class="w-1 bg-primary/60 h-[60%] rounded-sm"></div>
+<div class="w-1 bg-primary/50 h-[50%] rounded-sm"></div>
+<div class="w-1 bg-primary/40 h-[35%] rounded-sm"></div>
+<div class="w-1 bg-primary/30 h-[25%] rounded-sm"></div>
+</div>
+<span class="text-[10px] text-slate-400 dark:text-[#6b7280]">5.4k today</span>
+</td>
+<td class="py-4 px-6">
+<div class="flex flex-col gap-1 w-28">
+<div class="flex justify-between text-xs">
+<span class="text-slate-900 dark:text-white font-medium tabular-nums">58.7%</span>
+</div>
+<div class="h-1.5 w-full bg-slate-100 dark:bg-[#282e39] rounded-full overflow-hidden">
+<div class="h-full bg-emerald-500 rounded-full" style="width: 58.7%"></div>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-full hover:bg-slate-100 dark:hover:bg-[#282e39] transition-all">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="flex items-center justify-between px-6 py-4 border-t border-slate-200 dark:border-[#3b4354] bg-slate-50 dark:bg-[#20252e]">
+<span class="text-xs text-slate-500 dark:text-[#9ca6ba]">Showing <span class="font-medium text-slate-900 dark:text-white">1</span> to <span class="font-medium text-slate-900 dark:text-white">10</span> of <span class="font-medium text-slate-900 dark:text-white">2,845</span> problems</span>
+<div class="flex gap-2">
+<button class="px-3 py-1 text-xs font-medium rounded bg-white dark:bg-[#282e39] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#3b4354] hover:bg-slate-50 dark:hover:bg-[#323945]">Previous</button>
+<button class="px-3 py-1 text-xs font-medium rounded bg-white dark:bg-[#282e39] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#3b4354] hover:bg-slate-50 dark:hover:bg-[#323945]">Next</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

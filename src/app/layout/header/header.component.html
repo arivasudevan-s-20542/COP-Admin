@@ -1,0 +1,77 @@
+<header class="header">
+  <div class="header-left">
+    <!-- Global Search -->
+    <div class="search-container">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input 
+          type="text" 
+          pInputText 
+          placeholder="Search problems, users, logs..." 
+          class="search-input"
+          [(ngModel)]="searchQuery"
+          (keyup.enter)="onSearch()"
+        />
+      </span>
+      <kbd class="search-shortcut">⌘K</kbd>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <!-- Quick Actions -->
+    <button 
+      pButton 
+      type="button" 
+      icon="pi pi-plus"
+      class="p-button-text p-button-rounded"
+      pTooltip="Quick Add"
+    ></button>
+
+    <!-- Refresh -->
+    <button 
+      pButton 
+      type="button" 
+      icon="pi pi-refresh"
+      class="p-button-text p-button-rounded"
+      pTooltip="Refresh Data"
+    ></button>
+
+    <!-- Notifications -->
+    <button 
+      pButton 
+      type="button" 
+      icon="pi pi-bell"
+      class="p-button-text p-button-rounded notification-btn"
+      pTooltip="Notifications"
+      [routerLink]="['/alerts/notifications']"
+    >
+      @if (notificationCount() > 0) {
+        <p-badge [value]="notificationCount().toString()" severity="danger" class="notification-badge" />
+      }
+    </button>
+
+    <!-- Theme Toggle -->
+    <button 
+      pButton 
+      type="button" 
+      icon="pi pi-moon"
+      class="p-button-text p-button-rounded"
+      pTooltip="Toggle Theme"
+    ></button>
+
+    <!-- User Menu -->
+    @if (user()) {
+      <div class="user-menu">
+        <p-avatar 
+          [image]="user()!.avatar" 
+          shape="circle" 
+          size="normal"
+          [pTooltip]="user()!.name"
+          (click)="menu.toggle($event)"
+          styleClass="user-avatar-btn"
+        />
+        <p-menu #menu [model]="userMenuItems" [popup]="true" appendTo="body" />
+      </div>
+    }
+  </div>
+</header>

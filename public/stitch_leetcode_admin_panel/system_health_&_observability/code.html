@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>System Observability</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#111318",
+                        "surface-dark": "#1a1d24",
+                        "surface-border": "#282e39",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for dark dense UI */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111318; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #282e39; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b4354; 
+        }
+        .chart-grid-line {
+            stroke: #282e39;
+            stroke-dasharray: 4;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display overflow-hidden">
+<div class="flex h-screen w-full overflow-hidden">
+<!-- Side Navigation -->
+<div class="hidden md:flex flex-col w-64 border-r border-surface-border bg-background-dark h-full shrink-0">
+<div class="flex flex-col h-full p-4 justify-between">
+<div class="flex flex-col gap-6">
+<!-- User Profile / Brand -->
+<div class="flex gap-3 items-center px-2">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 shrink-0 border border-surface-border" data-alt="Admin user avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA9ZHdCekzTvlBXvIEjh6tf0paZyHgDDByU5I5-8TBrd3ILPvKUsxdfdDITYRed23DKDVCC_QUBegz8cVSgovZ_7PHeAV2hlU2xlVwKQj21TZKRsUfVE_HSDBbPtI_qJyHj8orBxpGoKF3lJ-jnwBz8AgSIviRAmMO8csZyJ1hdp9QlnOW25yUdEjNbjoeo0hA-uNeiAmpaTpXVfnW4-GfOShwol2LE5UX2NNmVnHWb835nIG9xIa8J6Mxa0zSot0HeB7tPrjRar7t8");'></div>
+<div class="flex flex-col overflow-hidden">
+<h1 class="text-white text-sm font-semibold leading-tight truncate">Admin Console</h1>
+<p class="text-[#9ca6ba] text-xs font-normal leading-normal truncate">SRE Team Lead</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex flex-col gap-1">
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 text-primary cursor-pointer group">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<p class="text-sm font-medium leading-normal">Overview</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#9ca6ba] hover:bg-surface-border/50 hover:text-white cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-[20px]">dns</span>
+<p class="text-sm font-medium leading-normal">Clusters</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#9ca6ba] hover:bg-surface-border/50 hover:text-white cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-[20px]">warning</span>
+<p class="text-sm font-medium leading-normal">Incidents</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#9ca6ba] hover:bg-surface-border/50 hover:text-white cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-[20px]">receipt_long</span>
+<p class="text-sm font-medium leading-normal">Logs</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#9ca6ba] hover:bg-surface-border/50 hover:text-white cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<p class="text-sm font-medium leading-normal">Settings</p>
+</div>
+</nav>
+</div>
+<!-- Bottom Actions -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#9ca6ba] hover:text-white cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+<p class="text-sm font-medium leading-normal">Sign Out</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content Area -->
+<div class="flex flex-col flex-1 h-full overflow-hidden bg-background-dark relative">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-surface-border px-6 py-3 bg-background-dark/95 backdrop-blur shrink-0 z-20">
+<div class="flex items-center gap-6">
+<!-- Mobile Menu Trigger -->
+<button class="md:hidden text-[#9ca6ba]">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="flex items-center gap-3 text-white">
+<div class="size-6 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">monitoring</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-tight">System Observability</h2>
+<span class="hidden sm:inline-block px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 text-xs font-medium border border-green-500/20">All Systems Operational</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<label class="hidden md:flex flex-col w-64 h-9">
+<div class="flex w-full flex-1 items-center rounded-lg h-full bg-surface-dark border border-surface-border focus-within:border-primary transition-colors">
+<div class="text-[#9ca6ba] flex items-center justify-center pl-3">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full bg-transparent border-none text-sm text-white focus:ring-0 placeholder:text-[#586174] pl-2" placeholder="Search metrics, logs..."/>
+</div>
+</label>
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center size-9 rounded-full hover:bg-surface-border text-[#9ca6ba] hover:text-white transition-colors relative">
+<span class="material-symbols-outlined text-[22px]">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border border-background-dark"></span>
+</button>
+<button class="flex items-center justify-center size-9 rounded-full hover:bg-surface-border text-[#9ca6ba] hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[22px]">help</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Scrollable Content -->
+<main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 scroll-smooth">
+<div class="max-w-[1600px] mx-auto flex flex-col gap-6">
+<!-- Page Header & Time Controls -->
+<div class="flex flex-col md:flex-row flex-wrap justify-between gap-4 items-end md:items-center">
+<div class="flex flex-col gap-1">
+<h1 class="text-white text-2xl font-bold tracking-tight">US-East-1 Cluster Health</h1>
+<p class="text-[#9ca6ba] text-sm">Real-time monitoring for evaluation workers and submission API.</p>
+</div>
+<div class="flex items-center gap-2 overflow-x-auto pb-1 max-w-full no-scrollbar">
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-surface-border hover:bg-surface-border/80 cursor-pointer px-3 transition-colors">
+<span class="material-symbols-outlined text-[16px] text-[#9ca6ba]">refresh</span>
+<span class="text-white text-sm font-medium">Auto: On</span>
+</div>
+<div class="w-px h-6 bg-surface-border mx-1"></div>
+<button class="flex h-8 shrink-0 items-center justify-center rounded-lg bg-primary text-white px-3 text-sm font-medium hover:bg-primary/90 transition-colors">
+                            Last 1h
+                        </button>
+<button class="flex h-8 shrink-0 items-center justify-center rounded-lg bg-surface-border text-[#9ca6ba] px-3 text-sm font-medium hover:text-white hover:bg-surface-border/80 transition-colors">
+                            Last 6h
+                        </button>
+<button class="flex h-8 shrink-0 items-center justify-center rounded-lg bg-surface-border text-[#9ca6ba] px-3 text-sm font-medium hover:text-white hover:bg-surface-border/80 transition-colors">
+                            Last 24h
+                        </button>
+<button class="flex h-8 shrink-0 items-center justify-center rounded-lg bg-surface-border text-[#9ca6ba] px-3 text-sm font-medium hover:text-white hover:bg-surface-border/80 transition-colors">
+                            Custom
+                        </button>
+</div>
+</div>
+<!-- KPI Stats Row -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="flex flex-col gap-1 rounded-xl p-5 border border-surface-border bg-surface-dark shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-[#9ca6ba] text-sm font-medium">Total Throughput (RPS)</p>
+<span class="material-symbols-outlined text-[#9ca6ba] text-[20px]">api</span>
+</div>
+<div class="flex items-baseline gap-2 mt-2">
+<p class="text-white text-2xl font-bold">12.5k</p>
+<p class="text-emerald-500 text-sm font-medium flex items-center">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span> 5.2%
+                            </p>
+</div>
+</div>
+<div class="flex flex-col gap-1 rounded-xl p-5 border border-surface-border bg-surface-dark shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-[#9ca6ba] text-sm font-medium">Global Error Rate</p>
+<span class="material-symbols-outlined text-[#9ca6ba] text-[20px]">error</span>
+</div>
+<div class="flex items-baseline gap-2 mt-2">
+<p class="text-white text-2xl font-bold">0.02%</p>
+<p class="text-emerald-500 text-sm font-medium flex items-center">
+<span class="material-symbols-outlined text-[16px]">arrow_downward</span> 0.01%
+                            </p>
+</div>
+<div class="w-full bg-surface-border rounded-full h-1 mt-2">
+<div class="bg-emerald-500 h-1 rounded-full" style="width: 2%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1 rounded-xl p-5 border border-surface-border bg-surface-dark shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-[#9ca6ba] text-sm font-medium">Avg Execution Time</p>
+<span class="material-symbols-outlined text-[#9ca6ba] text-[20px]">timer</span>
+</div>
+<div class="flex items-baseline gap-2 mt-2">
+<p class="text-white text-2xl font-bold">240ms</p>
+<p class="text-orange-500 text-sm font-medium flex items-center">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span> 12ms
+                            </p>
+</div>
+</div>
+<div class="flex flex-col gap-1 rounded-xl p-5 border border-surface-border bg-surface-dark shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-[#9ca6ba] text-sm font-medium">Active Websockets</p>
+<span class="material-symbols-outlined text-[#9ca6ba] text-[20px]">hub</span>
+</div>
+<div class="flex items-baseline gap-2 mt-2">
+<p class="text-white text-2xl font-bold">45,201</p>
+<p class="text-emerald-500 text-sm font-medium flex items-center">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span> 3.5%
+                            </p>
+</div>
+</div>
+</div>
+<!-- Main Charts Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+<!-- Latency Chart (Span 2) -->
+<div class="xl:col-span-2 rounded-xl border border-surface-border bg-surface-dark p-5 flex flex-col h-[360px]">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-white text-base font-semibold">Code Execution Latency (ms)</h3>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-blue-500"></span>
+<span class="text-xs text-[#9ca6ba]">p50</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-purple-500"></span>
+<span class="text-xs text-[#9ca6ba]">p90</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-red-500"></span>
+<span class="text-xs text-[#9ca6ba]">p99</span>
+</div>
+</div>
+</div>
+<!-- SVG Chart Simulation -->
+<div class="flex-1 w-full relative">
+<!-- Y-axis labels -->
+<div class="absolute left-0 top-0 bottom-6 w-8 flex flex-col justify-between text-[10px] text-[#586174] text-right pr-2">
+<span>1000</span>
+<span>750</span>
+<span>500</span>
+<span>250</span>
+<span>0</span>
+</div>
+<!-- Chart Area -->
+<div class="absolute left-8 right-0 top-0 bottom-6 border-l border-b border-surface-border">
+<!-- Grid Lines -->
+<div class="absolute top-[0%] w-full border-t border-surface-border/30 border-dashed"></div>
+<div class="absolute top-[25%] w-full border-t border-surface-border/30 border-dashed"></div>
+<div class="absolute top-[50%] w-full border-t border-surface-border/30 border-dashed"></div>
+<div class="absolute top-[75%] w-full border-t border-surface-border/30 border-dashed"></div>
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none">
+<defs>
+<lineargradient id="gradRed" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#ef4444" stop-opacity="0.1"></stop>
+<stop offset="100%" stop-color="#ef4444" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- p99 Line (Red - Spiky) -->
+<path class="opacity-30" d="M0,80 Q50,70 100,90 T200,60 T300,20 T400,50 T500,30 T600,60 T700,40 T800,70 L800,200 L0,200 Z" fill="url(#gradRed)" stroke="none"></path>
+<polyline fill="none" points="0,80 50,70 100,90 150,75 200,60 250,55 300,20 350,40 400,50 450,45 500,30 550,50 600,60 650,55 700,40 750,60 800,70 850,50 900,60 1000,55" stroke="#ef4444" stroke-width="2" vector-effect="non-scaling-stroke"></polyline>
+<!-- p90 Line (Purple) -->
+<polyline fill="none" points="0,120 50,115 100,125 150,120 200,110 250,115 300,90 350,100 400,105 450,100 500,95 550,105 600,110 650,105 700,100 750,110 800,115 850,105 900,110 1000,108" stroke="#a855f7" stroke-width="2" vector-effect="non-scaling-stroke"></polyline>
+<!-- p50 Line (Blue - Smooth) -->
+<polyline fill="none" points="0,150 50,148 100,152 150,150 200,145 250,148 300,140 350,142 400,145 450,144 500,142 550,145 600,148 650,146 700,145 750,148 800,150 850,148 900,149 1000,148" stroke="#3b82f6" stroke-width="2" vector-effect="non-scaling-stroke"></polyline>
+</svg>
+<!-- Tooltip Line (Simulated Hover) -->
+<div class="absolute left-[60%] top-0 bottom-0 w-px bg-white/20"></div>
+<div class="absolute left-[60%] top-[25%] -translate-x-1/2 -translate-y-1/2 size-2 bg-red-500 rounded-full border-2 border-surface-dark shadow-sm z-10"></div>
+<div class="absolute left-[60%] top-[15%] ml-2 bg-surface-dark border border-surface-border rounded p-2 shadow-xl z-20">
+<div class="text-[10px] text-[#9ca6ba] mb-1">10:42 AM</div>
+<div class="text-xs font-medium text-red-400">p99: 840ms</div>
+<div class="text-xs font-medium text-purple-400">p90: 420ms</div>
+<div class="text-xs font-medium text-blue-400">p50: 120ms</div>
+</div>
+</div>
+<!-- X-axis labels -->
+<div class="absolute left-8 right-0 bottom-0 h-4 flex justify-between text-[10px] text-[#586174] pt-1">
+<span>10:00</span>
+<span>10:15</span>
+<span>10:30</span>
+<span>10:45</span>
+<span>11:00</span>
+</div>
+</div>
+</div>
+<!-- Side Panel: Cluster Resources -->
+<div class="flex flex-col gap-4">
+<!-- Card 1 -->
+<div class="rounded-xl border border-surface-border bg-surface-dark p-5 flex-1 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-2">
+<div class="flex gap-3 items-center">
+<div class="size-8 rounded-lg bg-surface-border flex items-center justify-center text-[#9ca6ba]">
+<span class="material-symbols-outlined text-[20px]">memory</span>
+</div>
+<div>
+<h4 class="text-white text-sm font-semibold">Evaluation Workers</h4>
+<p class="text-[#9ca6ba] text-xs">us-east-1a</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/20 text-green-500 uppercase">Healthy</span>
+</div>
+<div class="space-y-3 mt-2">
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="text-[#9ca6ba]">CPU Usage</span>
+<span class="text-white font-medium">78%</span>
+</div>
+<div class="w-full bg-surface-border rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 78%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="text-[#9ca6ba]">Memory</span>
+<span class="text-white font-medium">42%</span>
+</div>
+<div class="w-full bg-surface-border rounded-full h-1.5 overflow-hidden">
+<div class="bg-purple-500 h-full rounded-full" style="width: 42%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="rounded-xl border border-surface-border bg-surface-dark p-5 flex-1 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-2">
+<div class="flex gap-3 items-center">
+<div class="size-8 rounded-lg bg-surface-border flex items-center justify-center text-[#9ca6ba]">
+<span class="material-symbols-outlined text-[20px]">database</span>
+</div>
+<div>
+<h4 class="text-white text-sm font-semibold">Primary Database</h4>
+<p class="text-[#9ca6ba] text-xs">Postgres Cluster</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/20 text-green-500 uppercase">Healthy</span>
+</div>
+<div class="space-y-3 mt-2">
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="text-[#9ca6ba]">CPU Usage</span>
+<span class="text-white font-medium">35%</span>
+</div>
+<div class="w-full bg-surface-border rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 35%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="text-[#9ca6ba]">IOPS</span>
+<span class="text-white font-medium">62%</span>
+</div>
+<div class="w-full bg-surface-border rounded-full h-1.5 overflow-hidden">
+<div class="bg-orange-500 h-full rounded-full" style="width: 62%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Section Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+<!-- Slowest Endpoints Table (Span 2) -->
+<div class="lg:col-span-2 rounded-xl border border-surface-border bg-surface-dark overflow-hidden flex flex-col">
+<div class="p-5 border-b border-surface-border flex justify-between items-center">
+<h3 class="text-white text-base font-semibold">Slowest Endpoints</h3>
+<button class="text-primary text-sm font-medium hover:text-primary/80">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-surface-border bg-surface-border/20 text-xs text-[#9ca6ba] uppercase tracking-wider font-semibold">
+<th class="px-5 py-3">Endpoint</th>
+<th class="px-5 py-3 text-right">Avg Latency</th>
+<th class="px-5 py-3 text-right">P99</th>
+<th class="px-5 py-3 w-40">Status (2xx/4xx/5xx)</th>
+</tr>
+</thead>
+<tbody class="text-sm divide-y divide-surface-border">
+<!-- Row 1 -->
+<tr class="group hover:bg-surface-border/30 transition-colors">
+<td class="px-5 py-3 font-mono text-white">POST /api/v2/submit</td>
+<td class="px-5 py-3 text-right text-[#9ca6ba]">450ms</td>
+<td class="px-5 py-3 text-right text-red-400 font-medium">2.1s</td>
+<td class="px-5 py-3">
+<div class="flex h-1.5 w-full rounded-full overflow-hidden bg-surface-border">
+<div class="bg-emerald-500" style="width: 85%"></div>
+<div class="bg-yellow-500" style="width: 10%"></div>
+<div class="bg-red-500" style="width: 5%"></div>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="group hover:bg-surface-border/30 transition-colors">
+<td class="px-5 py-3 font-mono text-white">GET /api/v1/problems</td>
+<td class="px-5 py-3 text-right text-[#9ca6ba]">120ms</td>
+<td class="px-5 py-3 text-right text-white">350ms</td>
+<td class="px-5 py-3">
+<div class="flex h-1.5 w-full rounded-full overflow-hidden bg-surface-border">
+<div class="bg-emerald-500" style="width: 98%"></div>
+<div class="bg-yellow-500" style="width: 2%"></div>
+<div class="bg-red-500" style="width: 0%"></div>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="group hover:bg-surface-border/30 transition-colors">
+<td class="px-5 py-3 font-mono text-white">POST /api/v1/run-code</td>
+<td class="px-5 py-3 text-right text-[#9ca6ba]">890ms</td>
+<td class="px-5 py-3 text-right text-orange-400 font-medium">1.5s</td>
+<td class="px-5 py-3">
+<div class="flex h-1.5 w-full rounded-full overflow-hidden bg-surface-border">
+<div class="bg-emerald-500" style="width: 92%"></div>
+<div class="bg-yellow-500" style="width: 7%"></div>
+<div class="bg-red-500" style="width: 1%"></div>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="group hover:bg-surface-border/30 transition-colors">
+<td class="px-5 py-3 font-mono text-white">GET /user/profile</td>
+<td class="px-5 py-3 text-right text-[#9ca6ba]">45ms</td>
+<td class="px-5 py-3 text-right text-white">120ms</td>
+<td class="px-5 py-3">
+<div class="flex h-1.5 w-full rounded-full overflow-hidden bg-surface-border">
+<div class="bg-emerald-500" style="width: 99%"></div>
+<div class="bg-yellow-500" style="width: 1%"></div>
+<div class="bg-red-500" style="width: 0%"></div>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="group hover:bg-surface-border/30 transition-colors">
+<td class="px-5 py-3 font-mono text-white">GET /contest/leaderboard</td>
+<td class="px-5 py-3 text-right text-[#9ca6ba]">210ms</td>
+<td class="px-5 py-3 text-right text-orange-400 font-medium">890ms</td>
+<td class="px-5 py-3">
+<div class="flex h-1.5 w-full rounded-full overflow-hidden bg-surface-border">
+<div class="bg-emerald-500" style="width: 90%"></div>
+<div class="bg-yellow-500" style="width: 8%"></div>
+<div class="bg-red-500" style="width: 2%"></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Live Log Stream (Compact) -->
+<div class="rounded-xl border border-surface-border bg-surface-dark flex flex-col h-full min-h-[300px]">
+<div class="p-5 border-b border-surface-border flex justify-between items-center">
+<h3 class="text-white text-base font-semibold">Live Errors</h3>
+<div class="flex gap-2">
+<span class="size-2 rounded-full bg-red-500 animate-pulse"></span>
+<span class="text-xs text-[#9ca6ba] uppercase tracking-wide font-medium">Streaming</span>
+</div>
+</div>
+<div class="flex-1 p-3 overflow-y-auto font-mono text-xs space-y-2 max-h-[300px] lg:max-h-full">
+<div class="p-2 rounded bg-surface-border/20 border-l-2 border-red-500 text-red-200">
+<span class="text-[#586174] mr-2">10:42:01</span>
+<span>FATAL: Connection timeout to Redis-cache-03</span>
+</div>
+<div class="p-2 rounded bg-surface-border/20 border-l-2 border-yellow-500 text-yellow-200">
+<span class="text-[#586174] mr-2">10:41:55</span>
+<span>WARN: High latency detected on worker-node-12</span>
+</div>
+<div class="p-2 rounded bg-surface-border/20 border-l-2 border-red-500 text-red-200">
+<span class="text-[#586174] mr-2">10:41:42</span>
+<span>ERROR: Failed to fetch test cases for ID: 4921</span>
+</div>
+<div class="p-2 rounded bg-surface-border/20 border-l-2 border-yellow-500 text-yellow-200">
+<span class="text-[#586174] mr-2">10:41:20</span>
+<span>WARN: Memory usage &gt; 90% on eval-pod-89</span>
+</div>
+<div class="p-2 rounded bg-surface-border/20 border-l-2 border-red-500 text-red-200">
+<span class="text-[#586174] mr-2">10:41:05</span>
+<span>ERROR: 503 Service Unavailable upstream</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>

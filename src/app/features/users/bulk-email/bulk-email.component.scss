@@ -1,0 +1,96 @@
+$bg-primary: #1e293b;
+$bg-secondary: #0f172a;
+$bg-card: #1e293b;
+$bg-hover: #334155;
+$border-color: #334155;
+$text-primary: #f8fafc;
+$text-secondary: #94a3b8;
+$text-muted: #64748b;
+$primary-color: #0d59f2;
+$success-color: #22c55e;
+$warning-color: #f59e0b;
+$danger-color: #ef4444;
+$info-color: #3b82f6;
+
+.bulk-email-container { padding: 1.5rem; min-height: 100vh; background: $bg-secondary; }
+
+.page-header {
+  display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;
+  .header-content { h1 { margin: 0 0 0.25rem; font-size: 1.75rem; font-weight: 600; color: $text-primary; } .subtitle { margin: 0; color: $text-secondary; font-size: 0.9rem; } }
+}
+
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; @media (max-width: 1200px) { grid-template-columns: repeat(2, 1fr); } }
+
+.stat-card {
+  background: $bg-card; border: 1px solid $border-color; border-radius: 12px; padding: 1.25rem; display: flex; align-items: center; gap: 1rem; transition: all 0.2s;
+  &:hover { border-color: $primary-color; transform: translateY(-2px); }
+  .stat-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    i { font-size: 1.25rem; }
+    &.sent { background: rgba($primary-color, 0.15); color: $primary-color; }
+    &.open { background: rgba($success-color, 0.15); color: $success-color; }
+    &.click { background: rgba($warning-color, 0.15); color: $warning-color; }
+    &.active { background: rgba($info-color, 0.15); color: $info-color; }
+  }
+  .stat-content { display: flex; flex-direction: column; .stat-value { font-size: 1.5rem; font-weight: 600; color: $text-primary; } .stat-label { font-size: 0.8rem; color: $text-muted; } }
+}
+
+::ng-deep .campaigns-card .p-card { background: $bg-card; border: 1px solid $border-color; border-radius: 12px;
+  .p-card-header { padding: 1rem 1.5rem; border-bottom: 1px solid $border-color; }
+  .p-card-body, .p-card-content { padding: 0; }
+}
+
+.card-header {
+  display: flex; justify-content: space-between; align-items: center;
+  h3 { margin: 0; font-size: 1rem; font-weight: 600; color: $text-primary; }
+}
+
+::ng-deep .campaigns-table .p-datatable {
+  .p-datatable-thead > tr > th { background: $bg-secondary; color: $text-secondary; border: none; border-bottom: 1px solid $border-color; padding: 1rem; font-weight: 500; font-size: 0.8rem; text-transform: uppercase; }
+  .p-datatable-tbody > tr { background: $bg-card; &:hover { background: $bg-hover; } > td { border: none; border-bottom: 1px solid $border-color; padding: 1rem; color: $text-primary; } }
+  .p-paginator { background: $bg-secondary; border: none; border-top: 1px solid $border-color; }
+}
+
+.campaign-cell { display: flex; flex-direction: column; gap: 0.25rem; .campaign-name { font-weight: 500; font-size: 0.9rem; } .campaign-subject { font-size: 0.8rem; color: $text-muted; } }
+.recipients { font-weight: 500; }
+.timestamp { font-family: monospace; font-size: 0.8rem; color: $text-muted; }
+.actions-cell { display: flex; gap: 0.25rem; }
+
+.rate-cell {
+  display: flex; flex-direction: column; gap: 0.25rem;
+  .rate-value { font-size: 0.85rem; font-weight: 500; }
+  .rate-bar { height: 4px; background: $bg-secondary; border-radius: 2px; overflow: hidden;
+    .rate-fill { height: 100%; border-radius: 2px; &.open { background: $success-color; } &.click { background: $warning-color; } }
+  }
+}
+
+::ng-deep .compose-dialog .p-dialog { background: $bg-card; border: 1px solid $border-color; border-radius: 12px;
+  .p-dialog-header { background: $bg-card; border-bottom: 1px solid $border-color; color: $text-primary; padding: 1.25rem 1.5rem; }
+  .p-dialog-content { background: $bg-card; padding: 1.5rem; }
+  .p-dialog-footer { background: $bg-card; border-top: 1px solid $border-color; padding: 1rem 1.5rem; }
+}
+
+.compose-form {
+  display: flex; flex-direction: column; gap: 1.25rem;
+  .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.5rem;
+    label { font-size: 0.85rem; font-weight: 500; color: $text-secondary; }
+    input, ::ng-deep .p-dropdown, ::ng-deep .p-multiselect { background: $bg-secondary !important; border: 1px solid $border-color !important; border-radius: 8px; color: $text-primary;
+      &:focus { border-color: $primary-color !important; }
+    }
+    input { padding: 0.75rem 1rem; }
+    .audience-estimate { font-size: 0.8rem; color: $success-color; margin-top: 0.25rem; }
+  }
+}
+
+::ng-deep .email-editor {
+  .p-editor-container { border: 1px solid $border-color; border-radius: 8px; overflow: hidden; }
+  .p-editor-toolbar { background: $bg-secondary; border-bottom: 1px solid $border-color; }
+  .p-editor-content { background: $bg-card;
+    .ql-editor { color: $text-primary; min-height: 200px;
+      &.ql-blank::before { color: $text-muted; }
+    }
+  }
+}
+
+.dialog-actions { display: flex; justify-content: space-between; width: 100%; .right-actions { display: flex; gap: 0.75rem; } }
+.w-full { width: 100%; }

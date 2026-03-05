@@ -1,0 +1,88 @@
+$bg-primary: #1e293b;
+$bg-secondary: #0f172a;
+$bg-card: #1e293b;
+$bg-hover: #334155;
+$border-color: #334155;
+$text-primary: #f8fafc;
+$text-secondary: #94a3b8;
+$text-muted: #64748b;
+$primary-color: #0d59f2;
+$success-color: #22c55e;
+$warning-color: #f59e0b;
+$danger-color: #ef4444;
+$info-color: #3b82f6;
+
+.tickets-container { padding: 1.5rem; min-height: 100vh; background: $bg-secondary; }
+
+.page-header {
+  display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;
+  .header-content { h1 { margin: 0 0 0.25rem; font-size: 1.75rem; font-weight: 600; color: $text-primary; } .subtitle { margin: 0; color: $text-secondary; font-size: 0.9rem; } }
+}
+
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; @media (max-width: 1200px) { grid-template-columns: repeat(2, 1fr); } }
+
+.stat-card {
+  background: $bg-card; border: 1px solid $border-color; border-radius: 12px; padding: 1.25rem; display: flex; align-items: center; gap: 1rem;
+  &:hover { border-color: $primary-color; transform: translateY(-2px); }
+  .stat-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    i { font-size: 1.25rem; }
+    &.total { background: rgba($info-color, 0.15); color: $info-color; }
+    &.open { background: rgba($danger-color, 0.15); color: $danger-color; }
+    &.progress { background: rgba($warning-color, 0.15); color: $warning-color; }
+    &.time { background: rgba($success-color, 0.15); color: $success-color; }
+  }
+  .stat-content { display: flex; flex-direction: column; .stat-value { font-size: 1.5rem; font-weight: 600; color: $text-primary; } .stat-label { font-size: 0.8rem; color: $text-muted; } }
+}
+
+.filters-section {
+  display: flex; gap: 1rem; margin-bottom: 1.5rem;
+  .search-box { flex: 1; position: relative;
+    i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: $text-muted; }
+    input { width: 100%; padding: 0.75rem 1rem 0.75rem 2.75rem; background: $bg-card; border: 1px solid $border-color; border-radius: 8px; color: $text-primary;
+      &::placeholder { color: $text-muted; }
+      &:focus { outline: none; border-color: $primary-color; box-shadow: 0 0 0 3px rgba($primary-color, 0.15); }
+    }
+  }
+}
+
+::ng-deep .tickets-card .p-card { background: $bg-card; border: 1px solid $border-color; border-radius: 12px; .p-card-body, .p-card-content { padding: 0; } }
+
+::ng-deep .tickets-table .p-datatable {
+  .p-datatable-thead > tr > th { background: $bg-secondary; color: $text-secondary; border: none; border-bottom: 1px solid $border-color; padding: 1rem; font-weight: 500; font-size: 0.8rem; text-transform: uppercase; }
+  .p-datatable-tbody > tr { background: $bg-card; &:hover { background: $bg-hover; } > td { border: none; border-bottom: 1px solid $border-color; padding: 1rem; color: $text-primary; } }
+  .p-paginator { background: $bg-secondary; border: none; border-top: 1px solid $border-color; }
+}
+
+.ticket-cell { display: flex; flex-direction: column; gap: 0.25rem; .ticket-id { font-family: monospace; font-size: 0.75rem; color: $text-muted; } .ticket-subject { font-weight: 500; font-size: 0.9rem; } }
+
+.user-cell {
+  display: flex; align-items: center; gap: 0.75rem;
+  .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, $primary-color, lighten($primary-color, 15%)); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.75rem; color: white; &.small { width: 24px; height: 24px; font-size: 0.6rem; } }
+  .user-info { display: flex; flex-direction: column; .user-name { font-weight: 500; font-size: 0.85rem; } .user-email { font-size: 0.75rem; color: $text-muted; } }
+}
+
+.category-cell { display: flex; align-items: center; gap: 0.5rem; i { color: $text-muted; } span { font-size: 0.85rem; text-transform: capitalize; } }
+.assignee { font-size: 0.85rem; color: $text-secondary; }
+.timestamp { font-family: monospace; font-size: 0.8rem; color: $text-muted; }
+.actions-cell { display: flex; gap: 0.25rem; }
+.empty-message { text-align: center; padding: 3rem !important; color: $text-muted; i { display: block; font-size: 3rem; margin-bottom: 1rem; } }
+
+::ng-deep .ticket-dialog .p-dialog { background: $bg-card; border: 1px solid $border-color; border-radius: 12px;
+  .p-dialog-header { background: $bg-card; border-bottom: 1px solid $border-color; color: $text-primary; padding: 1.25rem 1.5rem; }
+  .p-dialog-content { background: $bg-card; padding: 1.5rem; }
+}
+
+.ticket-detail {
+  .ticket-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid $border-color;
+    .ticket-title { .ticket-id { font-family: monospace; font-size: 0.8rem; color: $text-muted; display: block; margin-bottom: 0.25rem; } h3 { margin: 0; font-size: 1.1rem; color: $text-primary; } }
+    .ticket-badges { display: flex; gap: 0.5rem; }
+  }
+  .ticket-info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem;
+    .info-item { display: flex; flex-direction: column; gap: 0.25rem; .label { font-size: 0.75rem; color: $text-muted; text-transform: uppercase; } }
+  }
+  .ticket-description { margin-bottom: 1.5rem; h4 { margin: 0 0 0.5rem; font-size: 0.9rem; color: $text-primary; } p { margin: 0; color: $text-secondary; font-size: 0.9rem; padding: 1rem; background: $bg-secondary; border-radius: 8px; } }
+  .reply-section { h4 { margin: 0 0 0.75rem; font-size: 0.9rem; color: $text-primary; }
+    .reply-input { width: 100%; background: $bg-secondary; border: 1px solid $border-color; border-radius: 8px; color: $text-primary; padding: 0.75rem; resize: none; &:focus { border-color: $primary-color; } }
+    .reply-actions { display: flex; justify-content: space-between; margin-top: 1rem; }
+  }
+}

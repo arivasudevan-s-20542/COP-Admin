@@ -1,0 +1,465 @@
+// Dark theme variables
+$bg-primary: #1e293b;
+$bg-secondary: #0f172a;
+$bg-card: #1e293b;
+$bg-hover: #334155;
+$border-color: #334155;
+$text-primary: #f8fafc;
+$text-secondary: #94a3b8;
+$text-muted: #64748b;
+$primary-color: #0d59f2;
+$success-color: #22c55e;
+$warning-color: #f59e0b;
+$danger-color: #ef4444;
+$info-color: #3b82f6;
+
+.search-container {
+  padding: 1.5rem;
+  min-height: 100vh;
+  background: $bg-secondary;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+// Page Header
+.page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  h1 {
+    margin: 0 0 0.25rem 0;
+    font-size: 2rem;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  .subtitle {
+    margin: 0;
+    color: $text-secondary;
+    font-size: 1rem;
+  }
+}
+
+// Search Section
+.search-section {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  .search-box-large {
+    flex: 1;
+    position: relative;
+
+    .search-icon {
+      position: absolute;
+      left: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.25rem;
+      color: $text-muted;
+    }
+
+    .loading-icon {
+      position: absolute;
+      right: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $primary-color;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 1rem 3rem 1rem 3.5rem;
+      background: $bg-card;
+      border: 2px solid $border-color;
+      border-radius: 12px;
+      color: $text-primary;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+
+      &::placeholder {
+        color: $text-muted;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 4px rgba($primary-color, 0.15);
+      }
+    }
+  }
+
+  ::ng-deep .filter-dropdown {
+    .p-dropdown {
+      background: $bg-card;
+      border: 2px solid $border-color;
+      border-radius: 12px;
+      min-width: 160px;
+
+      &:hover {
+        border-color: $primary-color;
+      }
+
+      .p-dropdown-label {
+        color: $text-primary;
+        padding: 1rem;
+      }
+    }
+  }
+}
+
+// Results Section
+.results-section {
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+
+    .result-count {
+      font-size: 0.85rem;
+      color: $text-muted;
+    }
+  }
+
+  .results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+.result-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $primary-color;
+    background: $bg-hover;
+    transform: translateX(4px);
+
+    .result-arrow {
+      opacity: 1;
+      transform: translateX(4px);
+    }
+  }
+
+  .result-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    i {
+      font-size: 1.1rem;
+    }
+
+    &.user {
+      background: rgba($info-color, 0.15);
+      color: $info-color;
+    }
+
+    &.problem {
+      background: rgba($success-color, 0.15);
+      color: $success-color;
+    }
+
+    &.contest {
+      background: rgba($warning-color, 0.15);
+      color: $warning-color;
+    }
+
+    &.submission {
+      background: rgba($primary-color, 0.15);
+      color: $primary-color;
+    }
+
+    &.setting {
+      background: rgba($danger-color, 0.15);
+      color: $danger-color;
+    }
+  }
+
+  .result-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .result-title {
+      font-weight: 600;
+      color: $text-primary;
+      font-size: 0.95rem;
+    }
+
+    .result-description {
+      font-size: 0.85rem;
+      color: $text-secondary;
+    }
+
+    .result-metadata {
+      font-size: 0.75rem;
+      color: $text-muted;
+    }
+  }
+
+  .result-arrow {
+    color: $text-muted;
+    opacity: 0;
+    transition: all 0.2s ease;
+  }
+}
+
+// No Results
+.no-results {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+
+  i {
+    font-size: 3rem;
+    color: $text-muted;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    color: $text-primary;
+  }
+
+  p {
+    margin: 0;
+    color: $text-secondary;
+  }
+}
+
+// Default Content
+.default-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+// Quick Links
+.quick-links-section {
+  h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: $text-primary;
+  }
+}
+
+.quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.quick-link-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $primary-color;
+    background: $bg-hover;
+
+    .pi-arrow-right {
+      transform: translateX(4px);
+    }
+  }
+
+  .quick-link-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba($primary-color, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 1.1rem;
+      color: $primary-color;
+    }
+  }
+
+  .quick-link-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .quick-link-label {
+      font-weight: 600;
+      color: $text-primary;
+      font-size: 0.9rem;
+    }
+
+    .quick-link-count {
+      font-size: 0.8rem;
+      color: $text-muted;
+    }
+  }
+
+  .pi-arrow-right {
+    color: $text-muted;
+    transition: transform 0.2s ease;
+  }
+}
+
+// Recent Searches
+.recent-section {
+  .recent-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+  }
+
+  .recent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $primary-color;
+    background: $bg-hover;
+  }
+
+  .pi-history {
+    color: $text-muted;
+  }
+
+  .recent-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .recent-query {
+      font-weight: 500;
+      color: $text-primary;
+      font-size: 0.9rem;
+    }
+
+    .recent-meta {
+      font-size: 0.75rem;
+      color: $text-muted;
+    }
+  }
+
+  .pi-arrow-up-right {
+    color: $text-muted;
+    font-size: 0.8rem;
+  }
+}
+
+// Tips Section
+.tips-section {
+  h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: $text-primary;
+  }
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tip-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+
+  i {
+    color: $primary-color;
+    font-size: 1.1rem;
+    margin-top: 0.125rem;
+  }
+
+  .tip-content {
+    display: flex;
+    flex-direction: column;
+
+    .tip-title {
+      font-weight: 500;
+      color: $text-primary;
+      font-size: 0.9rem;
+    }
+
+    .tip-desc {
+      font-size: 0.8rem;
+      color: $text-muted;
+    }
+  }
+}

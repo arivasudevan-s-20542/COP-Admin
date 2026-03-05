@@ -1,0 +1,1045 @@
+/* Global Styles for ZCOP Admin Panel */
+
+// Sass color module for modern color functions
+@use 'sass:color';
+
+// PrimeNG Theme
+@import 'primeicons/primeicons.css';
+
+// Markdown Render Styles (for MarkdownRenderService)
+@import 'app/shared/styles/markdown-render.scss';
+
+// Variables
+$dark-bg: #0f172a;
+$card-bg: #1e293b;
+$border-color: #334155;
+$primary-color: #0d59f2;
+$success-color: #22c55e;
+$warning-color: #f59e0b;
+$danger-color: #ef4444;
+$info-color: #06b6d4;
+$text-primary: #f8fafc;
+$text-secondary: #94a3b8;
+$text-muted: #64748b;
+
+// Base Reset
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Dark Mode (default)
+body, html {
+  background: $dark-bg;
+  color: $text-primary;
+}
+
+// Apply dark mode class
+body {
+  @extend .dark-mode;
+}
+
+.dark-mode {
+  --surface-ground: #{$dark-bg};
+  --surface-section: #{$card-bg};
+  --surface-card: #{$card-bg};
+  --surface-overlay: #{$card-bg};
+  --surface-border: #{$border-color};
+  --surface-hover: rgba(255, 255, 255, 0.05);
+  --text-color: #{$text-primary};
+  --text-color-secondary: #{$text-secondary};
+  --primary-color: #{$primary-color};
+}
+
+// Scrollbar Styling
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $dark-bg;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $border-color;
+  border-radius: 4px;
+  
+  &:hover {
+    background: color.adjust($border-color, $lightness: 10%);
+  }
+}
+
+// Selection
+::selection {
+  background: rgba($primary-color, 0.3);
+  color: $text-primary;
+}
+
+// Links
+a {
+  color: $primary-color;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  
+  &:hover {
+    color: color.adjust($primary-color, $lightness: 10%);
+  }
+}
+
+// Typography
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+p {
+  margin: 0;
+}
+
+// PrimeNG Overrides for Dark Theme
+.dark-mode {
+  // PrimeIcons - ensure icons are visible
+  .pi {
+    font-family: 'primeicons' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  // Buttons
+  .p-button {
+    transition: all 0.2s ease;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    
+    .p-button-icon {
+      font-family: 'primeicons' !important;
+      display: inline-block !important;
+    }
+    
+    .pi {
+      display: inline-block !important;
+      font-size: 1rem !important;
+    }
+    
+    &.p-button-primary {
+      background: $primary-color;
+      border-color: $primary-color;
+      color: white !important;
+      
+      .pi, .p-button-icon {
+        color: white !important;
+      }
+      
+      &:hover {
+        background: color.adjust($primary-color, $lightness: -5%);
+        border-color: color.adjust($primary-color, $lightness: -5%);
+      }
+    }
+    
+    &.p-button-outlined {
+      background: transparent;
+      border-color: $border-color;
+      color: $text-secondary;
+      
+      .pi, .p-button-icon {
+        color: $text-secondary !important;
+      }
+      
+      &:hover {
+        background: rgba($primary-color, 0.1);
+        border-color: $primary-color;
+        color: $primary-color;
+        
+        .pi, .p-button-icon {
+          color: $primary-color !important;
+        }
+      }
+    }
+    
+    &.p-button-text {
+      background: transparent;
+      color: $text-secondary;
+      
+      .pi, .p-button-icon {
+        color: $text-secondary !important;
+      }
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: $text-primary;
+        
+        .pi, .p-button-icon {
+          color: $text-primary !important;
+        }
+      }
+    }
+  }
+  
+  // Input Fields
+  .p-inputtext {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: $border-color;
+    color: $text-primary;
+    
+    &:focus {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+    }
+    
+    &::placeholder {
+      color: $text-muted;
+    }
+  }
+  
+  // Dropdowns
+  .p-dropdown {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: $border-color;
+    
+    .p-dropdown-label {
+      color: $text-primary;
+    }
+    
+    &:not(.p-disabled):hover {
+      border-color: rgba($primary-color, 0.5);
+    }
+    
+    &:not(.p-disabled).p-focus {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+    }
+  }
+  
+  .p-dropdown-panel {
+    background: $card-bg;
+    border: 1px solid $border-color;
+    
+    .p-dropdown-items {
+      .p-dropdown-item {
+        color: $text-primary;
+        
+        &:hover {
+          background: rgba($primary-color, 0.1);
+        }
+        
+        &.p-highlight {
+          background: rgba($primary-color, 0.2);
+          color: $primary-color;
+        }
+      }
+    }
+  }
+  
+  // Tables
+  .p-datatable {
+    .p-datatable-header {
+      background: transparent;
+      border: none;
+    }
+    
+    .p-datatable-thead > tr > th {
+      background: rgba(0, 0, 0, 0.2);
+      border-color: $border-color;
+      color: $text-secondary;
+      font-weight: 600;
+    }
+    
+    .p-datatable-tbody > tr {
+      background: transparent;
+      
+      > td {
+        border-color: $border-color;
+        color: $text-primary;
+      }
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      
+      &.p-highlight {
+        background: rgba($primary-color, 0.1);
+        color: $text-primary;
+      }
+    }
+  }
+  
+  // Cards
+  .p-card {
+    background: $card-bg;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    
+    .p-card-title {
+      color: $text-primary;
+    }
+    
+    .p-card-subtitle {
+      color: $text-secondary;
+    }
+  }
+  
+  // Panels
+  .p-panel {
+    .p-panel-header {
+      background: rgba(0, 0, 0, 0.2);
+      border-color: $border-color;
+      color: $text-primary;
+    }
+    
+    .p-panel-content {
+      background: transparent;
+      border-color: $border-color;
+    }
+  }
+  
+  // Tags
+  .p-tag {
+    &.p-tag-success {
+      background: rgba($success-color, 0.15);
+      color: $success-color;
+    }
+    
+    &.p-tag-info {
+      background: rgba($info-color, 0.15);
+      color: $info-color;
+    }
+    
+    &.p-tag-warn, &.p-tag-warning {
+      background: rgba($warning-color, 0.15);
+      color: $warning-color;
+    }
+    
+    &.p-tag-danger {
+      background: rgba($danger-color, 0.15);
+      color: $danger-color;
+    }
+    
+    &.p-tag-secondary {
+      background: rgba($text-secondary, 0.15);
+      color: $text-secondary;
+    }
+  }
+  
+  // Progress Bars
+  .p-progressbar {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    
+    .p-progressbar-value {
+      background: $primary-color;
+    }
+  }
+  
+  // Skeleton
+  .p-skeleton {
+    background: linear-gradient(90deg, $card-bg 25%, color.adjust($card-bg, $lightness: 5%) 50%, $card-bg 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+  }
+  
+  @keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  
+  // Charts
+  .p-chart {
+    canvas {
+      max-width: 100%;
+    }
+  }
+  
+  // Tooltips
+  .p-tooltip {
+    .p-tooltip-text {
+      background: $card-bg;
+      border: 1px solid $border-color;
+      color: $text-primary;
+    }
+  }
+  
+  // Menu
+  .p-menu {
+    background: $card-bg;
+    border: 1px solid $border-color;
+    
+    .p-menuitem-link {
+      color: $text-primary;
+      
+      &:hover {
+        background: rgba($primary-color, 0.1);
+      }
+    }
+  }
+  
+  // Sidebar navigation
+  .sidebar-nav {
+    background: transparent !important;
+    
+    > * {
+      background: transparent !important;
+    }
+  }
+  
+  // Panel Menu (Sidebar)
+  .p-panelmenu,
+  p-panelmenu {
+    background: transparent !important;
+    
+    > .p-component {
+      background: transparent !important;
+    }
+    
+    .p-panelmenu-panel {
+      background: transparent !important;
+    }
+    
+    // Override any root container
+    &.p-component {
+      background: transparent !important;
+    }
+    
+    // PrimeNG v19 specific
+    [data-pc-section="root"],
+    [data-pc-section="panel"],
+    [data-pc-section="header"],
+    [data-pc-section="content"] {
+      background: transparent !important;
+    }
+    .p-panelmenu-header {
+      .p-panelmenu-header-content {
+        background: transparent;
+        border: none;
+        
+        .p-panelmenu-header-action {
+          color: $text-primary;
+          padding: 0.75rem 1rem;
+          border-radius: 8px;
+          
+          &:hover {
+            background: rgba($primary-color, 0.1);
+          }
+        }
+      }
+      
+      &.p-highlight {
+        .p-panelmenu-header-content {
+          .p-panelmenu-header-action {
+            background: rgba($primary-color, 0.1);
+            color: $primary-color;
+          }
+        }
+      }
+    }
+    
+    .p-panelmenu-content {
+      background: transparent;
+      border: none;
+      
+      .p-menuitem {
+        .p-menuitem-content {
+          background: transparent;
+          
+          .p-menuitem-link {
+            color: $text-secondary;
+            padding: 0.625rem 1rem 0.625rem 2.5rem;
+            border-radius: 6px;
+            
+            &:hover {
+              background: rgba($primary-color, 0.05);
+              color: $text-primary;
+            }
+          }
+        }
+        
+        &.p-highlight {
+          .p-menuitem-content {
+            background: transparent;
+            
+            .p-menuitem-link {
+              color: $primary-color;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Badges
+  .p-badge {
+    &.p-badge-success {
+      background: $success-color;
+    }
+    
+    &.p-badge-info {
+      background: $info-color;
+    }
+    
+    &.p-badge-warning {
+      background: $warning-color;
+    }
+    
+    &.p-badge-danger {
+      background: $danger-color;
+    }
+  }
+  
+  // Messages
+  .p-message {
+    &.p-message-error {
+      background: rgba($danger-color, 0.1);
+      border-color: rgba($danger-color, 0.3);
+      color: $danger-color;
+    }
+    
+    &.p-message-success {
+      background: rgba($success-color, 0.1);
+      border-color: rgba($success-color, 0.3);
+      color: $success-color;
+    }
+    
+    &.p-message-warn {
+      background: rgba($warning-color, 0.1);
+      border-color: rgba($warning-color, 0.3);
+      color: $warning-color;
+    }
+    
+    &.p-message-info {
+      background: rgba($info-color, 0.1);
+      border-color: rgba($info-color, 0.3);
+      color: $info-color;
+    }
+  }
+}
+
+// Utility Classes
+.text-primary { color: $text-primary !important; }
+.text-secondary { color: $text-secondary !important; }
+.text-muted { color: $text-muted !important; }
+.text-success { color: $success-color !important; }
+.text-warning { color: $warning-color !important; }
+.text-danger { color: $danger-color !important; }
+.text-info { color: $info-color !important; }
+
+.bg-dark { background: $dark-bg !important; }
+.bg-card { background: $card-bg !important; }
+
+// Animations
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn { animation: fadeIn 0.3s ease; }
+.animate-slideInUp { animation: slideInUp 0.3s ease; }
+
+// Global PrimeNG Dark Mode Overrides - Force dark backgrounds
+.dark-mode {
+  // Force dark surfaces on all PrimeNG components
+  .p-component {
+    background: transparent;
+  }
+  
+  // Toolbar
+  .p-toolbar {
+    background: $dark-bg !important;
+    border-color: $border-color !important;
+  }
+  
+  // Menubar
+  .p-menubar {
+    background: $dark-bg !important;
+    border-color: $border-color !important;
+    
+    .p-menubar-root-list > .p-menuitem > .p-menuitem-content {
+      background: transparent;
+      color: $text-primary;
+    }
+  }
+  
+  // Input wrapper backgrounds
+  .p-inputgroup,
+  .p-inputgroup-addon {
+    background: $card-bg;
+    border-color: $border-color;
+    color: $text-primary;
+  }
+  
+  // Avatar
+  .p-avatar {
+    background: $card-bg;
+    color: $text-primary;
+  }
+  
+  // Breadcrumb
+  .p-breadcrumb {
+    background: transparent;
+    border: none;
+    
+    .p-menuitem-text,
+    .p-menuitem-link {
+      color: $text-secondary;
+    }
+  }
+  
+  // Chip
+  .p-chip {
+    background: $card-bg;
+    color: $text-primary;
+  }
+  
+  // Tabview
+  .p-tabview {
+    .p-tabview-nav {
+      background: transparent;
+      border-color: $border-color;
+    }
+    
+    .p-tabview-panels {
+      background: transparent;
+    }
+    
+    .p-tabview-nav-link {
+      background: transparent;
+      color: $text-secondary;
+      
+      &:hover {
+        background: rgba($primary-color, 0.1);
+        color: $text-primary;
+      }
+    }
+    
+    .p-tabview-nav-item.p-highlight .p-tabview-nav-link {
+      background: transparent;
+      color: $primary-color;
+      border-color: $primary-color;
+    }
+  }
+  
+  // PrimeNG v19 Tabs Component (p-tabs, p-tablist, p-tab, p-tabpanels, p-tabpanel)
+  .p-tabs,
+  p-tabs {
+    background: transparent !important;
+    
+    .p-tablist {
+      background: $card-bg !important;
+      border: 1px solid $border-color !important;
+      border-radius: 8px !important;
+      padding: 0.25rem !important;
+      margin-bottom: 1rem !important;
+    }
+    
+    .p-tab {
+      background: transparent !important;
+      color: $text-secondary !important;
+      border: none !important;
+      padding: 0.75rem 1.25rem !important;
+      border-radius: 6px !important;
+      margin: 0 0.125rem !important;
+      transition: all 0.2s ease !important;
+      
+      &:hover {
+        background: rgba($primary-color, 0.1) !important;
+        color: $text-primary !important;
+      }
+      
+      &[data-p-active="true"],
+      &.p-tab-active,
+      &.p-highlight {
+        background: $primary-color !important;
+        color: white !important;
+      }
+      
+      i {
+        margin-right: 0.5rem;
+      }
+      
+      .p-badge {
+        margin-left: 0.5rem;
+      }
+    }
+    
+    .p-tabpanels {
+      background: transparent !important;
+      padding: 0 !important;
+    }
+    
+    .p-tabpanel {
+      background: transparent !important;
+      padding: 0 !important;
+    }
+  }
+  
+  // Mail tabs specific
+  .mail-tabs {
+    background: transparent !important;
+    
+    .p-tablist {
+      background: $card-bg !important;
+      border: 1px solid $border-color !important;
+      border-radius: 8px !important;
+    }
+    
+    .p-tab {
+      background: transparent !important;
+      color: $text-secondary !important;
+      
+      &[data-p-active="true"],
+      &.p-tab-active {
+        background: $primary-color !important;
+        color: white !important;
+      }
+    }
+  }
+  
+  // Accordion
+  .p-accordion {
+    .p-accordion-header .p-accordion-header-link {
+      background: $card-bg;
+      border-color: $border-color;
+      color: $text-primary;
+      
+      &:hover {
+        background: rgba($primary-color, 0.1);
+      }
+    }
+    
+    .p-accordion-content {
+      background: transparent;
+      border-color: $border-color;
+    }
+  }
+  
+  // Fieldset
+  .p-fieldset {
+    background: transparent;
+    border-color: $border-color;
+    
+    .p-fieldset-legend {
+      background: $card-bg;
+      border-color: $border-color;
+      color: $text-primary;
+    }
+  }
+  
+  // Splitter
+  .p-splitter {
+    background: $dark-bg;
+    border-color: $border-color;
+    
+    .p-splitter-gutter {
+      background: $border-color;
+    }
+  }
+  
+  // ScrollPanel
+  .p-scrollpanel-bar {
+    background: $border-color;
+  }
+
+  // Quill Editor (p-editor) Dark Theme
+  .p-editor {
+    .p-editor-toolbar {
+      background: $card-bg !important;
+      border-color: $border-color !important;
+      
+      .ql-picker-label {
+        color: $text-primary !important;
+        
+        &:hover {
+          color: $primary-color !important;
+        }
+      }
+      
+      .ql-picker-options {
+        background: $card-bg !important;
+        border-color: $border-color !important;
+        
+        .ql-picker-item {
+          color: $text-primary !important;
+          
+          &:hover {
+            color: $primary-color !important;
+            background: rgba($primary-color, 0.1) !important;
+          }
+        }
+      }
+      
+      .ql-stroke {
+        stroke: $text-secondary !important;
+      }
+      
+      .ql-fill {
+        fill: $text-secondary !important;
+      }
+      
+      button:hover .ql-stroke,
+      .ql-picker-label:hover .ql-stroke {
+        stroke: $primary-color !important;
+      }
+      
+      button:hover .ql-fill,
+      .ql-picker-label:hover .ql-fill {
+        fill: $primary-color !important;
+      }
+      
+      button.ql-active .ql-stroke {
+        stroke: $primary-color !important;
+      }
+      
+      button.ql-active .ql-fill {
+        fill: $primary-color !important;
+      }
+    }
+    
+    .p-editor-content {
+      background: $card-bg !important;
+      border-color: $border-color !important;
+      
+      .ql-editor {
+        background: $card-bg !important;
+        color: $text-primary !important;
+        min-height: 200px;
+        
+        &.ql-blank::before {
+          color: $text-muted !important;
+          font-style: italic;
+        }
+      }
+    }
+  }
+  
+  // Quill standalone styles
+  .ql-container {
+    background: $card-bg !important;
+    border-color: $border-color !important;
+    color: $text-primary !important;
+    
+    .ql-editor {
+      background: $card-bg !important;
+      color: $text-primary !important;
+      
+      &.ql-blank::before {
+        color: $text-muted !important;
+      }
+    }
+  }
+  
+  .ql-toolbar {
+    background: $card-bg !important;
+    border-color: $border-color !important;
+  }
+  
+  .ql-snow .ql-picker {
+    color: $text-primary !important;
+  }
+  
+  .ql-snow .ql-picker-options {
+    background: $card-bg !important;
+    border-color: $border-color !important;
+  }
+
+  // ===== DIALOG DARK THEME =====
+  .p-dialog {
+    background: $card-bg !important;
+    border: 1px solid $border-color !important;
+    border-radius: 12px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+    
+    .p-dialog-header {
+      background: $card-bg !important;
+      color: $text-primary !important;
+      border-bottom: 1px solid $border-color !important;
+      padding: 1.25rem 1.5rem !important;
+      border-radius: 12px 12px 0 0 !important;
+      
+      .p-dialog-title {
+        color: $text-primary !important;
+        font-weight: 600 !important;
+      }
+      
+      .p-dialog-header-close {
+        color: $text-secondary !important;
+        
+        &:hover {
+          color: $text-primary !important;
+          background: rgba(255, 255, 255, 0.1) !important;
+        }
+      }
+    }
+    
+    .p-dialog-content {
+      background: $card-bg !important;
+      color: $text-primary !important;
+      padding: 1.5rem !important;
+    }
+    
+    .p-dialog-footer {
+      background: $card-bg !important;
+      border-top: 1px solid $border-color !important;
+      padding: 1rem 1.5rem !important;
+      border-radius: 0 0 12px 12px !important;
+    }
+  }
+  
+  // Dialog overlay
+  .p-dialog-mask {
+    background: rgba(0, 0, 0, 0.6) !important;
+  }
+  
+  // Confirm Dialog
+  .p-confirmdialog {
+    .p-dialog {
+      background: $card-bg !important;
+    }
+    
+    .p-confirmdialog-message {
+      color: $text-primary !important;
+    }
+  }
+  
+  // Toast
+  .p-toast {
+    .p-toast-message {
+      background: $card-bg !important;
+      border: 1px solid $border-color !important;
+      
+      .p-toast-message-content {
+        color: $text-primary !important;
+      }
+      
+      .p-toast-summary {
+        color: $text-primary !important;
+      }
+      
+      .p-toast-detail {
+        color: $text-secondary !important;
+      }
+    }
+  }
+  
+  // Select/Dropdown Panel
+  .p-select-overlay,
+  .p-dropdown-panel,
+  .p-multiselect-overlay,
+  .p-multiselect-panel {
+    background: $card-bg !important;
+    border: 1px solid $border-color !important;
+    
+    .p-select-item,
+    .p-dropdown-item,
+    .p-multiselect-item {
+      color: $text-primary !important;
+      
+      &:hover {
+        background: rgba($primary-color, 0.1) !important;
+      }
+      
+      &.p-highlight {
+        background: rgba($primary-color, 0.2) !important;
+        color: $primary-color !important;
+      }
+    }
+    
+    .p-select-header,
+    .p-multiselect-header {
+      background: $card-bg !important;
+      border-color: $border-color !important;
+      color: $text-primary !important;
+    }
+    
+    .p-multiselect-filter-container {
+      .p-inputtext {
+        background: $dark-bg !important;
+        border-color: $border-color !important;
+        color: $text-primary !important;
+      }
+    }
+  }
+  
+  // Preview container inside dialogs
+  .preview-container {
+    background: $dark-bg !important;
+    border: 1px solid $border-color !important;
+    border-radius: 8px;
+    padding: 1.5rem;
+    
+    .preview-subject {
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid $border-color;
+      color: $text-primary;
+      
+      strong {
+        color: $text-secondary;
+      }
+    }
+    
+    .preview-content {
+      color: $text-primary !important;
+      line-height: 1.6;
+      
+      h1, h2, h3, h4, h5, h6 {
+        color: $text-primary !important;
+      }
+      
+      p {
+        color: $text-primary !important;
+      }
+    }
+  }
+  
+  // Form elements inside dialogs
+  .compose-form,
+  .template-edit-form {
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+      
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: $text-secondary;
+        font-weight: 500;
+        font-size: 0.875rem;
+      }
+    }
+  }
+}

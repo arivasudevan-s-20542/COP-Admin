@@ -1,0 +1,187 @@
+<div class="system-health-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="title-group">
+        <i class="pi pi-chart-line title-icon"></i>
+        <h1 class="page-title">System Observability</h1>
+        <p-tag [value]="statusLabel()" [severity]="statusSeverity()" class="status-badge"></p-tag>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="auto-refresh-toggle" (click)="toggleAutoRefresh()">
+        <i class="pi pi-refresh" [class.spinning]="autoRefresh()"></i>
+        <span>Auto: {{ autoRefresh() ? 'On' : 'Off' }}</span>
+      </div>
+      <div class="time-range-buttons">
+        @for (range of timeRangeOptions; track range.value) {
+          <button 
+            class="time-btn"
+            [class.active]="selectedTimeRange() === range.value"
+            (click)="setTimeRange(range.value)">
+            {{ range.label }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Cluster Info -->
+  <div class="cluster-info">
+    <h2 class="cluster-name">{{ clusterName() }}</h2>
+    <p class="cluster-description">Real-time monitoring for evaluation workers and submission API.</p>
+  </div>
+
+  <!-- KPI Stats Row -->
+  <div class="kpi-grid">
+    @for (stat of kpiStats(); track stat.label) {
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">{{ stat.label }}</span>
+          <i [class]="stat.icon + ' kpi-icon'"></i>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-value">{{ stat.value }}</span>
+          <span class="kpi-change" [class]="stat.changeType">
+            <i class="pi" [class.pi-arrow-up]="stat.changeType !== 'negative'" [class.pi-arrow-down]="stat.changeType === 'negative'"></i>
+            {{ stat.change }}
+          </span>
+        </div>
+        @if (stat.progress !== undefined) {
+          <div class="kpi-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="stat.progress"></div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Main Charts Grid -->
+  <div class="charts-grid">
+    <!-- Latency Chart -->
+    <div class="chart-card chart-large">
+      <div class="chart-header">
+        <h3 class="chart-title">Code Execution Latency (ms)</h3>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <span class="legend-dot blue"></span>
+            <span class="legend-label">p50</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot purple"></span>
+            <span class="legend-label">p90</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot red"></span>
+            <span class="legend-label">p99</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-body">
+        @if (latencyChartData()) {
+          <p-chart type="line" [data]="latencyChartData()" [options]="latencyChartOptions()" [style]="{ height: '280px' }"></p-chart>
+        }
+      </div>
+    </div>
+
+    <!-- Cluster Resources Panel -->
+    <div class="resources-panel">
+      @for (resource of clusterResources(); track resource.name) {
+        <div class="resource-card">
+          <div class="resource-header">
+            <div class="resource-info">
+              <div class="resource-icon">
+                <i [class]="resource.icon"></i>
+              </div>
+              <div class="resource-meta">
+                <h4 class="resource-name">{{ resource.name }}</h4>
+                <span class="resource-type">{{ resource.type }}</span>
+              </div>
+            </div>
+            <p-tag [value]="resource.status | titlecase" [severity]="getResourceStatusSeverity(resource.status)" class="resource-status"></p-tag>
+          </div>
+          <div class="resource-metrics">
+            <div class="metric-row">
+              <div class="metric-header">
+                <span class="metric-label">CPU Usage</span>
+                <span class="metric-value">{{ resource.cpuUsage }}%</span>
+              </div>
+              <div class="metric-bar">
+                <div class="metric-fill cpu" [style.width.%]="resource.cpuUsage" [class]="getCpuBarClass(resource.cpuUsage)"></div>
+              </div>
+            </div>
+            <div class="metric-row">
+              <div class="metric-header">
+                <span class="metric-label">{{ resource.icon === 'pi pi-database' ? 'IOPS' : 'Memory' }}</span>
+                <span class="metric-value">{{ resource.memoryUsage }}%</span>
+              </div>
+              <div class="metric-bar">
+                <div class="metric-fill memory" [style.width.%]="resource.memoryUsage"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Bottom Section Grid -->
+  <div class="bottom-grid">
+    <!-- Slowest Endpoints Table -->
+    <div class="endpoints-card">
+      <div class="card-header">
+        <h3 class="card-title">Slowest Endpoints</h3>
+        <button class="view-all-btn" (click)="viewAllEndpoints()">View All</button>
+      </div>
+      <div class="table-container">
+        <p-table [value]="endpoints()" [tableStyle]="{ 'min-width': '50rem' }" styleClass="custom-table">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Endpoint</th>
+              <th class="text-right">Avg Latency</th>
+              <th class="text-right">P99</th>
+              <th>Status (2xx/4xx/5xx)</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-endpoint>
+            <tr>
+              <td class="endpoint-cell">{{ endpoint.endpoint }}</td>
+              <td class="text-right latency-cell">{{ endpoint.avgLatency }}</td>
+              <td class="text-right" [class.latency-critical]="endpoint.p99Critical" [class.latency-warning]="!endpoint.p99Critical && endpoint.p99Latency > '500ms'">
+                {{ endpoint.p99Latency }}
+              </td>
+              <td>
+                <div class="status-bar">
+                  <div class="status-segment success" [style.width.%]="endpoint.status2xx"></div>
+                  <div class="status-segment warning" [style.width.%]="endpoint.status4xx"></div>
+                  <div class="status-segment error" [style.width.%]="endpoint.status5xx"></div>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- Live Errors Stream -->
+    <div class="errors-card">
+      <div class="card-header">
+        <h3 class="card-title">Live Errors</h3>
+        <div class="streaming-indicator">
+          <span class="pulse-dot"></span>
+          <span class="streaming-label">Streaming</span>
+        </div>
+      </div>
+      <div class="errors-stream">
+        @for (error of liveErrors(); track error.timestamp + error.message) {
+          <div class="error-entry" [class]="getErrorLevelClass(error.level)">
+            <span class="error-time">{{ error.timestamp }}</span>
+            <span class="error-message">{{ error.message }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

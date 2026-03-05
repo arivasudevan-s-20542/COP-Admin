@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bulk Email &amp; User Communication - Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }.custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+            border-radius: 20px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #374151;
+        }
+    </style>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3b82f6", // Blue for primary actions
+                        "primary-hover": "#2563eb",
+                        "background-light": "#f3f4f6",
+                        "background-dark": "#111827",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1f2937",
+                        "border-light": "#e5e7eb",
+                        "border-dark": "#374151",
+                        "text-primary-light": "#111827",
+                        "text-primary-dark": "#f9fafb",
+                        "text-secondary-light": "#6b7280",
+                        "text-secondary-dark": "#9ca3af",
+                        "toolbar-light": "#f9fafb",
+                        "toolbar-dark": "#2d3748",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display h-screen flex flex-col overflow-hidden text-text-primary-light dark:text-text-primary-dark antialiased selection:bg-primary selection:text-white transition-colors duration-200">
+<header class="h-16 bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark flex items-center justify-between px-6 shrink-0 z-10">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">code</span>
+<span class="font-bold text-lg tracking-tight">CodeMaster <span class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded-full border border-border-light dark:border-border-dark ml-2">Admin</span></span>
+</div>
+<div class="h-6 w-px bg-border-light dark:border-border-dark mx-2"></div>
+<nav class="hidden md:flex items-center gap-6 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">
+<a class="hover:text-primary transition-colors" href="#">Users</a>
+<a class="hover:text-primary transition-colors" href="#">Contests</a>
+<a class="text-primary cursor-default" href="#">Communication</a>
+<a class="hover:text-primary transition-colors" href="#">Analytics</a>
+</nav>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark transition-colors" onclick="document.documentElement.classList.toggle('dark')" title="Toggle Theme">
+<span class="material-symbols-outlined">contrast</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white text-xs font-bold ring-2 ring-offset-2 ring-offset-surface-light dark:ring-offset-surface-dark ring-transparent cursor-pointer">
+                AD
+            </div>
+</div>
+</header>
+<main class="flex-1 flex flex-col min-h-0 bg-background-light dark:bg-background-dark p-4 md:p-8">
+<div class="flex-1 flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl shadow-xl border border-border-light dark:border-border-dark overflow-hidden max-w-5xl mx-auto w-full">
+<div class="bg-primary text-white h-12 flex items-center justify-between px-4 shrink-0">
+<div class="flex items-center gap-2 font-medium">
+<span>New Bulk Message</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-1 hover:bg-white/20 rounded transition-colors"><span class="material-symbols-outlined text-lg">minimize</span></button>
+<button class="p-1 hover:bg-white/20 rounded transition-colors"><span class="material-symbols-outlined text-lg">open_in_full</span></button>
+<button class="p-1 hover:bg-white/20 rounded transition-colors"><span class="material-symbols-outlined text-lg">close</span></button>
+</div>
+</div>
+<div class="px-6 py-4 border-b border-border-light dark:border-border-dark flex items-center justify-between gap-4">
+<div class="flex items-center gap-3 flex-1">
+<div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-text-secondary-light dark:text-text-secondary-dark">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-text-primary-light dark:text-text-primary-dark">From: Admin Support</span>
+<span class="text-xs text-text-secondary-light dark:text-text-secondary-dark">&lt;support@codemaster.io&gt;</span>
+</div>
+</div>
+<div class="relative group">
+<button class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-primary border border-primary/30 rounded hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors">
+<span>Insert Template</span>
+<span class="material-symbols-outlined text-lg">arrow_drop_down</span>
+</button>
+</div>
+</div>
+<div class="bg-amber-50 dark:bg-amber-900/20 px-6 py-3 border-b border-amber-100 dark:border-amber-800/30 flex gap-3 text-sm text-amber-800 dark:text-amber-200">
+<span class="material-symbols-outlined text-amber-600 dark:text-amber-400 shrink-0">info</span>
+<p>
+<span class="font-semibold">Bulk Action Notice:</span> You are about to send an email to a large user segment. Emails will be queued and sent via our authenticated domain to ensure high deliverability. <a class="underline hover:text-amber-900 dark:hover:text-amber-100" href="#">Learn More</a>
+</p>
+</div>
+<div class="flex flex-col border-b border-border-light dark:border-border-dark">
+<div class="flex items-start px-6 py-3 gap-4 border-b border-border-light/50 dark:border-border-dark/50">
+<label class="mt-1.5 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark w-12">To</label>
+<div class="flex-1 flex flex-wrap gap-2">
+<div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 text-text-primary-light dark:text-text-primary-dark px-2 py-1 rounded-full text-sm border border-border-light dark:border-border-dark">
+<span class="material-symbols-outlined text-base text-text-secondary-light dark:text-text-secondary-dark">group</span>
+<span>All Premium Users</span>
+<button class="hover:text-red-500 ml-1"><span class="material-symbols-outlined text-base">close</span></button>
+</div>
+<div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 text-text-primary-light dark:text-text-primary-dark px-2 py-1 rounded-full text-sm border border-border-light dark:border-border-dark">
+<span class="material-symbols-outlined text-base text-text-secondary-light dark:text-text-secondary-dark">trophy</span>
+<span>Contest #42 Participants</span>
+<button class="hover:text-red-500 ml-1"><span class="material-symbols-outlined text-base">close</span></button>
+</div>
+<input class="bg-transparent border-none outline-none text-sm p-1.5 placeholder-text-secondary-light dark:placeholder-text-secondary-dark flex-1 min-w-[150px] focus:ring-0" placeholder="Add users or groups..." type="text"/>
+</div>
+<div class="flex items-center gap-3 text-sm text-primary cursor-pointer shrink-0 mt-1.5 font-medium">
+<span class="hover:underline">Bcc</span>
+<span class="hover:underline">Cc</span>
+</div>
+</div>
+<div class="flex items-center px-6 py-3 gap-4">
+<input class="w-full bg-transparent border-none outline-none text-lg font-medium placeholder-text-secondary-light dark:placeholder-text-secondary-dark focus:ring-0 p-0 text-text-primary-light dark:text-text-primary-dark" placeholder="Subject" type="text" value="Update: Weekly Contest Schedule Change"/>
+</div>
+</div>
+<div class="bg-toolbar-light dark:bg-toolbar-dark border-b border-border-light dark:border-border-dark px-4 py-2 flex flex-wrap items-center gap-1 sticky top-0 z-10">
+<div class="flex items-center border-r border-border-light dark:border-border-dark pr-2 mr-1">
+<button class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark" title="Bold"><span class="material-symbols-outlined">format_bold</span></button>
+<button class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark" title="Italic"><span class="material-symbols-outlined">format_italic</span></button>
+<button class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark" title="Underline"><span class="material-symbols-outlined">format_underlined</span></button>
+<button class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark" title="Strikethrough"><span class="material-symbols-outlined">format_strikethrough</span></button>
+</div>
+<div class="flex items-center border-r border-border-light dark:border-border-dark pr-2 mr-1 gap-1">
+<button class="flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-sm text-text-primary-light dark:text-text-primary-dark">
+<span>Sans Serif</span>
+<span class="material-symbols-outlined text-sm">arrow_drop_down</span>
+</button>
+<div class="w-px h-4 bg-border-light dark:border-border-dark mx-1"></div>
+<button class="flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-sm text-text-primary-light dark:text-text-primary-dark">
+<span>14</span> 
+<span class="material-symbols-outlined text-sm">arrow_drop_down</span>
+</button>
+</div>
+<div class="flex items-center border-r border-border-light dark:border-border-dark pr-2 mr-1">
+<button class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark" title="Text Color"><span class="material-symbols-outlined">format_color_text</span></button>
+<button class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark" title="Highlight Color"><span class="material-symbols-outlined">format_ink_highlighter</span></button>
+</div>
+<div class="flex items-center border-r border-border-light dark:border-border-dark pr-2 mr-1">
+<button class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark" title="Align Left"><span class="material-symbols-outlined">format_align_left</span></button>
+<button class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark" title="Bulleted List"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+<button class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark" title="Indent"><span class="material-symbols-outlined">format_indent_increase</span></button>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark" title="Link"><span class="material-symbols-outlined">link</span></button>
+<button class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark" title="Code Block"><span class="material-symbols-outlined">code</span></button>
+<button class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark" title="Image"><span class="material-symbols-outlined">image</span></button>
+</div>
+<div class="flex-1"></div>
+<button class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary px-2">Plain text</button>
+</div>
+<div class="flex-1 p-6 overflow-y-auto custom-scrollbar bg-surface-light dark:bg-surface-dark relative" contenteditable="true">
+<p class="mb-4 text-text-primary-light dark:text-text-primary-dark">Hello Coders,</p>
+<p class="mb-4 text-text-primary-light dark:text-text-primary-dark">We have an important update regarding the schedule for <span class="font-bold text-primary">Weekly Contest #305</span>. Due to maintenance on our server infrastructure to handle increased traffic, the contest will be delayed by 2 hours.</p>
+<div class="bg-gray-50 dark:bg-gray-800 border-l-4 border-primary p-4 my-4 rounded-r">
+<p class="font-medium text-text-primary-light dark:text-text-primary-dark">New Start Time:</p>
+<p class="text-text-secondary-light dark:text-text-secondary-dark font-mono mt-1">Saturday, Oct 24th, 16:00 UTC</p>
+</div>
+<p class="mb-4 text-text-primary-light dark:text-text-primary-dark">We apologize for any inconvenience this may cause. Keep practicing!</p>
+<p class="mt-8 text-text-secondary-light dark:text-text-secondary-dark">Best regards,<br/>The CodeMaster Team</p>
+</div>
+<div class="h-16 border-t border-border-light dark:border-border-dark px-6 flex items-center justify-between shrink-0 bg-surface-light dark:bg-surface-dark">
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-primary transition-colors tooltip" title="Attach Files">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark transition-colors tooltip" title="Insert Emoji">
+<span class="material-symbols-outlined">sentiment_satisfied</span>
+</button>
+<button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark transition-colors tooltip" title="Drive">
+<span class="material-symbols-outlined">add_to_drive</span>
+</button>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark transition-colors" title="Magic Format">
+<span class="material-symbols-outlined text-purple-500">auto_fix_high</span>
+</button>
+<div class="h-6 w-px bg-border-light dark:border-border-dark mx-1"></div>
+<button class="flex items-center gap-2 px-4 py-2 rounded text-sm font-medium text-text-primary-light dark:text-text-primary-dark hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+<span class="material-symbols-outlined text-lg">schedule</span>
+                        Schedule
+                    </button>
+<div class="flex relative rounded-md shadow-sm">
+<button class="px-6 py-2 bg-primary hover:bg-primary-hover text-white text-sm font-semibold rounded-l-md transition-colors flex items-center gap-2">
+                            Send
+                            <span class="material-symbols-outlined text-lg">send</span>
+</button>
+<button class="px-2 bg-primary border-l border-white/20 hover:bg-primary-hover text-white rounded-r-md transition-colors">
+<span class="material-symbols-outlined text-lg">arrow_drop_down</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="text-center mt-4 text-xs text-text-secondary-light dark:text-text-secondary-dark">
+            Last draft saved at 10:42 AM
+        </div>
+</main>
+<script>
+        // Simple script to initialize dark mode based on system preference if not already set, or just default to dark for this demo context
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            // Defaulting to dark for the demo as requested by user context "Dark Mode"
+            document.documentElement.classList.add('dark')
+        }
+    </script>
+
+</body></html>

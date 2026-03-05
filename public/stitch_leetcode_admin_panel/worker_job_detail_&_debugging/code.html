@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Worker Job Detail &amp; Debugging</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                        "surface-dark": "#161b26",
+                        "surface-darker": "#0d1117",
+                        "border-dark": "#282e39",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for code editors */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #161b26;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #282e39;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #3b4354;
+        }
+    </style>
+</head>
+<body class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display antialiased overflow-x-hidden">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-border-dark bg-white dark:bg-background-dark px-10 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 dark:text-white text-slate-900">
+<div class="size-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[20px]">terminal</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">DevOps Console</h2>
+</div>
+<label class="hidden lg:flex flex-col min-w-40 !h-10 w-96">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-slate-400 dark:text-[#9ca6ba] flex border-none bg-slate-100 dark:bg-[#282e39] items-center justify-center pl-4 rounded-l-lg border-r-0">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg dark:text-white focus:outline-0 focus:ring-0 border-none bg-slate-100 dark:bg-[#282e39] focus:border-none h-full placeholder:text-slate-400 dark:placeholder:text-[#9ca6ba] px-4 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal" placeholder="Search jobs, workers, or logs..." value=""/>
+<div class="text-slate-400 dark:text-[#9ca6ba] flex border-none bg-slate-100 dark:bg-[#282e39] items-center justify-center pr-4 rounded-r-lg border-l-0 text-xs font-mono">
+                        ⌘K
+                    </div>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Dashboard</a>
+<a class="text-primary dark:text-white text-sm font-medium leading-normal transition-colors" href="#">Jobs</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Workers</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Analytics</a>
+</nav>
+<div class="h-6 w-px bg-gray-200 dark:bg-border-dark"></div>
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center rounded-full size-8 hover:bg-slate-100 dark:hover:bg-surface-dark transition-colors">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">notifications</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9 border-2 border-slate-200 dark:border-border-dark" data-alt="User Avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCgUUVQ8OPfv_xIv0vt9TOCCUXHfQmByGjk6eTUbO8vS5PtNvNHIGarB7kAvY14TR2PFNr2pGiZAG_yM27JQcTuWyrYqWdHl_5A-zoUQlriE9lqHwH86BFB6ohvKVFdsiWF_xcCwREgOUGfz8JRDL9XjXPiLD4gqVL_YoVtYwLDTblTXKeqjnAPAXj5Qqq900YaqR1n2A6iFJ3mtKhm84_Vj712lIj1NDpISGX2M9pL5HI6mbGild4Njr2ndCPM9s4C_If6LobwzaMf");'></div>
+</div>
+</div>
+</header>
+<div class="layout-container flex h-full grow flex-col px-4 md:px-10 lg:px-40 py-8">
+<div class="layout-content-container flex flex-col w-full max-w-[1400px] mx-auto flex-1 gap-6">
+<!-- Breadcrumbs -->
+<div class="flex flex-wrap gap-2 items-center">
+<a class="text-slate-500 dark:text-[#9ca6ba] text-sm font-medium leading-normal hover:underline" href="#">Jobs</a>
+<span class="material-symbols-outlined text-slate-500 dark:text-[#9ca6ba] text-sm">chevron_right</span>
+<a class="text-slate-500 dark:text-[#9ca6ba] text-sm font-medium leading-normal hover:underline" href="#">Failed Executions</a>
+<span class="material-symbols-outlined text-slate-500 dark:text-[#9ca6ba] text-sm">chevron_right</span>
+<span class="text-slate-900 dark:text-white text-sm font-medium leading-normal">#JR-99210</span>
+</div>
+<!-- Page Header -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-2 border-b border-gray-200 dark:border-border-dark/50">
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-4">
+<h1 class="text-slate-900 dark:text-white text-3xl font-bold leading-tight tracking-tight">Job #JR-99210</h1>
+<div class="flex h-7 shrink-0 items-center justify-center gap-x-1.5 rounded-full bg-red-100 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 pl-2 pr-3">
+<span class="material-symbols-outlined text-red-600 dark:text-red-500 text-[18px]">error</span>
+<p class="text-red-600 dark:text-red-500 text-xs font-bold leading-normal tracking-wide">FAILED</p>
+</div>
+</div>
+<p class="text-slate-500 dark:text-[#9ca6ba] text-sm font-normal leading-normal">
+                        Failed execution in <span class="font-mono text-slate-700 dark:text-slate-300">priority-submission-queue</span> • 2 minutes ago
+                    </p>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-9 px-4 border border-transparent hover:bg-slate-100 dark:hover:bg-surface-dark text-slate-600 dark:text-slate-300 text-sm font-semibold transition-colors">
+<span class="material-symbols-outlined mr-2 text-[18px]">article</span>
+                        View Node Logs
+                    </button>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-9 px-4 border border-slate-300 dark:border-border-dark bg-white dark:bg-transparent hover:bg-slate-50 dark:hover:bg-surface-dark text-slate-900 dark:text-white text-sm font-semibold transition-colors">
+<span class="material-symbols-outlined mr-2 text-[18px]">edit</span>
+                        Edit &amp; Retry
+                    </button>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-9 px-4 bg-primary hover:bg-primary/90 text-white text-sm font-bold shadow-lg shadow-primary/20 transition-all">
+<span class="material-symbols-outlined mr-2 text-[18px]">refresh</span>
+                        Retry Now
+                    </button>
+</div>
+</div>
+<!-- Stats/Metadata -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Worker Node -->
+<div class="flex flex-col gap-1 rounded-xl p-5 border border-gray-200 dark:border-border-dark bg-white dark:bg-surface-dark shadow-sm">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-slate-400 text-[20px]">dns</span>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">Worker Node</p>
+</div>
+<p class="text-slate-900 dark:text-white font-mono text-sm font-medium truncate" title="worker-us-east-1a-04">worker-us-east-1a-04</p>
+</div>
+<!-- Queue Name -->
+<div class="flex flex-col gap-1 rounded-xl p-5 border border-gray-200 dark:border-border-dark bg-white dark:bg-surface-dark shadow-sm">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-slate-400 text-[20px]">layers</span>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">Queue Name</p>
+</div>
+<p class="text-slate-900 dark:text-white font-mono text-sm font-medium truncate">priority-submission</p>
+</div>
+<!-- Duration -->
+<div class="flex flex-col gap-1 rounded-xl p-5 border border-gray-200 dark:border-border-dark bg-white dark:bg-surface-dark shadow-sm">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-slate-400 text-[20px]">timer</span>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">Duration</p>
+</div>
+<p class="text-slate-900 dark:text-white font-mono text-sm font-medium">452ms</p>
+</div>
+<!-- Retries -->
+<div class="flex flex-col gap-1 rounded-xl p-5 border border-gray-200 dark:border-border-dark bg-white dark:bg-surface-dark shadow-sm">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-slate-400 text-[20px]">replay</span>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">Retries</p>
+</div>
+<div class="flex items-center gap-2">
+<p class="text-slate-900 dark:text-white font-mono text-sm font-medium">3 <span class="text-slate-400">/ 5</span></p>
+<div class="h-1.5 w-16 bg-gray-200 dark:bg-border-dark rounded-full overflow-hidden ml-auto">
+<div class="h-full bg-yellow-500 w-[60%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Split Pane: Payload & Stack Trace -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[500px]">
+<!-- Left Pane: Job Payload -->
+<div class="flex flex-col rounded-xl overflow-hidden border border-gray-200 dark:border-border-dark bg-white dark:bg-surface-dark shadow-sm h-full">
+<div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-border-dark bg-slate-50 dark:bg-[#1f2633]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-[18px]">data_object</span>
+<span class="text-slate-700 dark:text-slate-200 text-sm font-semibold">Job Payload</span>
+<span class="text-xs text-slate-400 font-mono ml-2">JSON</span>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors" title="Copy to clipboard">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+</button>
+</div>
+<div class="relative flex-1 bg-slate-50 dark:bg-surface-darker overflow-hidden">
+<div class="absolute inset-0 p-4 font-mono text-sm overflow-auto custom-scrollbar">
+<pre class="text-slate-600 dark:text-slate-300 leading-relaxed"><span class="text-slate-400 select-none">1  </span>{
+<span class="text-slate-400 select-none">2  </span>  <span class="text-purple-600 dark:text-purple-400">"submission_id"</span>: <span class="text-blue-600 dark:text-blue-400">88219</span>,
+<span class="text-slate-400 select-none">3  </span>  <span class="text-purple-600 dark:text-purple-400">"language"</span>: <span class="text-green-600 dark:text-green-400">"cpp"</span>,
+<span class="text-slate-400 select-none">4  </span>  <span class="text-purple-600 dark:text-purple-400">"time_limit"</span>: <span class="text-blue-600 dark:text-blue-400">2000</span>,
+<span class="text-slate-400 select-none">5  </span>  <span class="text-purple-600 dark:text-purple-400">"memory_limit"</span>: <span class="text-blue-600 dark:text-blue-400">128</span>,
+<span class="text-slate-400 select-none">6  </span>  <span class="text-purple-600 dark:text-purple-400">"code_hash"</span>: <span class="text-green-600 dark:text-green-400">"a1b2c3d4e5f6g7h8i9j0"</span>,
+<span class="text-slate-400 select-none">7  </span>  <span class="text-purple-600 dark:text-purple-400">"test_cases"</span>: [
+<span class="text-slate-400 select-none">8  </span>    {
+<span class="text-slate-400 select-none">9  </span>      <span class="text-purple-600 dark:text-purple-400">"input"</span>: <span class="text-green-600 dark:text-green-400">"[2,7,11,15], 9"</span>,
+<span class="text-slate-400 select-none">10 </span>      <span class="text-purple-600 dark:text-purple-400">"expected"</span>: <span class="text-green-600 dark:text-green-400">"[0,1]"</span>
+<span class="text-slate-400 select-none">11 </span>    },
+<span class="text-slate-400 select-none">12 </span>    {
+<span class="text-slate-400 select-none">13 </span>      <span class="text-purple-600 dark:text-purple-400">"input"</span>: <span class="text-green-600 dark:text-green-400">"[3,2,4], 6"</span>,
+<span class="text-slate-400 select-none">14 </span>      <span class="text-purple-600 dark:text-purple-400">"expected"</span>: <span class="text-green-600 dark:text-green-400">"[1,2]"</span>
+<span class="text-slate-400 select-none">15 </span>    }
+<span class="text-slate-400 select-none">16 </span>  ],
+<span class="text-slate-400 select-none">17 </span>  <span class="text-purple-600 dark:text-purple-400">"meta"</span>: {
+<span class="text-slate-400 select-none">18 </span>    <span class="text-purple-600 dark:text-purple-400">"retry_count"</span>: <span class="text-blue-600 dark:text-blue-400">3</span>,
+<span class="text-slate-400 select-none">19 </span>    <span class="text-purple-600 dark:text-purple-400">"origin"</span>: <span class="text-green-600 dark:text-green-400">"contest_service"</span>
+<span class="text-slate-400 select-none">20 </span>  }
+<span class="text-slate-400 select-none">21 </span>}
+</pre>
+</div>
+</div>
+</div>
+<!-- Right Pane: Stack Trace -->
+<div class="flex flex-col rounded-xl overflow-hidden border border-gray-200 dark:border-border-dark bg-white dark:bg-surface-dark shadow-sm h-full">
+<div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-border-dark bg-slate-50 dark:bg-[#1f2633]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-red-500 text-[18px]">bug_report</span>
+<span class="text-slate-700 dark:text-slate-200 text-sm font-semibold">Error Output &amp; Stack Trace</span>
+</div>
+<div class="flex gap-3">
+<button class="text-slate-400 hover:text-primary transition-colors text-xs font-medium uppercase">Wrap</button>
+<button class="text-slate-400 hover:text-primary transition-colors" title="Copy to clipboard">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+</button>
+</div>
+</div>
+<div class="relative flex-1 bg-[#101010] overflow-hidden">
+<div class="absolute inset-0 p-4 font-mono text-sm overflow-auto custom-scrollbar">
+<pre class="leading-relaxed"><span class="text-red-500 font-bold">Runtime Error: Segmentation Fault (SIGSEGV)</span>
+<span class="text-slate-400">Thread 1 "solution" received signal SIGSEGV, Segmentation fault.</span>
+<span class="text-slate-500">0x00005555555551a9 in Solution::twoSum (this=0x7fffffffe0e0, nums=std::vector of length 4, capacity 4 = {...}, target=9) at solution.cpp:14</span>
+
+<span class="text-slate-300">Stack trace:</span>
+<span class="text-slate-400">#0</span>  <span class="text-blue-400">Solution::twoSum</span> <span class="text-slate-500">(this=0x7fffffffe0e0, nums=..., target=9)</span> at <span class="text-slate-300 underline cursor-pointer">solution.cpp:14</span>
+    <span class="text-slate-600 italic">14 |         if (map.find(complement) != map.end() &amp;&amp; map[complement] != i) {</span>
+<span class="text-slate-400">#1</span>  <span class="text-blue-400">__driver__::main</span> <span class="text-slate-500">()</span> at <span class="text-slate-300 underline cursor-pointer">driver.cpp:42</span>
+<span class="text-slate-400">#2</span>  <span class="text-blue-400">__libc_start_main</span> <span class="text-slate-500">(main=0x5555555552a0 <main>, argc=1, argv=0x7fffffffe238, init=<optimized out="">, fini=<optimized out="">, rtld_fini=<optimized out="">, stack_end=0x7fffffffe228)</optimized></optimized></optimized></main></span> at <span class="text-slate-300">../csu/libc-start.c:308</span>
+<span class="text-slate-400">#3</span>  <span class="text-blue-400">_start</span> <span class="text-slate-500">()</span> at <span class="text-slate-300">../sysdeps/x86_64/start.S:120</span>
+
+<span class="text-yellow-600">Standard Error:</span>
+<span class="text-slate-400">AddressSanitizer:DEADLYSIGNAL</span>
+<span class="text-slate-400">=================================================================</span>
+<span class="text-red-400">==1==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0x000000401254 bp 0x7ffc8c88f4b0 sp 0x7ffc8c88f490 T0)</span>
+<span class="text-slate-400">==1==The signal is caused by a READ memory access.</span>
+<span class="text-slate-400">==1==Hint: address points to the zero page.</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<!-- Lifecycle Timeline -->
+<div class="rounded-xl p-6 border border-gray-200 dark:border-border-dark bg-white dark:bg-surface-dark shadow-sm">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 text-[20px]">history</span>
+<h3 class="text-slate-900 dark:text-white text-base font-semibold">Lifecycle Timeline</h3>
+</div>
+<div class="relative flex flex-col md:flex-row justify-between items-start md:items-center w-full px-2 gap-8 md:gap-0">
+<!-- Connecting Line (Desktop) -->
+<div class="absolute top-[23px] left-0 right-0 h-0.5 bg-gray-200 dark:bg-border-dark hidden md:block -z-0 mx-10"></div>
+<!-- Step 1: Queued -->
+<div class="relative z-10 flex md:flex-col items-center gap-4 md:gap-3 w-full md:w-auto">
+<div class="flex items-center justify-center size-12 rounded-full bg-blue-100 dark:bg-primary/20 text-primary border-2 border-primary">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="flex flex-col md:items-center">
+<p class="text-slate-900 dark:text-white text-sm font-bold">Queued</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-mono mt-0.5">10:00:01.241</p>
+</div>
+</div>
+<!-- Step 2: Picked -->
+<div class="relative z-10 flex md:flex-col items-center gap-4 md:gap-3 w-full md:w-auto">
+<div class="flex items-center justify-center size-12 rounded-full bg-blue-100 dark:bg-primary/20 text-primary border-2 border-primary">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="flex flex-col md:items-center">
+<p class="text-slate-900 dark:text-white text-sm font-bold">Picked</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-mono mt-0.5">10:00:02.105</p>
+</div>
+</div>
+<!-- Step 3: Executing -->
+<div class="relative z-10 flex md:flex-col items-center gap-4 md:gap-3 w-full md:w-auto">
+<div class="flex items-center justify-center size-12 rounded-full bg-blue-100 dark:bg-primary/20 text-primary border-2 border-primary">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="flex flex-col md:items-center">
+<p class="text-slate-900 dark:text-white text-sm font-bold">Executing</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-mono mt-0.5">10:00:02.155</p>
+</div>
+</div>
+<!-- Step 4: Failed -->
+<div class="relative z-10 flex md:flex-col items-center gap-4 md:gap-3 w-full md:w-auto">
+<div class="flex items-center justify-center size-12 rounded-full bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-500 border-2 border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+<span class="material-symbols-outlined text-[24px]">close</span>
+</div>
+<div class="flex flex-col md:items-center">
+<p class="text-red-600 dark:text-red-500 text-sm font-bold">Failed</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-mono mt-0.5">10:00:02.607</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

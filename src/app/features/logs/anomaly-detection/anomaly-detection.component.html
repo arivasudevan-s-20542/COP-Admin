@@ -1,0 +1,174 @@
+<div class="anomaly-detection-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>
+        <i class="pi pi-bolt"></i>
+        Anomaly Detection
+      </h1>
+      <p>AI-powered anomaly detection and pattern analysis</p>
+    </div>
+    <div class="header-actions">
+      <div class="live-indicator">
+        <span class="pulse"></span>
+        <span>Live Detection</span>
+      </div>
+      <button pButton label="Configure ML Model" icon="pi pi-cog" class="p-button-outlined"></button>
+      <button pButton label="Export Report" icon="pi pi-download" class="p-button-outlined"></button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon detected">
+        <i class="pi pi-search"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().totalDetected | number }}</span>
+        <span class="stat-label">Total Detected (24h)</span>
+      </div>
+    </div>
+    <div class="stat-card active">
+      <div class="stat-icon active">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().activeAnomalies }}</span>
+        <span class="stat-label">Active Anomalies</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon speed">
+        <i class="pi pi-clock"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().avgDetectionTime }}</span>
+        <span class="stat-label">Avg Detection Time</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon accuracy">
+        <i class="pi pi-check-circle"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().falsePositiveRate }}%</span>
+        <span class="stat-label">False Positive Rate</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="charts-row">
+    <div class="chart-card trend-chart">
+      <div class="chart-header">
+        <h3>Anomaly Trend</h3>
+        <span class="time-range">Last 24 hours</span>
+      </div>
+      <div class="chart-container">
+        <p-chart type="line" [data]="anomalyTrendChart" [options]="chartOptions" height="200px"></p-chart>
+      </div>
+    </div>
+    
+    <div class="chart-card distribution-chart">
+      <div class="chart-header">
+        <h3>Severity Distribution</h3>
+      </div>
+      <div class="chart-container">
+        <p-chart type="doughnut" [data]="distributionChart" [options]="doughnutOptions" height="200px"></p-chart>
+      </div>
+    </div>
+  </div>
+
+  <!-- Severity Filter -->
+  <div class="severity-filter">
+    <span class="filter-label">Filter by severity:</span>
+    @for (severity of severities; track severity) {
+      <button 
+        class="severity-btn" 
+        [class.active]="selectedSeverity() === severity"
+        [class]="severity"
+        (click)="onSeverityFilter(severity)"
+      >
+        {{ severity | titlecase }}
+      </button>
+    }
+  </div>
+
+  <!-- Anomalies Table -->
+  <div class="anomalies-table-card">
+    <p-table 
+      [value]="filteredAnomalies" 
+      [paginator]="true" 
+      [rows]="10"
+      styleClass="p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Severity</th>
+          <th>Source</th>
+          <th>Deviation</th>
+          <th>Status</th>
+          <th>Detected</th>
+          <th style="width: 140px">Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-anomaly>
+        <tr [class]="anomaly.severity">
+          <td>
+            <span class="anomaly-type">{{ anomaly.type }}</span>
+          </td>
+          <td>
+            <div class="description-cell">
+              <span class="description">{{ anomaly.description }}</span>
+              <span class="metric-info">
+                {{ anomaly.metric }}: {{ anomaly.expectedValue }} → {{ anomaly.actualValue }}
+              </span>
+            </div>
+          </td>
+          <td>
+            <p-tag [value]="anomaly.severity | titlecase" [severity]="getSeveritySeverity(anomaly.severity)"></p-tag>
+          </td>
+          <td>
+            <span class="source">{{ anomaly.source }}</span>
+          </td>
+          <td>
+            <div class="deviation-cell">
+              <span class="deviation-value" [class.high]="anomaly.deviation > 100">
+                +{{ anomaly.deviation }}%
+              </span>
+              <p-progressBar [value]="Math.min(anomaly.deviation, 100)" [showValue]="false" styleClass="deviation-bar"></p-progressBar>
+            </div>
+          </td>
+          <td>
+            <p-tag [value]="anomaly.status | titlecase" [severity]="getStatusSeverity(anomaly.status)"></p-tag>
+          </td>
+          <td>
+            <span class="timestamp">{{ anomaly.timestamp }}</span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              @if (anomaly.status === 'active') {
+                <button pButton icon="pi pi-eye" class="p-button-rounded p-button-text p-button-sm" pTooltip="Investigate" (click)="acknowledgeAnomaly(anomaly)"></button>
+              }
+              @if (anomaly.status !== 'resolved' && anomaly.status !== 'false_positive') {
+                <button pButton icon="pi pi-check" class="p-button-rounded p-button-text p-button-success p-button-sm" pTooltip="Resolve" (click)="resolveAnomaly(anomaly)"></button>
+                <button pButton icon="pi pi-times" class="p-button-rounded p-button-text p-button-secondary p-button-sm" pTooltip="False Positive" (click)="markFalsePositive(anomaly)"></button>
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="empty-message">
+            <i class="pi pi-check-circle"></i>
+            <span>No anomalies detected - System is healthy!</span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

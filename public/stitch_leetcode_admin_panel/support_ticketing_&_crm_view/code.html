@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Support Ticketing &amp; CRM View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                        "surface-dark": "#161b26",
+                        "border-dark": "#3b4354",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for a cleaner look in dark mode */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #111318; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #3b4354; 
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #4b5563; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display h-screen overflow-hidden flex flex-col md:flex-row">
+<!-- Column 1: Main Navigation Sidebar -->
+<aside class="w-full md:w-64 bg-[#111318] border-r border-border-dark flex flex-col shrink-0 z-20">
+<!-- Brand / User Profile -->
+<div class="p-4 border-b border-border-dark flex items-center gap-3">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 shrink-0" data-alt="Admin user avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDjZJb2WLOFlthu2ztaCwpu3BSyhJ9qlY5_Mv0wVQA96femS_Ze9wWxHyw37sAmiJHsQ-bAAbaQ7b8Z6hYTjQIaxgbmxyytqSWTCMvPc-oU5lVadctFNuWX9HwmjDxbvmpt9qerMso8sfawSLWRYQJcBo_1U_L_FxCJhnXa1kkYdjanlKKHACK6bOnaQhVWi814JNkqyr_W9hhHlL8yKtdEjuQfnVBrNvXyEkTiO5FgRw76jSRg5aADq17Au8oLNms1zl9UaR6tsMvx");'></div>
+<div class="flex flex-col overflow-hidden">
+<h1 class="text-white text-sm font-bold truncate">SysAdmin Portal</h1>
+<p class="text-[#9ca6ba] text-xs font-normal">Alex Chen</p>
+</div>
+</div>
+<!-- Global Nav -->
+<div class="flex flex-col gap-1 p-3 overflow-y-auto custom-scrollbar flex-1">
+<div class="flex items-center gap-3 px-3 py-2 text-[#9ca6ba] hover:text-white hover:bg-[#282e39] rounded-lg cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<p class="text-sm font-medium">Dashboard</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-[20px] fill-1">confirmation_number</span>
+<p class="text-sm font-medium">Tickets</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 text-[#9ca6ba] hover:text-white hover:bg-[#282e39] rounded-lg cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<p class="text-sm font-medium">Users</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 text-[#9ca6ba] hover:text-white hover:bg-[#282e39] rounded-lg cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+<p class="text-sm font-medium">Analytics</p>
+</div>
+<div class="h-px bg-border-dark my-2 mx-3"></div>
+<p class="px-3 text-xs font-semibold text-[#64748b] uppercase tracking-wider mb-1">Queues</p>
+<!-- Queues List -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between gap-3 px-3 py-2 text-white bg-[#282e39] rounded-lg cursor-pointer border border-[#3b4354]">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">inbox</span>
+<p class="text-sm font-medium">Inbox</p>
+</div>
+<span class="bg-primary text-white text-xs font-bold px-1.5 py-0.5 rounded-full">12</span>
+</div>
+<div class="flex items-center justify-between gap-3 px-3 py-2 text-[#9ca6ba] hover:bg-[#1b1f27] hover:text-white rounded-lg cursor-pointer transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">assignment_ind</span>
+<p class="text-sm font-medium">My Tickets</p>
+</div>
+<span class="bg-[#3b4354] text-[#9ca6ba] text-xs font-bold px-1.5 py-0.5 rounded-full">4</span>
+</div>
+<div class="flex items-center justify-between gap-3 px-3 py-2 text-[#9ca6ba] hover:bg-[#1b1f27] hover:text-white rounded-lg cursor-pointer transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">hourglass_empty</span>
+<p class="text-sm font-medium">Pending</p>
+</div>
+<span class="bg-[#3b4354] text-[#9ca6ba] text-xs font-bold px-1.5 py-0.5 rounded-full">5</span>
+</div>
+<div class="flex items-center justify-between gap-3 px-3 py-2 text-[#9ca6ba] hover:bg-[#1b1f27] hover:text-white rounded-lg cursor-pointer transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+<p class="text-sm font-medium">Resolved</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Settings -->
+<div class="p-3 border-t border-border-dark">
+<div class="flex items-center gap-3 px-3 py-2 text-[#9ca6ba] hover:text-white hover:bg-[#282e39] rounded-lg cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<p class="text-sm font-medium">Settings</p>
+</div>
+</div>
+</aside>
+<!-- Column 2: Ticket List (Secondary Sidebar) -->
+<div class="w-full md:w-80 bg-surface-dark border-r border-border-dark flex flex-col shrink-0 z-10 hidden lg:flex">
+<div class="p-4 border-b border-border-dark">
+<h2 class="text-white font-bold text-lg mb-3">Inbox</h2>
+<!-- Search Field -->
+<div class="relative w-full">
+<input class="w-full bg-[#111318] border border-border-dark rounded-lg text-sm text-white placeholder-[#9ca6ba] px-3 py-2 pl-9 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Search tickets..."/>
+<span class="material-symbols-outlined absolute left-2.5 top-2 text-[#9ca6ba] text-[18px]">search</span>
+</div>
+<div class="flex gap-2 mt-3 overflow-x-auto pb-1 no-scrollbar">
+<button class="text-xs font-medium bg-[#282e39] text-white px-3 py-1 rounded-full border border-border-dark hover:bg-border-dark whitespace-nowrap">Unassigned</button>
+<button class="text-xs font-medium bg-transparent text-[#9ca6ba] px-3 py-1 rounded-full border border-border-dark hover:bg-[#282e39] whitespace-nowrap">High Priority</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar">
+<!-- Ticket Item: Selected -->
+<div class="border-b border-border-dark bg-[#1e2430] border-l-4 border-l-primary p-4 cursor-pointer hover:bg-[#1e2430] transition-colors relative group">
+<div class="flex justify-between items-start mb-1">
+<div class="flex items-center gap-2">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-5" data-alt="User avatar small" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA4ybmFKLlHy8OaDePW76gYNwKxfyQ9R7az5HgmER1l2dXZkaoW3tq6xHTFRFDUcWAoUanmwc0z0sgcXkz6Q_bt8rON-C5n7DX5-5qfGJnam1tcZ_hE_6E30j7SkRpl6Oli9Sp223lx4-RCB4QB72Mfhw6U6w5dr8GZkB_IqSv63XuOtfLGqkyNrJai5Uwper--0ilJa2NVie96JViqYiX6GfpwvSMGkDohxqbBSjsQNwPEQZf-65VUkZPIKTdgxPEuPrABbE4MoxDU");'></div>
+<span class="text-xs text-[#9ca6ba] font-medium">coder_123</span>
+</div>
+<span class="text-xs text-[#9ca6ba]">2m</span>
+</div>
+<h3 class="text-white text-sm font-semibold mb-1 leading-snug">Time Limit Exceeded error on O(n) solution</h3>
+<p class="text-[#9ca6ba] text-xs line-clamp-2">I keep getting a Time Limit Exceeded error on my Python solution even though the complexity is O(n). Is there a strict...</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-500/10 text-red-400 border border-red-500/20">High</span>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">Python</span>
+</div>
+</div>
+<!-- Ticket Item -->
+<div class="border-b border-border-dark p-4 cursor-pointer hover:bg-[#1b1f27] transition-colors relative group">
+<div class="flex justify-between items-start mb-1">
+<div class="flex items-center gap-2">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-5" data-alt="User avatar small" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD9oSUBE7WAlM-G53-RpOJpWBt-E5MzRGBhIe25hC3Gim3j3XAH3JkghNDIlLMcSU33nRy7zuZCErEYPBqXGvhVzdrT_VxDmfMz0KcMHZdOZvgoi10JkUpi3NC5CkAHpbQzAJndDdusOTuWL8golWODzJ0VIBZaq2_CIus6U4fwovmMP1qNM7XqqYYXazBMzLBP66pmLaZHFDYdoJcNKom4-Ex-Rut1PJ4XgBKYSuiCFmG5HPt-JSoY3f0TDnWFcM_Vv4gTpDjqxmMP");'></div>
+<span class="text-xs text-[#9ca6ba] font-medium">dev_jane</span>
+</div>
+<span class="text-xs text-[#9ca6ba]">45m</span>
+</div>
+<h3 class="text-[#cbd5e1] text-sm font-medium mb-1 leading-snug">Cannot renew subscription</h3>
+<p class="text-[#9ca6ba] text-xs line-clamp-2">My credit card is being declined repeatedly but I called my bank and they said it's fine.</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">Medium</span>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">Billing</span>
+</div>
+</div>
+<!-- Ticket Item -->
+<div class="border-b border-border-dark p-4 cursor-pointer hover:bg-[#1b1f27] transition-colors relative group">
+<div class="flex justify-between items-start mb-1">
+<div class="flex items-center gap-2">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-5" data-alt="User avatar small" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDJuMOMCfHt8s9NU5FgwpyIanCd9spHErPpNdu-hbRHCtrqozEWmSo-HN8aLJBybnpXk9uzypYU1PBDm6Mxy53YQchrg69XtTMnyLkwgHeys-jd94815vv-nMdYrJ4ff1H32fAO8L2stlcixVSqbXDfaCNNUU6bQAxOtFF7XHcN8kQkm3CDLZUt0eVecnwXkkDywrrlie0YIvZce9J-dBsQULwROyej7z5EPYeuD-Cpe0UURrI5OTP_pK9kX17W-5j_Z17UFu8z7ed_");'></div>
+<span class="text-xs text-[#9ca6ba] font-medium">algo_master</span>
+</div>
+<span class="text-xs text-[#9ca6ba]">2h</span>
+</div>
+<h3 class="text-[#cbd5e1] text-sm font-medium mb-1 leading-snug">Test case #42 is incorrect</h3>
+<p class="text-[#9ca6ba] text-xs line-clamp-2">I believe the constraints mentioned in Q.214 are violated by test case 42. Here is my proof...</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-500/10 text-green-400 border border-green-500/20">Low</span>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-500/10 text-gray-400 border border-gray-500/20">Content</span>
+</div>
+</div>
+<!-- Ticket Item -->
+<div class="border-b border-border-dark p-4 cursor-pointer hover:bg-[#1b1f27] transition-colors relative group">
+<div class="flex justify-between items-start mb-1">
+<div class="flex items-center gap-2">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-5" data-alt="User avatar small" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCubVWEKb812hrY2Re5dkCKeo2e3BrEE_ZgeUtvW092JUi9MKxlZR54Z_q6_7rnB2WrWzLvqyos6Nf1ysRBUrYlEg0YI2wSzSPEwoyepNCKWmDOtvAJZaXU9N-mE_OpfXheFCD10CFW0HPCnG6h9cjp1vGwM7qHqFlgLDqxdEsasGSJLHbifVWlR2kZyVn7rGakLED0LAtvN79nWAs_BRHmXpHDMRcIZ7nIwBmh5kjF5US1_rDCHjYHucHX7vKJo5Fgee_Ia6tkKvc6");'></div>
+<span class="text-xs text-[#9ca6ba] font-medium">guest_99</span>
+</div>
+<span class="text-xs text-[#9ca6ba]">4h</span>
+</div>
+<h3 class="text-[#cbd5e1] text-sm font-medium mb-1 leading-snug">Login issues with GitHub</h3>
+<p class="text-[#9ca6ba] text-xs line-clamp-2">Clicking the GitHub login button just refreshes the page.</p>
+</div>
+</div>
+</div>
+<!-- Column 3: Conversation Area (Main) -->
+<main class="flex-1 flex flex-col bg-background-dark min-w-0 relative">
+<!-- Header -->
+<header class="h-16 border-b border-border-dark flex items-center justify-between px-6 shrink-0 bg-[#111318]">
+<div class="flex items-center gap-4 overflow-hidden">
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<h2 class="text-white font-semibold text-lg truncate">Time Limit Exceeded error on O(n) solution</h2>
+<span class="px-2 py-0.5 rounded text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/20">Open</span>
+</div>
+<p class="text-[#9ca6ba] text-xs flex items-center gap-2">
+<span>#4923</span>
+<span>•</span>
+<span>via Web Portal</span>
+<span>•</span>
+<span>Created 2m ago</span>
+</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center justify-center size-8 rounded-lg hover:bg-[#282e39] text-[#9ca6ba] transition-colors" title="Mark as Spam">
+<span class="material-symbols-outlined text-[20px]">report</span>
+</button>
+<div class="h-4 w-px bg-border-dark mx-1"></div>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border-dark bg-[#1b1f27] hover:bg-[#282e39] text-white text-sm font-medium transition-colors">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+<span>Assign</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border-dark bg-[#1b1f27] hover:bg-[#282e39] text-white text-sm font-medium transition-colors">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+<span>Resolve</span>
+</button>
+</div>
+</header>
+<!-- Message Stream -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-6 flex flex-col gap-6">
+<!-- Date Separator -->
+<div class="flex justify-center">
+<span class="text-[#64748b] text-xs font-medium bg-[#1e2430] px-3 py-1 rounded-full border border-[#282e39]">Today, Oct 24</span>
+</div>
+<!-- User Message -->
+<div class="flex gap-4 max-w-3xl">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 shrink-0" data-alt="User avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDDfb88kHKFeP0BZjqipI7ep3Jp0c2xNvpaqMb5vZdxhNCz1TISkRzv1HN1hLFI5e9X_uive_pWZ0_zQljng8pknioE2qZwxwsgLyRBuQgoW8y8AaNI65HJu2npqRWyQxqA-9eofzO5vDi8w4SqfXfGeGHFPENGKE1FfH27y98QZ_sbNW2Q1H4VpnaURi0BvArz3nKAqWmzPuSedjipNPvPMb7YS7JHYktBVjC-T5muSAe29DoFx6IaNJxVghxmNVfo2x_NVUsXjeuZ");'></div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="text-white text-sm font-semibold">coder_123</span>
+<span class="text-[#64748b] text-xs">10:42 AM</span>
+</div>
+<div class="bg-[#1e293b] text-[#e2e8f0] p-4 rounded-xl rounded-tl-none border border-[#334155] shadow-sm">
+<p class="text-sm leading-relaxed">Hi team, I keep getting a <span class="text-red-400 font-mono text-xs bg-red-500/10 px-1 rounded">Time Limit Exceeded</span> error on my Python solution for problem #214 (Count Subarrays), even though the complexity is O(n). Is there a strict timeout for Python on this problem?</p>
+</div>
+</div>
+</div>
+<!-- System Message -->
+<div class="flex items-center gap-4 justify-center">
+<div class="h-px bg-border-dark flex-1"></div>
+<div class="text-[#64748b] text-xs flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">code</span>
+                    User attached code snippet
+                </div>
+<div class="h-px bg-border-dark flex-1"></div>
+</div>
+<!-- Code Snippet Preview -->
+<div class="flex justify-center">
+<div class="bg-[#0f1115] border border-border-dark rounded-lg p-3 w-full max-w-2xl">
+<div class="flex justify-between items-center mb-2 pb-2 border-b border-border-dark">
+<span class="text-xs text-[#9ca6ba] font-mono">solution.py</span>
+<button class="text-xs text-primary hover:underline">View Full</button>
+</div>
+<pre class="font-mono text-xs text-gray-300 overflow-x-auto"><code>def countSubarrays(nums, k):
+    count = 0
+    curr_sum = 0
+    prefix_sums = {0: 1}
+    
+    for num in nums:
+        curr_sum += num
+        # Potential issue here with large inputs?
+        if (curr_sum - k) in prefix_sums:
+            count += prefix_sums[curr_sum - k]
+            
+    return count</code></pre>
+</div>
+</div>
+<!-- Admin Reply (Draft/Sent) -->
+<div class="flex gap-4 flex-row-reverse max-w-3xl ml-auto">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 shrink-0" data-alt="Admin avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAO6T86NfV6vQrXwb9_y7hkvUURBe8jqqmCpHUGP_5Gt-fu3hxxyoQlipDDsr1ZOxmrUCQLbp0-XmnDWz3cOttN5WUicHPhcBNBI5EVZMxPXSZlUkFtzLiCLekpDS2SFRdMI5GTPJcpbptyG5D876DcYfPq01Z72gBwtl_jtnsgui2C5vTA7ymvvsh6XUJ4vEla_hDeNjJ9JGMHn7k8ZN1sitbxCvO7oQEqsoNrVM3xKlherUnItQeDuTMTGd-FnyJcYsjITWqm3pZN");'></div>
+<div class="flex flex-col gap-1 items-end">
+<div class="flex items-baseline gap-2 flex-row-reverse">
+<span class="text-white text-sm font-semibold">You</span>
+<span class="text-[#64748b] text-xs">10:45 AM</span>
+</div>
+<div class="bg-primary text-white p-4 rounded-xl rounded-tr-none shadow-sm">
+<p class="text-sm leading-relaxed">Hi there! Thanks for reaching out. I've taken a look at your submission history.</p>
+<p class="text-sm leading-relaxed mt-2">While your logic is theoretically O(n), Python's overhead can sometimes trigger TLE on very tight constraints. I see you are using a dictionary for prefix sums. Have you tried optimizing the hash map lookups or switching to an array if the constraints allow?</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Editor Area -->
+<div class="p-4 border-t border-border-dark bg-[#111318]">
+<div class="bg-[#1b1f27] border border-border-dark rounded-lg flex flex-col focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
+<!-- Toolbar -->
+<div class="flex items-center gap-1 p-2 border-b border-border-dark">
+<button class="p-1.5 rounded hover:bg-[#282e39] text-[#9ca6ba] transition-colors"><span class="material-symbols-outlined text-[18px]">format_bold</span></button>
+<button class="p-1.5 rounded hover:bg-[#282e39] text-[#9ca6ba] transition-colors"><span class="material-symbols-outlined text-[18px]">format_italic</span></button>
+<button class="p-1.5 rounded hover:bg-[#282e39] text-[#9ca6ba] transition-colors"><span class="material-symbols-outlined text-[18px]">code</span></button>
+<div class="h-4 w-px bg-border-dark mx-1"></div>
+<button class="p-1.5 rounded hover:bg-[#282e39] text-[#9ca6ba] transition-colors"><span class="material-symbols-outlined text-[18px]">link</span></button>
+<button class="p-1.5 rounded hover:bg-[#282e39] text-[#9ca6ba] transition-colors"><span class="material-symbols-outlined text-[18px]">image</span></button>
+<div class="h-4 w-px bg-border-dark mx-1"></div>
+<button class="flex items-center gap-1 px-2 py-1 rounded hover:bg-[#282e39] text-[#9ca6ba] text-xs font-medium transition-colors">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+                        Insert Macro
+                    </button>
+</div>
+<!-- Textarea -->
+<textarea class="w-full bg-transparent border-none text-white p-3 text-sm focus:ring-0 resize-none min-h-[100px]" placeholder="Type your reply or use / for macros..."></textarea>
+<!-- Footer Actions -->
+<div class="flex items-center justify-between p-2">
+<div class="flex items-center gap-2 px-2">
+<span class="text-[#64748b] text-xs">Press <kbd class="font-sans border border-[#3b4354] rounded px-1">⌘ ↵</kbd> to send</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-4 py-2 rounded-lg border border-border-dark text-white text-sm font-medium hover:bg-[#282e39] transition-colors">Internal Note</button>
+<button class="px-4 py-2 rounded-lg bg-primary hover:bg-blue-600 text-white text-sm font-medium transition-colors flex items-center gap-2">
+<span>Send Reply</span>
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Column 4: Right CRM Sidebar -->
+<aside class="w-full md:w-80 bg-[#111318] border-l border-border-dark flex flex-col shrink-0 hidden xl:flex overflow-y-auto custom-scrollbar">
+<!-- User Profile Card -->
+<div class="p-6 border-b border-border-dark flex flex-col items-center text-center">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-20 mb-3 border-4 border-[#1b1f27]" data-alt="User profile large" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAkRYSAvmu8jExAeJUTNXIP-OXrMW2hlPUfShuoaNmDQ6RaWCbBCO8xISaC8P0ijG2yRrCHN18hSiLeP3VrU60WrwX6x-O2kYJZBZTZAsfBLQkqaxGm6I2IEQ_5QQimpO36jmT5diXY6Y-pZmoWXGy635GDnlj0eZdGVu0oxbqzQXClkpZbx8zz1sPj91spNkAe099OR6WzF1GdfXEb1KEKz-6f7y9t0ELrOpD4AWUtL3NYWB9wjBrfJcZnwVPa4xzFsn7SLyc75XSP");'></div>
+<h2 class="text-white text-lg font-bold">coder_123</h2>
+<p class="text-[#9ca6ba] text-sm mb-3">joined 2 years ago</p>
+<div class="flex items-center gap-2 mb-4">
+<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/20 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">star</span> Premium
+                 </span>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#282e39] text-[#9ca6ba] border border-[#3b4354]">
+                    US (West)
+                 </span>
+</div>
+<div class="grid grid-cols-2 gap-3 w-full">
+<div class="bg-[#1b1f27] p-2 rounded-lg border border-[#282e39]">
+<p class="text-[#64748b] text-xs uppercase font-semibold">Rank</p>
+<p class="text-white text-lg font-mono font-bold">14,203</p>
+</div>
+<div class="bg-[#1b1f27] p-2 rounded-lg border border-[#282e39]">
+<p class="text-[#64748b] text-xs uppercase font-semibold">Solved</p>
+<p class="text-white text-lg font-mono font-bold">452</p>
+</div>
+</div>
+</div>
+<!-- Section: Internal Notes -->
+<div class="p-4 border-b border-border-dark">
+<div class="flex items-center justify-between mb-2">
+<h3 class="text-white text-sm font-bold">Internal Notes</h3>
+<button class="text-primary text-xs hover:underline">Edit</button>
+</div>
+<div class="bg-yellow-900/10 border border-yellow-700/30 p-3 rounded-lg">
+<p class="text-yellow-200/80 text-xs leading-relaxed">
+                    User frequently reports TLE on easy questions. Advised checking optimization guides previously.
+                </p>
+<p class="text-yellow-700 text-[10px] mt-2 font-medium">Added by Sarah J. • 2 weeks ago</p>
+</div>
+</div>
+<!-- Section: Recent Activity -->
+<div class="p-4 flex-1">
+<h3 class="text-white text-sm font-bold mb-3">Recent Submissions</h3>
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex flex-col">
+<p class="text-[#e2e8f0] text-sm font-medium group-hover:text-primary transition-colors">214. Count Subarrays</p>
+<p class="text-[#64748b] text-xs">Python • 2m ago</p>
+</div>
+<span class="text-red-400 text-xs font-mono font-bold bg-red-500/10 px-1.5 py-0.5 rounded">TLE</span>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex flex-col">
+<p class="text-[#e2e8f0] text-sm font-medium group-hover:text-primary transition-colors">55. Jump Game</p>
+<p class="text-[#64748b] text-xs">Python • 1h ago</p>
+</div>
+<span class="text-green-400 text-xs font-mono font-bold bg-green-500/10 px-1.5 py-0.5 rounded">AC</span>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex flex-col">
+<p class="text-[#e2e8f0] text-sm font-medium group-hover:text-primary transition-colors">1. Two Sum</p>
+<p class="text-[#64748b] text-xs">Java • 1d ago</p>
+</div>
+<span class="text-green-400 text-xs font-mono font-bold bg-green-500/10 px-1.5 py-0.5 rounded">AC</span>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex flex-col">
+<p class="text-[#e2e8f0] text-sm font-medium group-hover:text-primary transition-colors">4. Median Arrays</p>
+<p class="text-[#64748b] text-xs">C++ • 3d ago</p>
+</div>
+<span class="text-red-400 text-xs font-mono font-bold bg-red-500/10 px-1.5 py-0.5 rounded">RE</span>
+</div>
+</div>
+<button class="w-full mt-4 text-xs text-[#9ca6ba] hover:text-white border border-[#282e39] hover:bg-[#282e39] py-2 rounded transition-colors">View All Submissions</button>
+</div>
+<!-- Danger Zone -->
+<div class="p-4 mt-auto">
+<button class="w-full border border-red-900/50 text-red-400 hover:bg-red-900/20 text-xs font-medium py-2 rounded transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">block</span>
+                Ban User
+            </button>
+</div>
+</aside>
+</body></html>

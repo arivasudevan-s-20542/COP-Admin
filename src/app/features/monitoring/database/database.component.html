@@ -1,0 +1,204 @@
+<div class="database-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-info">
+      <div class="title-row">
+        <h1>Database Cluster: {{ clusterName() }}</h1>
+        <span class="status-badge" [class.active]="clusterStatus() === 'active'" 
+              [class.degraded]="clusterStatus() === 'degraded'"
+              [class.down]="clusterStatus() === 'down'">
+          {{ clusterStatus() | titlecase }}
+        </span>
+        <span class="region-tag">{{ region() }}</span>
+      </div>
+      <p class="subtitle">{{ dbVersion() }} • High Availability • 3 Replicas</p>
+    </div>
+    <div class="header-actions">
+      <!-- Time Range Selector -->
+      <div class="time-range-selector">
+        @for (range of timeRanges; track range) {
+          <button 
+            [class.active]="selectedTimeRange() === range"
+            (click)="setTimeRange(range)">
+            {{ range }}
+          </button>
+        }
+      </div>
+      <button class="config-btn">
+        <i class="pi pi-cog"></i>
+        Config
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Stats Grid -->
+  <div class="kpi-grid">
+    @for (kpi of kpis(); track kpi.label) {
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">{{ kpi.label }}</span>
+          <i [class]="kpi.icon + ' ' + kpi.iconColor"></i>
+        </div>
+        <div class="kpi-value-row">
+          <span class="kpi-value">{{ kpi.value }}</span>
+          @if (kpi.trend) {
+            <span class="kpi-trend" [class.negative]="!kpi.trend.positive">
+              <i [class]="kpi.trend.direction === 'up' ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"></i>
+              {{ kpi.trend.value }}
+            </span>
+          }
+          @if (kpi.subValue) {
+            <span class="kpi-sub-value" [class]="kpi.iconColor">{{ kpi.subValue }}</span>
+          }
+        </div>
+        @if (kpi.progress !== undefined) {
+          <div class="kpi-progress-bar">
+            <div class="progress-fill" [class]="kpi.progressColor" [style.width.%]="kpi.progress"></div>
+          </div>
+        }
+        @if (kpi.label === 'Avg Query Latency') {
+          <div class="mini-sparkline">
+            <div class="spark-bar" style="height: 33%"></div>
+            <div class="spark-bar" style="height: 50%"></div>
+            <div class="spark-bar" style="height: 33%"></div>
+            <div class="spark-bar" style="height: 66%"></div>
+            <div class="spark-bar highlight" style="height: 83%"></div>
+            <div class="spark-bar" style="height: 50%"></div>
+            <div class="spark-bar" style="height: 33%"></div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Charts Area -->
+  <div class="charts-grid">
+    <!-- Latency Distribution Chart -->
+    <div class="chart-card latency-chart">
+      <div class="chart-header">
+        <div>
+          <h3>Query Latency Distribution</h3>
+          <p>Percentiles (p50, p90, p99) over last {{ selectedTimeRange() }}</p>
+        </div>
+      </div>
+      <div class="chart-wrapper">
+        @if (latencyChartData()) {
+          <p-chart type="line" [data]="latencyChartData()" [options]="latencyChartOptions()" height="250"></p-chart>
+        }
+      </div>
+    </div>
+
+    <!-- Throughput Chart -->
+    <div class="chart-card throughput-chart">
+      <div class="chart-header">
+        <div>
+          <h3>Throughput (QPS)</h3>
+          <div class="throughput-value">
+            <span class="value">{{ currentThroughput() | number }}</span>
+            <span class="unit">req/sec</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-wrapper">
+        @if (throughputChartData()) {
+          <p-chart type="bar" [data]="throughputChartData()" [options]="throughputChartOptions()" height="250"></p-chart>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Section -->
+  <div class="bottom-grid">
+    <!-- Slow Query Logs Table -->
+    <div class="slow-query-card">
+      <div class="card-header">
+        <h3>Slow Query Logs (>100ms)</h3>
+        <button class="view-all-btn">View All Logs</button>
+      </div>
+      <p-table [value]="slowQueries()" styleClass="p-datatable-sm" [scrollable]="true">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Query ID</th>
+            <th style="width: 40%">SQL Statement</th>
+            <th class="text-right">Duration</th>
+            <th class="text-right">Rows</th>
+            <th class="text-right">Timestamp</th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-query>
+          <tr>
+            <td>
+              <span class="query-id">{{ query.id }}</span>
+            </td>
+            <td>
+              <div class="sql-statement">
+                <span [class]="getSqlTypeColor(query.type)">{{ query.type }}</span>
+                {{ query.sql.replace(query.type + ' ', '') }}
+              </div>
+            </td>
+            <td class="text-right">
+              <span class="duration" 
+                    [class.critical]="query.duration > 1000"
+                    [class.warning]="query.duration > 200 && query.duration <= 1000">
+                {{ formatDuration(query.duration) }}
+              </span>
+            </td>
+            <td class="text-right">{{ formatRows(query.rows) }}</td>
+            <td class="text-right">
+              <span class="timestamp">{{ query.timestamp }}</span>
+            </td>
+            <td class="text-right">
+              <button class="details-btn" pTooltip="View query details">Details</button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="sidebar-widgets">
+      <!-- Active Locks Widget -->
+      <div class="widget-card locks-widget">
+        <div class="widget-header">
+          <h3>Active Locks & Deadlocks</h3>
+          <span class="critical-badge">Critical</span>
+        </div>
+        <div class="locks-list">
+          @for (lock of activeLocks(); track lock.sourcePid) {
+            <div class="lock-item" [class.critical]="lock.severity === 'critical'">
+              <div class="lock-pids">
+                <i [class]="lock.severity === 'critical' ? 'pi pi-lock text-red-500' : 'pi pi-clock text-yellow-500'"></i>
+                <span class="pid" [class.text-red-400]="lock.severity === 'critical'" 
+                      [class.text-yellow-500]="lock.severity === 'warning'">{{ lock.sourcePid }}</span>
+                <i class="pi pi-arrow-right text-gray-500"></i>
+                <span class="pid text-white">{{ lock.targetPid }}</span>
+              </div>
+              <p class="lock-table">Table: <span>{{ lock.table }}</span></p>
+              <p class="lock-wait">Wait time: {{ lock.waitTime }}s</p>
+            </div>
+          }
+        </div>
+        <button class="widget-action-btn">View Lock Monitor</button>
+      </div>
+
+      <!-- Storage Usage Widget -->
+      <div class="widget-card storage-widget">
+        <h3>Storage Usage per Table</h3>
+        <div class="storage-list">
+          @for (item of storageUsage(); track item.table) {
+            <div class="storage-item">
+              <div class="storage-header">
+                <span class="table-name">{{ item.table }}</span>
+                <span class="table-size">{{ item.size }}</span>
+              </div>
+              <div class="storage-bar">
+                <div class="storage-fill" [class]="item.color" [style.width.%]="item.percentage"></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

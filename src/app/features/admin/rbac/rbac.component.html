@@ -1,0 +1,166 @@
+<div class="rbac-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>
+        <i class="pi pi-shield"></i>
+        RBAC Management
+      </h1>
+      <p>Manage roles, permissions, and access control</p>
+    </div>
+    <div class="header-actions">
+      <button pButton label="Create Role" icon="pi pi-plus" (click)="openRoleDialog()"></button>
+    </div>
+  </div>
+
+  <div class="rbac-content">
+    <!-- Roles List -->
+    <div class="roles-panel">
+      <div class="panel-header">
+        <h3>Roles</h3>
+        <span class="role-count">{{ roles().length }} roles</span>
+      </div>
+      
+      <div class="roles-list">
+        @for (role of roles(); track role.id) {
+          <div 
+            class="role-item" 
+            [class.active]="selectedRole()?.id === role.id"
+            (click)="selectRole(role)"
+          >
+            <div class="role-info">
+              <div class="role-header">
+                <span class="role-name">{{ role.name }}</span>
+                @if (role.isSystem) {
+                  <span class="system-badge">System</span>
+                }
+              </div>
+              <span class="role-desc">{{ role.description }}</span>
+              <div class="role-meta">
+                <span><i class="pi pi-users"></i> {{ role.usersCount }} users</span>
+                <span><i class="pi pi-key"></i> {{ role.permissions.length }} permissions</span>
+              </div>
+            </div>
+            <div class="role-actions">
+              <button pButton icon="pi pi-pencil" class="p-button-text p-button-sm" (click)="openRoleDialog(role); $event.stopPropagation()"></button>
+              @if (!role.isSystem) {
+                <button pButton icon="pi pi-trash" class="p-button-text p-button-sm p-button-danger" (click)="deleteRole(role); $event.stopPropagation()"></button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Permissions Panel -->
+    <div class="permissions-panel">
+      @if (selectedRole()) {
+        <div class="panel-header">
+          <div class="header-info">
+            <h3>{{ selectedRole()!.name }} Permissions</h3>
+            <p-tag [value]="selectedRole()!.isSystem ? 'System Role' : 'Custom Role'" [severity]="getRoleSeverity(selectedRole()!)"></p-tag>
+          </div>
+          <button pButton label="Edit Permissions" icon="pi pi-pencil" class="p-button-outlined" (click)="openRoleDialog(selectedRole()!)"></button>
+        </div>
+
+        <div class="permissions-grid">
+          @for (category of permissionCategories(); track category.name) {
+            <div class="permission-category">
+              <div class="category-header">
+                <div class="category-info">
+                  <i class="pi {{ category.icon }}"></i>
+                  <span>{{ category.name }}</span>
+                </div>
+                <span class="perm-count">
+                  {{ getCategoryGrantedCount(category) }}/{{ category.permissions.length }}
+                </span>
+              </div>
+              <div class="permissions-list">
+                @for (permission of category.permissions; track permission.id) {
+                  <div class="permission-item" [class.granted]="hasPermission(permission.id)">
+                    <div class="perm-status">
+                      <i class="pi" [class.pi-check-circle]="hasPermission(permission.id)" [class.pi-times-circle]="!hasPermission(permission.id)"></i>
+                    </div>
+                    <div class="perm-info">
+                      <span class="perm-name">{{ permission.name }}</span>
+                      <span class="perm-desc">{{ permission.description }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <i class="pi pi-shield"></i>
+          <span>Select a role to view permissions</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Create/Edit Role Dialog -->
+  <p-dialog 
+    header="{{editingRole() ? 'Edit' : 'Create'}} Role" 
+    [(visible)]="showRoleDialog" 
+    [modal]="true"
+    [style]="{ width: '800px', height: '80vh' }"
+    styleClass="dark-dialog"
+  >
+    <div class="dialog-content">
+      <div class="role-form">
+        <div class="form-group">
+          <label>Role Name</label>
+          <input pInputText [(ngModel)]="newRole.name" placeholder="e.g., Content Manager" />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea pInputText [(ngModel)]="newRole.description" rows="2" placeholder="Describe the role's purpose..."></textarea>
+        </div>
+      </div>
+
+      <div class="permissions-selector">
+        <h4>Select Permissions</h4>
+        
+        <div class="categories-list">
+          @for (category of permissionCategories(); track category.name) {
+            <div class="category-block">
+              <div class="category-header-check">
+                <p-checkbox 
+                  [binary]="true"
+                  [ngModel]="isCategoryFullySelected(category)"
+                  (ngModelChange)="toggleCategoryPermissions(category)"
+                ></p-checkbox>
+                <div class="cat-info">
+                  <i class="pi {{ category.icon }}"></i>
+                  <span class="cat-name">{{ category.name }}</span>
+                </div>
+                <span class="cat-count">{{ getCategoryGrantedCount(category) }}/{{ category.permissions.length }}</span>
+              </div>
+              <div class="category-permissions">
+                @for (perm of category.permissions; track perm.id) {
+                  <div class="perm-checkbox">
+                    <p-checkbox 
+                      [binary]="true"
+                      [ngModel]="hasPermission(perm.id)"
+                      (ngModelChange)="togglePermission(perm.id)"
+                    ></p-checkbox>
+                    <div class="perm-label">
+                      <span>{{ perm.name }}</span>
+                      <small>{{ perm.description }}</small>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <button pButton label="Cancel" class="p-button-text" (click)="showRoleDialog.set(false)"></button>
+      <button pButton label="Save Role" (click)="saveRole()"></button>
+    </ng-template>
+  </p-dialog>
+</div>

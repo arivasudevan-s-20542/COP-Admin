@@ -1,0 +1,248 @@
+<div class="alert-rules-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Alert Rules</h1>
+      <p>Configure alert rules and threshold notifications</p>
+    </div>
+    <div class="header-actions">
+      <button pButton label="Import Rules" icon="pi pi-upload" class="p-button-outlined"></button>
+      <button pButton label="Add Rule" icon="pi pi-plus" (click)="addNewRule()"></button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon rules">
+        <i class="pi pi-list"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().totalRules }}</span>
+        <span class="stat-label">Total Rules</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon active">
+        <i class="pi pi-check-circle"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().activeRules }}</span>
+        <span class="stat-label">Active Rules</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon triggered">
+        <i class="pi pi-bell"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().triggeredToday }}</span>
+        <span class="stat-label">Triggered Today</span>
+      </div>
+    </div>
+    <div class="stat-card critical">
+      <div class="stat-icon critical">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().criticalAlerts }}</span>
+        <span class="stat-label">Critical Alerts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Filter -->
+  <div class="category-filter">
+    @for (category of categories; track category) {
+      <button 
+        class="category-btn" 
+        [class.active]="selectedCategory() === category"
+        (click)="onCategoryFilter(category)"
+      >
+        {{ category | titlecase }}
+      </button>
+    }
+  </div>
+
+  <!-- Rules Table -->
+  <div class="rules-table-card">
+    <p-table 
+      [value]="filteredRules" 
+      [paginator]="true" 
+      [rows]="10"
+      styleClass="p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 60px">Status</th>
+          <th>Rule Name</th>
+          <th>Category</th>
+          <th>Condition</th>
+          <th>Severity</th>
+          <th>Channels</th>
+          <th>Last Triggered</th>
+          <th style="width: 120px">Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rule>
+        <tr [class.disabled-rule]="!rule.enabled">
+          <td>
+            <p-checkbox [(ngModel)]="rule.enabled" [binary]="true" (onChange)="toggleRule(rule)"></p-checkbox>
+          </td>
+          <td>
+            <div class="rule-info">
+              <span class="rule-name">{{ rule.name }}</span>
+              <span class="rule-desc">{{ rule.description }}</span>
+            </div>
+          </td>
+          <td>
+            <p-tag [value]="rule.category | titlecase" [severity]="getCategorySeverity(rule.category)"></p-tag>
+          </td>
+          <td>
+            <div class="condition-cell">
+              <span class="metric">{{ rule.metric }}</span>
+              <span class="operator">{{ getConditionLabel(rule.condition) }}</span>
+              <span class="threshold">{{ rule.threshold }}{{ rule.unit }}</span>
+            </div>
+          </td>
+          <td>
+            <p-tag [value]="rule.severity | titlecase" [severity]="getSeveritySeverity(rule.severity)"></p-tag>
+          </td>
+          <td>
+            <div class="channels">
+              @for (channel of rule.channels; track channel) {
+                <span class="channel-badge" [class]="channel">
+                  @switch (channel) {
+                    @case ('email') { <i class="pi pi-envelope"></i> }
+                    @case ('slack') { <i class="pi pi-slack"></i> }
+                    @case ('pagerduty') { <i class="pi pi-phone"></i> }
+                    @default { <i class="pi pi-bell"></i> }
+                  }
+                </span>
+              }
+            </div>
+          </td>
+          <td>
+            <span class="last-triggered" [class.never]="!rule.lastTriggered">
+              {{ rule.lastTriggered || 'Never' }}
+            </span>
+            @if (rule.triggerCount > 0) {
+              <span class="trigger-count">({{ rule.triggerCount }}x)</span>
+            }
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit" (click)="editRule(rule)"></button>
+              <button pButton icon="pi pi-copy" class="p-button-rounded p-button-text p-button-sm" pTooltip="Duplicate"></button>
+              <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm" pTooltip="Delete" (click)="deleteRule(rule)"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="empty-message">
+            <i class="pi pi-bell"></i>
+            <span>No alert rules configured</span>
+            <button pButton label="Create your first rule" class="p-button-sm" (click)="addNewRule()"></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- Rule Edit Dialog -->
+<p-dialog 
+  [header]="editingRule()?.id ? 'Edit Alert Rule' : 'Create Alert Rule'" 
+  [(visible)]="showRuleDialog" 
+  [modal]="true" 
+  [style]="{ width: '550px' }"
+  [dismissableMask]="true"
+>
+  @if (editingRule()) {
+    <div class="rule-form">
+      <div class="form-group">
+        <label>Rule Name</label>
+        <input type="text" pInputText [(ngModel)]="editingRule()!.name" placeholder="Enter rule name" />
+      </div>
+      
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" pInputText [(ngModel)]="editingRule()!.description" placeholder="Enter description" />
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category</label>
+          <select [(ngModel)]="editingRule()!.category">
+            <option value="system">System</option>
+            <option value="security">Security</option>
+            <option value="performance">Performance</option>
+            <option value="business">Business</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Severity</label>
+          <select [(ngModel)]="editingRule()!.severity">
+            <option value="critical">Critical</option>
+            <option value="warning">Warning</option>
+            <option value="info">Info</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Metric</label>
+        <input type="text" pInputText [(ngModel)]="editingRule()!.metric" placeholder="e.g., cpu_usage" />
+      </div>
+      
+      <div class="form-row threshold-row">
+        <div class="form-group">
+          <label>Condition</label>
+          <select [(ngModel)]="editingRule()!.condition">
+            <option value="gt">Greater than (>)</option>
+            <option value="gte">Greater or equal (≥)</option>
+            <option value="lt">Less than (<)</option>
+            <option value="lte">Less or equal (≤)</option>
+            <option value="eq">Equals (=)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Threshold</label>
+          <p-inputNumber [(ngModel)]="editingRule()!.threshold" [showButtons]="true"></p-inputNumber>
+        </div>
+        
+        <div class="form-group unit">
+          <label>Unit</label>
+          <input type="text" pInputText [(ngModel)]="editingRule()!.unit" placeholder="%" />
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Notification Channels</label>
+        <div class="channel-toggles">
+          <label class="channel-toggle">
+            <input type="checkbox" [checked]="editingRule()!.channels.includes('email')" />
+            <i class="pi pi-envelope"></i> Email
+          </label>
+          <label class="channel-toggle">
+            <input type="checkbox" [checked]="editingRule()!.channels.includes('slack')" />
+            <i class="pi pi-slack"></i> Slack
+          </label>
+          <label class="channel-toggle">
+            <input type="checkbox" [checked]="editingRule()!.channels.includes('pagerduty')" />
+            <i class="pi pi-phone"></i> PagerDuty
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button pButton label="Cancel" class="p-button-outlined" (click)="showRuleDialog.set(false)"></button>
+        <button pButton label="Save Rule" icon="pi pi-check" (click)="saveRule()"></button>
+      </div>
+    </div>
+  }
+</p-dialog>

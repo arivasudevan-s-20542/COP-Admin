@@ -1,0 +1,164 @@
+$dark-bg: #0f172a;
+$dark-surface: #1e293b;
+$dark-border: #334155;
+$text-primary: #f8fafc;
+$text-secondary: #94a3b8;
+$primary-color: #0d59f2;
+
+:host {
+  display: block;
+}
+
+.header {
+  height: 64px;
+  background: $dark-bg !important;
+  border-bottom: 1px solid $dark-border;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.toggle-btn {
+  color: $text-secondary !important;
+  
+  &:hover {
+    color: $text-primary !important;
+    background: $dark-surface !important;
+  }
+}
+
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .p-input-icon-left {
+    i {
+      color: $text-secondary;
+    }
+  }
+}
+
+.search-input {
+  width: 400px;
+  background: $dark-surface !important;
+  border: 1px solid $dark-border !important;
+  color: $text-primary !important;
+  border-radius: 8px !important;
+  padding-left: 2.5rem !important;
+
+  &::placeholder {
+    color: $text-secondary;
+  }
+
+  &:focus {
+    border-color: $primary-color !important;
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.2) !important;
+  }
+}
+
+.search-shortcut {
+  position: absolute;
+  right: 12px;
+  background: $dark-border;
+  color: $text-secondary;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-family: inherit;
+  border: none;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  button.p-button-text {
+    color: $text-secondary !important;
+
+    &:hover {
+      color: $text-primary !important;
+      background: $dark-surface !important;
+    }
+  }
+}
+
+.notification-btn {
+  position: relative;
+
+  .notification-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    transform: scale(0.8);
+  }
+}
+
+.user-menu {
+  margin-left: 0.5rem;
+  padding-left: 1rem;
+  border-left: 1px solid $dark-border;
+}
+
+:host ::ng-deep {
+  .user-avatar-btn {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  .p-menu {
+    background: $dark-surface;
+    border: 1px solid $dark-border;
+    border-radius: 8px;
+    min-width: 180px;
+
+    .p-menuitem {
+      .p-menuitem-content {
+        background: transparent;
+        border-radius: 6px;
+        margin: 2px 4px;
+
+        &:hover {
+          background: rgba($primary-color, 0.1);
+        }
+
+        .p-menuitem-link {
+          color: $text-secondary;
+          padding: 0.75rem 1rem;
+
+          .p-menuitem-icon {
+            color: $text-secondary;
+            margin-right: 0.5rem;
+          }
+
+          &:hover {
+            .p-menuitem-text,
+            .p-menuitem-icon {
+              color: $text-primary;
+            }
+          }
+        }
+      }
+    }
+
+    .p-menuitem-separator {
+      border-color: $dark-border;
+      margin: 4px 8px;
+    }
+  }
+}

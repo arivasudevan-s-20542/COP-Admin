@@ -1,0 +1,253 @@
+<div class="profile-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Admin Profile</h1>
+      <p class="subtitle">Manage your account settings and preferences</p>
+    </div>
+  </div>
+
+  <div class="profile-grid">
+    <!-- Profile Card -->
+    <div class="profile-main">
+      <p-card styleClass="profile-card">
+        <div class="profile-header">
+          <div class="avatar-section">
+            <div class="avatar-large">
+              {{ getInitials(profile().name) }}
+            </div>
+            <button pButton icon="pi pi-camera" class="p-button-rounded p-button-text avatar-edit" pTooltip="Change avatar"></button>
+          </div>
+          <div class="profile-info">
+            <h2>{{ profile().name }}</h2>
+            <p-tag [value]="profile().role" severity="info"></p-tag>
+            <p class="email">{{ profile().email }}</p>
+          </div>
+          @if (!isEditing()) {
+            <button pButton label="Edit Profile" icon="pi pi-pencil" class="p-button-outlined" (click)="startEditing()"></button>
+          }
+        </div>
+
+        <p-divider></p-divider>
+
+        @if (isEditing()) {
+          <div class="edit-form">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" pInputText [(ngModel)]="editName" class="w-full">
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" pInputText [(ngModel)]="editEmail" class="w-full">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" pInputText [(ngModel)]="editPhone" class="w-full">
+              </div>
+              <div class="form-group">
+                <label>Department</label>
+                <input type="text" pInputText [(ngModel)]="editDepartment" class="w-full">
+              </div>
+            </div>
+            <div class="form-actions">
+              <button pButton label="Cancel" class="p-button-outlined" (click)="cancelEditing()"></button>
+              <button pButton label="Save Changes" icon="pi pi-check" (click)="saveProfile()"></button>
+            </div>
+          </div>
+        } @else {
+          <div class="profile-details">
+            <div class="detail-row">
+              <div class="detail-item">
+                <span class="label">Department</span>
+                <span class="value">{{ profile().department }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Phone</span>
+                <span class="value">{{ profile().phone }}</span>
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-item">
+                <span class="label">Timezone</span>
+                <span class="value">{{ profile().timezone }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Joined</span>
+                <span class="value">{{ profile().joinedDate }}</span>
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-item">
+                <span class="label">Last Login</span>
+                <span class="value">{{ profile().lastLogin }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Admin ID</span>
+                <code class="value">{{ profile().id }}</code>
+              </div>
+            </div>
+          </div>
+        }
+      </p-card>
+
+      <!-- Security Settings -->
+      <p-card styleClass="settings-card">
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3>Security Settings</h3>
+          </div>
+        </ng-template>
+        
+        <div class="settings-list">
+          <div class="setting-item">
+            <div class="setting-info">
+              <i class="pi pi-lock"></i>
+              <div>
+                <span class="setting-name">Password</span>
+                <span class="setting-desc">Last changed 30 days ago</span>
+              </div>
+            </div>
+            <button pButton label="Change" class="p-button-outlined p-button-sm" (click)="showPasswordDialog.set(true)"></button>
+          </div>
+          
+          <div class="setting-item">
+            <div class="setting-info">
+              <i class="pi pi-shield"></i>
+              <div>
+                <span class="setting-name">Two-Factor Authentication</span>
+                <span class="setting-desc">{{ profile().twoFactorEnabled ? 'Enabled' : 'Disabled' }}</span>
+              </div>
+            </div>
+            <button pButton [label]="profile().twoFactorEnabled ? 'Disable' : 'Enable'" 
+                    [class]="profile().twoFactorEnabled ? 'p-button-outlined p-button-danger p-button-sm' : 'p-button-sm'"
+                    (click)="toggleTwoFactor()"></button>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Notification Preferences -->
+      <p-card styleClass="settings-card">
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3>Notification Preferences</h3>
+          </div>
+        </ng-template>
+        
+        <div class="settings-list">
+          <div class="setting-item">
+            <div class="setting-info">
+              <i class="pi pi-envelope"></i>
+              <div>
+                <span class="setting-name">Email Notifications</span>
+                <span class="setting-desc">Receive alerts via email</span>
+              </div>
+            </div>
+            <button pButton [label]="profile().emailNotifications ? 'On' : 'Off'" 
+                    [class]="profile().emailNotifications ? 'p-button-sm' : 'p-button-outlined p-button-sm'"
+                    (click)="toggleEmailNotifications()"></button>
+          </div>
+          
+          <div class="setting-item">
+            <div class="setting-info">
+              <i class="pi pi-slack"></i>
+              <div>
+                <span class="setting-name">Slack Notifications</span>
+                <span class="setting-desc">Get notified in Slack</span>
+              </div>
+            </div>
+            <button pButton [label]="profile().slackNotifications ? 'On' : 'Off'" 
+                    [class]="profile().slackNotifications ? 'p-button-sm' : 'p-button-outlined p-button-sm'"
+                    (click)="toggleSlackNotifications()"></button>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="profile-sidebar">
+      <!-- Recent Activity -->
+      <p-card styleClass="activity-card">
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3>Recent Activity</h3>
+          </div>
+        </ng-template>
+        
+        <div class="activity-list">
+          @for (activity of recentActivity(); track activity.id) {
+            <div class="activity-item">
+              <div class="activity-icon">
+                <i class="pi {{ getActionIcon(activity.action) }}"></i>
+              </div>
+              <div class="activity-content">
+                <span class="activity-action">{{ activity.action }}</span>
+                <span class="activity-desc">{{ activity.description }}</span>
+                <span class="activity-time">{{ activity.timestamp }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </p-card>
+
+      <!-- Active Sessions -->
+      <p-card styleClass="sessions-card">
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3>Active Sessions</h3>
+            <button pButton label="Revoke All" class="p-button-text p-button-danger p-button-sm" 
+                    (click)="revokeAllOtherSessions()" pTooltip="Revoke all other sessions"></button>
+          </div>
+        </ng-template>
+        
+        <div class="sessions-list">
+          @for (session of activeSessions(); track session.id) {
+            <div class="session-item" [class.current]="session.current">
+              <div class="session-icon">
+                <i class="pi {{ getDeviceIcon(session.device) }}"></i>
+              </div>
+              <div class="session-content">
+                <div class="session-header">
+                  <span class="session-device">{{ session.device }}</span>
+                  @if (session.current) {
+                    <p-tag value="Current" severity="success" [style]="{fontSize: '0.65rem'}"></p-tag>
+                  }
+                </div>
+                <span class="session-browser">{{ session.browser }}</span>
+                <span class="session-location">{{ session.location }} · {{ session.ipAddress }}</span>
+                <span class="session-time">{{ session.lastActive }}</span>
+              </div>
+              @if (!session.current) {
+                <button pButton icon="pi pi-times" class="p-button-text p-button-danger p-button-sm"
+                        pTooltip="Revoke session" (click)="revokeSession(session.id)"></button>
+              }
+            </div>
+          }
+        </div>
+      </p-card>
+    </div>
+  </div>
+</div>
+
+<!-- Password Dialog -->
+<p-dialog header="Change Password" [(visible)]="showPasswordDialog" [modal]="true" 
+          [style]="{width: '400px'}" styleClass="password-dialog">
+  <div class="password-form">
+    <div class="form-group">
+      <label>Current Password</label>
+      <input type="password" pInputText [(ngModel)]="currentPassword" class="w-full">
+    </div>
+    <div class="form-group">
+      <label>New Password</label>
+      <input type="password" pInputText [(ngModel)]="newPassword" class="w-full">
+    </div>
+    <div class="form-group">
+      <label>Confirm New Password</label>
+      <input type="password" pInputText [(ngModel)]="confirmPassword" class="w-full">
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" class="p-button-outlined" (click)="showPasswordDialog.set(false)"></button>
+    <button pButton label="Update Password" icon="pi pi-check" (click)="changePassword()"></button>
+  </ng-template>
+</p-dialog>

@@ -1,0 +1,171 @@
+<div class="blog-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1><i class="pi pi-book"></i> Blog Management</h1>
+      <p class="subtitle">Create, edit, and manage blog posts</p>
+    </div>
+    <button pButton label="New Post" icon="pi pi-plus" (click)="createPost()"></button>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon total"><i class="pi pi-file"></i></div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().totalPosts }}</span>
+        <span class="stat-label">Total Posts</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon published"><i class="pi pi-check-circle"></i></div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().publishedPosts }}</span>
+        <span class="stat-label">Published</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon views"><i class="pi pi-eye"></i></div>
+      <div class="stat-content">
+        <span class="stat-value">{{ formatNumber(stats().totalViews) }}</span>
+        <span class="stat-label">Total Views</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon comments"><i class="pi pi-comments"></i></div>
+      <div class="stat-content">
+        <span class="stat-value">{{ formatNumber(stats().totalComments) }}</span>
+        <span class="stat-label">Comments</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="pi pi-search"></i>
+      <input 
+        type="text" 
+        pInputText 
+        placeholder="Search posts by title, author, or tags..."
+        [value]="searchQuery()"
+        (input)="onSearchChange($event)"
+      >
+    </div>
+    <div class="filter-buttons">
+      @for (status of statuses; track status.value) {
+        <button 
+          pButton 
+          [label]="status.label" 
+          [class.p-button-outlined]="selectedStatus() !== status.value"
+          class="p-button-sm"
+          (click)="onStatusChange(status.value)"
+        ></button>
+      }
+    </div>
+    <div class="category-filter">
+      @for (cat of categories; track cat.value) {
+        <button 
+          pButton 
+          [label]="cat.label" 
+          [class.p-button-outlined]="selectedCategory() !== cat.value"
+          class="p-button-sm p-button-secondary"
+          (click)="onCategoryChange(cat.value)"
+        ></button>
+      }
+    </div>
+  </div>
+
+  <!-- Posts Grid -->
+  <div class="posts-grid">
+    @for (post of filteredPosts; track post.id) {
+      <div class="post-card">
+        <div class="post-image" [style.backgroundImage]="'url(' + post.featuredImage + ')'">
+          <div class="post-status">
+            <p-tag [value]="post.status | titlecase" [severity]="getStatusSeverity(post.status)"></p-tag>
+          </div>
+        </div>
+        <div class="post-content">
+          <div class="post-category">{{ getCategoryLabel(post.category) }}</div>
+          <h3 class="post-title">{{ post.title }}</h3>
+          <p class="post-excerpt">{{ post.excerpt }}</p>
+          
+          <div class="post-tags">
+            @for (tag of post.tags.slice(0, 3); track tag) {
+              <span class="tag">#{{ tag }}</span>
+            }
+            @if (post.tags.length > 3) {
+              <span class="tag more">+{{ post.tags.length - 3 }}</span>
+            }
+          </div>
+
+          <div class="post-meta">
+            <div class="author">
+              <p-avatar [image]="post.author.avatar" shape="circle" size="normal"></p-avatar>
+              <div class="author-info">
+                <span class="author-name">{{ post.author.name }}</span>
+                <span class="post-date">{{ formatDate(post.publishedAt || post.createdAt) }}</span>
+              </div>
+            </div>
+            <div class="post-stats">
+              <span class="stat" pTooltip="Views"><i class="pi pi-eye"></i> {{ formatNumber(post.views) }}</span>
+              <span class="stat" pTooltip="Likes"><i class="pi pi-heart"></i> {{ formatNumber(post.likes) }}</span>
+              <span class="stat" pTooltip="Comments"><i class="pi pi-comment"></i> {{ post.comments }}</span>
+            </div>
+          </div>
+
+          <div class="post-actions">
+            <button pButton icon="pi pi-pencil" label="Edit" class="p-button-sm" (click)="editPost(post)"></button>
+            <button pButton icon="pi pi-eye" class="p-button-sm p-button-outlined" pTooltip="Preview" (click)="previewPostDialog(post)"></button>
+            <p-menu #menu [model]="getPostActions(post)" [popup]="true"></p-menu>
+            <button pButton icon="pi pi-ellipsis-v" class="p-button-sm p-button-text" (click)="menu.toggle($event)"></button>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <h3>No posts found</h3>
+        <p>Try adjusting your filters or create a new post</p>
+        <button pButton label="Create First Post" icon="pi pi-plus" (click)="createPost()"></button>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Preview Dialog -->
+<p-dialog 
+  header="Post Preview" 
+  [(visible)]="showPreviewDialog" 
+  [modal]="true" 
+  [style]="{width: '800px', maxHeight: '90vh'}"
+  styleClass="preview-dialog"
+>
+  @if (previewPost()) {
+    <div class="preview-content">
+      <img [src]="previewPost()!.featuredImage" [alt]="previewPost()!.title" class="preview-image">
+      <div class="preview-meta">
+        <p-tag [value]="previewPost()!.status | titlecase" [severity]="getStatusSeverity(previewPost()!.status)"></p-tag>
+        <span class="preview-category">{{ getCategoryLabel(previewPost()!.category) }}</span>
+        <span class="preview-date">{{ formatDate(previewPost()!.publishedAt || previewPost()!.createdAt) }}</span>
+      </div>
+      <h2 class="preview-title">{{ previewPost()!.title }}</h2>
+      <div class="preview-author">
+        <p-avatar [image]="previewPost()!.author.avatar" shape="circle"></p-avatar>
+        <span>By {{ previewPost()!.author.name }}</span>
+      </div>
+      <p class="preview-excerpt">{{ previewPost()!.excerpt }}</p>
+      <div class="preview-tags">
+        @for (tag of previewPost()!.tags; track tag) {
+          <span class="tag">#{{ tag }}</span>
+        }
+      </div>
+    </div>
+  }
+  <ng-template pTemplate="footer">
+    <button pButton label="Edit Post" icon="pi pi-pencil" (click)="editPost(previewPost()!); showPreviewDialog.set(false)"></button>
+    <button pButton label="Close" icon="pi pi-times" class="p-button-outlined" (click)="showPreviewDialog.set(false)"></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog></p-confirmDialog>

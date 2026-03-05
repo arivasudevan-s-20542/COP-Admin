@@ -1,0 +1,541 @@
+/* ==========================================================================
+   Markdown Render Styles
+   Styles for content rendered by MarkdownRenderService
+   ========================================================================== */
+
+/* Base Container */
+.markdown-rendered {
+  font-family: var(--font-family);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--text-color);
+}
+
+/* ==========================================================================
+   Headings
+   ========================================================================== */
+
+.md-heading {
+  font-weight: 600;
+  color: var(--text-color);
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.md-h1 {
+  font-size: 1.875rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.md-h2 {
+  font-size: 1.5rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.md-h3 {
+  font-size: 1.25rem;
+}
+
+.md-h4 {
+  font-size: 1.125rem;
+}
+
+.md-h5 {
+  font-size: 1rem;
+}
+
+.md-h6 {
+  font-size: 0.875rem;
+  color: var(--text-color-secondary);
+}
+
+/* ==========================================================================
+   Paragraphs & Text
+   ========================================================================== */
+
+.md-paragraph {
+  margin-bottom: 1rem;
+}
+
+/* ==========================================================================
+   Inline Code
+   ========================================================================== */
+
+.inline-code {
+  display: inline;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+  font-size: 0.875em;
+  padding: 0.2em 0.4em;
+  margin: 0 0.1em;
+  background: rgba(255, 121, 198, 0.15);
+  color: #ff79c6;
+  border-radius: 4px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Light theme adjustment */
+:root:not([data-theme="dark"]) .inline-code,
+[data-theme="light"] .inline-code {
+  background: rgba(233, 30, 99, 0.1);
+  color: #c2185b;
+}
+
+/* ==========================================================================
+   Multi-Tab Code Blocks (LeetCode Style)
+   ========================================================================== */
+
+.multi-tab-code-block {
+  margin: 1.25rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1e1e1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.code-tab-header {
+  display: flex;
+  align-items: center;
+  background: #252526;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0 0.5rem;
+  gap: 0;
+}
+
+.code-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1rem;
+  background: transparent;
+  border: none;
+  color: #808080;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  font-family: var(--font-family);
+}
+
+.code-tab-btn:hover {
+  color: #cccccc;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.code-tab-btn.active {
+  color: #ffffff;
+  background: transparent;
+}
+
+.code-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary-color, #ffa116);
+}
+
+.code-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: #808080;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.code-copy-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.code-copy-btn.copied {
+  color: #4caf50;
+}
+
+.code-copy-btn.copied::after {
+  content: '✓';
+  margin-left: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.code-tab-content {
+  position: relative;
+}
+
+.code-tab-panel {
+  display: none;
+}
+
+.code-tab-panel.active {
+  display: block;
+}
+
+.code-tab-panel pre.code-block {
+  margin: 0;
+  border-radius: 0;
+  border: none;
+}
+
+/* ==========================================================================
+   Standard Code Blocks
+   ========================================================================== */
+
+.code-block-wrapper {
+  position: relative;
+  margin: 1.25rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1e1e1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.code-language-label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #808080;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom-left-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+pre.code-block {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  background: #1e1e1e;
+  border-radius: 8px;
+}
+
+pre.code-block code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: #d4d4d4;
+  background: transparent;
+  padding: 0;
+}
+
+/* ==========================================================================
+   Syntax Highlighting
+   ========================================================================== */
+
+.hljs-keyword {
+  color: #569cd6;
+  font-weight: 500;
+}
+
+.hljs-string {
+  color: #ce9178;
+}
+
+.hljs-number {
+  color: #b5cea8;
+}
+
+.hljs-comment {
+  color: #6a9955;
+  font-style: italic;
+}
+
+.hljs-function {
+  color: #dcdcaa;
+}
+
+.hljs-decorator {
+  color: #c586c0;
+}
+
+.hljs-symbol {
+  color: #4ec9b0;
+}
+
+.hljs-preprocessor {
+  color: #c586c0;
+}
+
+/* ==========================================================================
+   Math Expressions
+   ========================================================================== */
+
+.math-block {
+  display: block;
+  margin: 1.25rem 0;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 165, 0, 0.08);
+  border-left: 3px solid var(--primary-color, #ffa116);
+  border-radius: 0 6px 6px 0;
+  font-family: 'KaTeX_Math', 'Times New Roman', serif;
+  font-size: 1.1em;
+  font-style: italic;
+  color: var(--text-color);
+  text-align: center;
+}
+
+.math-inline {
+  display: inline;
+  font-family: 'KaTeX_Math', 'Times New Roman', serif;
+  font-style: italic;
+  padding: 0 0.2em;
+  color: var(--primary-color, #ffa116);
+}
+
+/* ==========================================================================
+   Blockquotes
+   ========================================================================== */
+
+.md-blockquote {
+  margin: 1.25rem 0;
+  padding: 0.75rem 1rem 0.75rem 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 4px solid var(--primary-color, #ffa116);
+  border-radius: 0 6px 6px 0;
+  color: var(--text-color-secondary);
+  font-style: italic;
+}
+
+.md-blockquote p {
+  margin: 0;
+}
+
+/* ==========================================================================
+   Lists
+   ========================================================================== */
+
+.md-list {
+  margin: 1rem 0;
+  padding-left: 1.75rem;
+}
+
+.md-list li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.md-list li::marker {
+  color: var(--primary-color, #ffa116);
+}
+
+.md-ol {
+  list-style-type: decimal;
+}
+
+.md-ul {
+  list-style-type: disc;
+}
+
+/* Nested lists */
+.md-list .md-list {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+/* ==========================================================================
+   Horizontal Rules
+   ========================================================================== */
+
+.md-hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--surface-border) 20%,
+    var(--surface-border) 80%,
+    transparent
+  );
+  margin: 2rem 0;
+}
+
+/* ==========================================================================
+   Images
+   ========================================================================== */
+
+.markdown-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1rem 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ==========================================================================
+   Links
+   ========================================================================== */
+
+.markdown-link {
+  color: var(--primary-color, #ffa116);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.markdown-link:hover {
+  color: var(--primary-color, #ffb84d);
+  border-bottom-color: currentColor;
+}
+
+/* ==========================================================================
+   Tables (if needed in future)
+   ========================================================================== */
+
+.md-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  font-size: 0.875rem;
+}
+
+.md-table th,
+.md-table td {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--surface-border);
+  text-align: left;
+}
+
+.md-table th {
+  background: var(--surface-ground);
+  font-weight: 600;
+}
+
+.md-table tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ==========================================================================
+   Light Theme Overrides
+   ========================================================================== */
+
+:root:not([data-theme="dark"]) .multi-tab-code-block,
+:root:not([data-theme="dark"]) .code-block-wrapper,
+[data-theme="light"] .multi-tab-code-block,
+[data-theme="light"] .code-block-wrapper {
+  background: #f8f8f8;
+  border-color: #e0e0e0;
+}
+
+:root:not([data-theme="dark"]) .code-tab-header,
+[data-theme="light"] .code-tab-header {
+  background: #f0f0f0;
+  border-bottom-color: #e0e0e0;
+}
+
+:root:not([data-theme="dark"]) .code-tab-btn,
+[data-theme="light"] .code-tab-btn {
+  color: #666666;
+}
+
+:root:not([data-theme="dark"]) .code-tab-btn:hover,
+[data-theme="light"] .code-tab-btn:hover {
+  color: #333333;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+:root:not([data-theme="dark"]) .code-tab-btn.active,
+[data-theme="light"] .code-tab-btn.active {
+  color: #1a1a1a;
+}
+
+:root:not([data-theme="dark"]) pre.code-block,
+[data-theme="light"] pre.code-block {
+  background: #f8f8f8;
+}
+
+:root:not([data-theme="dark"]) pre.code-block code,
+[data-theme="light"] pre.code-block code {
+  color: #333333;
+}
+
+:root:not([data-theme="dark"]) .hljs-keyword,
+[data-theme="light"] .hljs-keyword {
+  color: #0000ff;
+}
+
+:root:not([data-theme="dark"]) .hljs-string,
+[data-theme="light"] .hljs-string {
+  color: #a31515;
+}
+
+:root:not([data-theme="dark"]) .hljs-number,
+[data-theme="light"] .hljs-number {
+  color: #098658;
+}
+
+:root:not([data-theme="dark"]) .hljs-comment,
+[data-theme="light"] .hljs-comment {
+  color: #008000;
+}
+
+:root:not([data-theme="dark"]) .hljs-function,
+[data-theme="light"] .hljs-function {
+  color: #795e26;
+}
+
+/* ==========================================================================
+   Responsive Adjustments
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .md-h1 {
+    font-size: 1.5rem;
+  }
+  
+  .md-h2 {
+    font-size: 1.25rem;
+  }
+  
+  .md-h3 {
+    font-size: 1.125rem;
+  }
+  
+  pre.code-block {
+    padding: 0.875rem 1rem;
+    font-size: 0.75rem;
+  }
+  
+  .code-tab-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+  
+  .math-block {
+    padding: 0.75rem 1rem;
+    font-size: 1em;
+  }
+}
+
+/* ==========================================================================
+   Animation for Copy Button
+   ========================================================================== */
+
+@keyframes copySuccess {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.code-copy-btn.copied {
+  animation: copySuccess 0.3s ease;
+}

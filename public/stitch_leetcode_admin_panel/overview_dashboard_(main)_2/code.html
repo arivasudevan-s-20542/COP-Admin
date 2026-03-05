@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AdminConsole - Users &amp; Activity Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#0b0c10",
+                        "surface-dark": "#161b22",
+                        "border-dark": "#30363d",
+                        "secondary": "#a855f7",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0c10; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #30363d; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #586069; 
+        }
+        .cohort-cell-0 { background-color: rgba(13, 89, 242, 0.05); color: #94a3b8; }
+        .cohort-cell-1 { background-color: rgba(13, 89, 242, 0.15); color: #e2e8f0; }
+        .cohort-cell-2 { background-color: rgba(13, 89, 242, 0.3); color: #fff; }
+        .cohort-cell-3 { background-color: rgba(13, 89, 242, 0.5); color: #fff; }
+        .cohort-cell-4 { background-color: rgba(13, 89, 242, 0.7); color: #fff; }
+        .cohort-cell-5 { background-color: rgba(13, 89, 242, 0.9); color: #fff; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 overflow-hidden h-screen flex">
+<aside class="w-16 lg:w-64 flex flex-col border-r border-slate-200 dark:border-border-dark bg-white dark:bg-surface-dark transition-all duration-300 z-20 flex-shrink-0">
+<div class="h-16 flex items-center justify-center lg:justify-start lg:px-6 border-b border-slate-200 dark:border-border-dark">
+<div class="flex items-center gap-3">
+<div class="bg-primary/20 p-2 rounded-lg text-primary">
+<span class="material-symbols-outlined !text-[24px]">terminal</span>
+</div>
+<h1 class="hidden lg:block text-base font-bold tracking-tight">AdminConsole</h1>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto py-4 flex flex-col gap-1 px-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined !text-[22px]">dashboard</span>
+<span class="hidden lg:block text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined !text-[22px]">code</span>
+<span class="hidden lg:block text-sm font-medium">Problems</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary group" href="#">
+<span class="material-symbols-outlined !text-[22px]">group</span>
+<span class="hidden lg:block text-sm font-medium">Users</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined !text-[22px]">dns</span>
+<span class="hidden lg:block text-sm font-medium">Infrastructure</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined !text-[22px]">credit_card</span>
+<span class="hidden lg:block text-sm font-medium">Billing</span>
+</a>
+<div class="my-2 border-t border-slate-200 dark:border-border-dark mx-2"></div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined !text-[22px]">settings</span>
+<span class="hidden lg:block text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-border-dark">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCaAZ7bW0bZckqY8ZKbxtnWXtXDckU1llzw_UT7cFRT3QhVl51kCPmMUrzr07B2uNbDwtKWGyvN6tHiH9QhvYwtxib0rORjo4xR2ktzQCJv4FMt90T0STKM8frNZA3PnrpzHdwqQk_qqzEaPKZbt-Ibo5ww2YdmYTZJqMPEO-zglXl5WhFtU1WdRAFXmY5M8J9ls2IwxTo3Q7rI590L_HQhDUvGofGX9-49Uzv1lwdSxFFAT7F3_LZlTZNHSA-T2A60lZ1t3KvNOt44');"></div>
+<div class="hidden lg:flex flex-col">
+<p class="text-sm font-medium leading-none">Alex Admin</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">DevOps Lead</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<header class="h-16 border-b border-slate-200 dark:border-border-dark bg-white dark:bg-surface-dark flex items-center justify-between px-6 flex-shrink-0 z-10">
+<div class="flex items-center gap-6 flex-1">
+<div class="hidden md:flex items-center text-sm font-medium text-slate-500 dark:text-slate-400">
+<span class="hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors">Dashboard</span>
+<span class="mx-2 text-slate-300 dark:text-slate-600">/</span>
+<span class="text-slate-900 dark:text-white">Users &amp; Activity</span>
+</div>
+<div class="relative w-full max-w-md hidden sm:block">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+<span class="material-symbols-outlined !text-[20px]">search</span>
+</span>
+<input class="w-full bg-slate-100 dark:bg-[#0d1117] border border-transparent dark:border-border-dark focus:border-primary focus:ring-1 focus:ring-primary rounded text-sm py-1.5 pl-10 pr-4 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400" placeholder="Search user ID, email or ip..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 h-8 px-3 rounded bg-slate-100 dark:bg-[#0d1117] border border-slate-200 dark:border-border-dark text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
+<span class="material-symbols-outlined !text-[16px]">calendar_today</span>
+<span class="text-xs font-medium">Last 30 Days</span>
+<span class="material-symbols-outlined !text-[16px]">expand_more</span>
+</button>
+<div class="h-6 w-px bg-slate-200 dark:bg-border-dark mx-1"></div>
+<button class="h-8 w-8 flex items-center justify-center rounded hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
+<span class="material-symbols-outlined !text-[20px]">settings_applications</span>
+</button>
+<button class="h-8 w-8 flex items-center justify-center rounded hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
+<span class="material-symbols-outlined !text-[20px]">notifications</span>
+</button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-4 md:p-6 scroll-smooth">
+<div class="max-w-[1600px] mx-auto flex flex-col gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="p-4 rounded-lg bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Users</h3>
+<span class="material-symbols-outlined text-slate-400 !text-[18px]">group</span>
+</div>
+<div class="flex items-end gap-3">
+<span class="text-2xl font-bold font-mono tracking-tight text-slate-900 dark:text-white">845.2K</span>
+<span class="flex items-center text-xs font-medium text-green-500 bg-green-500/10 px-1.5 py-0.5 rounded mb-1">
+<span class="material-symbols-outlined !text-[12px] mr-0.5">trending_up</span>
+                            5.2%
+                        </span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 dark:text-slate-400">+12.4k this week</p>
+</div>
+</div>
+<div class="p-4 rounded-lg bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Daily Active (DAU)</h3>
+<span class="material-symbols-outlined text-slate-400 !text-[18px]">person_check</span>
+</div>
+<div class="flex items-end gap-3">
+<span class="text-2xl font-bold font-mono tracking-tight text-slate-900 dark:text-white">128.5K</span>
+<span class="flex items-center text-xs font-medium text-green-500 bg-green-500/10 px-1.5 py-0.5 rounded mb-1">
+<span class="material-symbols-outlined !text-[12px] mr-0.5">arrow_upward</span>
+                            3.1%
+                        </span>
+</div>
+<div class="mt-3 h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[65%] rounded-full"></div>
+</div>
+</div>
+<div class="p-4 rounded-lg bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Monthly Active (MAU)</h3>
+<span class="material-symbols-outlined text-slate-400 !text-[18px]">calendar_month</span>
+</div>
+<div class="flex items-end gap-3">
+<span class="text-2xl font-bold font-mono tracking-tight text-slate-900 dark:text-white">450.1K</span>
+<span class="flex items-center text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 rounded mb-1">
+<span class="material-symbols-outlined !text-[12px] mr-0.5">remove</span>
+                            0.5%
+                        </span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 dark:text-slate-400">DAU/MAU Ratio: 28.5%</p>
+</div>
+</div>
+<div class="p-4 rounded-lg bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Avg Solves / User</h3>
+<span class="material-symbols-outlined text-purple-500 !text-[18px]">emoji_events</span>
+</div>
+<div class="flex items-end gap-3">
+<span class="text-2xl font-bold font-mono tracking-tight text-slate-900 dark:text-white">42</span>
+<span class="flex items-center text-xs font-medium text-green-500 bg-green-500/10 px-1.5 py-0.5 rounded mb-1">
+<span class="material-symbols-outlined !text-[12px] mr-0.5">arrow_upward</span>
+                            1.2
+                        </span>
+</div>
+<div class="mt-3 flex gap-1">
+<div class="h-1 flex-1 bg-purple-500 rounded-full opacity-30"></div>
+<div class="h-1 flex-1 bg-purple-500 rounded-full opacity-50"></div>
+<div class="h-1 flex-1 bg-purple-500 rounded-full opacity-70"></div>
+<div class="h-1 flex-1 bg-purple-500 rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-auto">
+<div class="lg:col-span-2 p-5 rounded-lg bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark shadow-sm flex flex-col h-auto">
+<div class="flex items-center justify-between mb-4">
+<div>
+<h3 class="text-sm font-semibold text-slate-900 dark:text-white">User Retention Analysis</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Weekly retention of new user cohorts over 12 weeks</p>
+</div>
+<button class="text-xs border border-slate-200 dark:border-border-dark px-2 py-1 rounded text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5">Export CSV</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-center text-xs font-mono border-separate" style="border-spacing: 2px;">
+<thead>
+<tr class="text-slate-500 dark:text-slate-400">
+<th class="text-left font-medium pb-2 w-24">Cohort</th>
+<th class="font-medium pb-2 w-16">Users</th>
+<th class="pb-2">W1</th>
+<th class="pb-2">W2</th>
+<th class="pb-2">W3</th>
+<th class="pb-2">W4</th>
+<th class="pb-2">W5</th>
+<th class="pb-2">W6</th>
+<th class="pb-2">W7</th>
+<th class="pb-2">W8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="text-left text-slate-700 dark:text-slate-300 py-1">Oct 01</td>
+<td class="text-slate-500">1,240</td>
+<td class="rounded cohort-cell-5">100%</td>
+<td class="rounded cohort-cell-4">78%</td>
+<td class="rounded cohort-cell-3">64%</td>
+<td class="rounded cohort-cell-3">58%</td>
+<td class="rounded cohort-cell-2">52%</td>
+<td class="rounded cohort-cell-2">48%</td>
+<td class="rounded cohort-cell-2">45%</td>
+<td class="rounded cohort-cell-1">42%</td>
+</tr>
+<tr>
+<td class="text-left text-slate-700 dark:text-slate-300 py-1">Oct 08</td>
+<td class="text-slate-500">1,310</td>
+<td class="rounded cohort-cell-5">100%</td>
+<td class="rounded cohort-cell-4">81%</td>
+<td class="rounded cohort-cell-4">68%</td>
+<td class="rounded cohort-cell-3">62%</td>
+<td class="rounded cohort-cell-3">56%</td>
+<td class="rounded cohort-cell-2">51%</td>
+<td class="rounded cohort-cell-2">48%</td>
+<td class="rounded cohort-cell-0"></td>
+</tr>
+<tr>
+<td class="text-left text-slate-700 dark:text-slate-300 py-1">Oct 15</td>
+<td class="text-slate-500">1,185</td>
+<td class="rounded cohort-cell-5">100%</td>
+<td class="rounded cohort-cell-4">76%</td>
+<td class="rounded cohort-cell-3">61%</td>
+<td class="rounded cohort-cell-2">55%</td>
+<td class="rounded cohort-cell-2">49%</td>
+<td class="rounded cohort-cell-2">45%</td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+</tr>
+<tr>
+<td class="text-left text-slate-700 dark:text-slate-300 py-1">Oct 22</td>
+<td class="text-slate-500">1,450</td>
+<td class="rounded cohort-cell-5">100%</td>
+<td class="rounded cohort-cell-4">79%</td>
+<td class="rounded cohort-cell-4">66%</td>
+<td class="rounded cohort-cell-3">60%</td>
+<td class="rounded cohort-cell-3">54%</td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+</tr>
+<tr>
+<td class="text-left text-slate-700 dark:text-slate-300 py-1">Oct 29</td>
+<td class="text-slate-500">1,502</td>
+<td class="rounded cohort-cell-5">100%</td>
+<td class="rounded cohort-cell-4">82%</td>
+<td class="rounded cohort-cell-4">70%</td>
+<td class="rounded cohort-cell-3">64%</td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+</tr>
+<tr>
+<td class="text-left text-slate-700 dark:text-slate-300 py-1">Nov 05</td>
+<td class="text-slate-500">1,390</td>
+<td class="rounded cohort-cell-5">100%</td>
+<td class="rounded cohort-cell-4">80%</td>
+<td class="rounded cohort-cell-4">69%</td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+</tr>
+<tr>
+<td class="text-left text-slate-700 dark:text-slate-300 py-1">Nov 12</td>
+<td class="text-slate-500">1,620</td>
+<td class="rounded cohort-cell-5">100%</td>
+<td class="rounded cohort-cell-5">85%</td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+</tr>
+<tr>
+<td class="text-left text-slate-700 dark:text-slate-300 py-1">Nov 19</td>
+<td class="text-slate-500">1,580</td>
+<td class="rounded cohort-cell-5">100%</td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+<td class="rounded cohort-cell-0"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="p-5 rounded-lg bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark shadow-sm flex flex-col">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-sm font-semibold text-slate-900 dark:text-white">Conversion Funnel</h3>
+<span class="material-symbols-outlined text-slate-400 !text-[18px]">filter_alt</span>
+</div>
+<div class="flex-1 flex flex-col justify-center gap-4 relative">
+<div class="relative z-10">
+<div class="flex justify-between text-xs mb-1">
+<span class="font-medium text-slate-700 dark:text-slate-300">Registration</span>
+<span class="text-slate-500">100%</span>
+</div>
+<div class="h-8 w-full bg-slate-100 dark:bg-white/5 rounded-r flex items-center px-3 border-l-4 border-blue-500">
+<span class="text-sm font-mono text-slate-900 dark:text-white">12,450</span>
+</div>
+</div>
+<div class="absolute left-6 top-[2.5rem] bottom-[2.5rem] w-0.5 bg-slate-200 dark:bg-slate-800 -z-0"></div>
+<div class="relative z-10 pl-4">
+<div class="flex justify-between text-xs mb-1">
+<span class="font-medium text-slate-700 dark:text-slate-300">First Submission</span>
+<span class="text-slate-500">68%</span>
+</div>
+<div class="h-8 w-[85%] bg-slate-100 dark:bg-white/5 rounded-r flex items-center px-3 border-l-4 border-blue-400">
+<span class="text-sm font-mono text-slate-900 dark:text-white">8,466</span>
+<span class="ml-auto text-[10px] text-red-400">-32%</span>
+</div>
+</div>
+<div class="relative z-10 pl-8">
+<div class="flex justify-between text-xs mb-1">
+<span class="font-medium text-slate-700 dark:text-slate-300">Solved Problem</span>
+<span class="text-slate-500">45%</span>
+</div>
+<div class="h-8 w-[70%] bg-slate-100 dark:bg-white/5 rounded-r flex items-center px-3 border-l-4 border-purple-500">
+<span class="text-sm font-mono text-slate-900 dark:text-white">5,602</span>
+<span class="ml-auto text-[10px] text-red-400">-34%</span>
+</div>
+</div>
+<div class="relative z-10 pl-12">
+<div class="flex justify-between text-xs mb-1">
+<span class="font-medium text-slate-700 dark:text-slate-300">Premium Sub</span>
+<span class="text-slate-500">5.2%</span>
+</div>
+<div class="h-8 w-[35%] bg-slate-100 dark:bg-white/5 rounded-r flex items-center px-3 border-l-4 border-green-500 shadow-[0_0_10px_rgba(34,197,94,0.2)]">
+<span class="text-sm font-mono text-slate-900 dark:text-white">647</span>
+<span class="ml-auto text-[10px] text-red-400">-88%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-6">
+<div class="lg:col-span-2 p-5 rounded-lg bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark shadow-sm flex flex-col h-[350px]">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h3 class="text-sm font-semibold text-slate-900 dark:text-white">Growth: New vs Active</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Correlation between acquisition and daily engagement</p>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="text-xs text-slate-500 dark:text-slate-400">New Registrations</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+<span class="text-xs text-slate-500 dark:text-slate-400">Active Users</span>
+</div>
+</div>
+</div>
+<div class="flex-1 w-full relative">
+<div class="absolute inset-0 flex items-end justify-between px-2 gap-1 opacity-90">
+<div class="w-full h-full relative">
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+<div class="w-full h-px bg-slate-100 dark:bg-slate-800 border-t border-dashed border-slate-200 dark:border-slate-800"></div>
+<div class="w-full h-px bg-slate-100 dark:bg-slate-800 border-t border-dashed border-slate-200 dark:border-slate-800"></div>
+<div class="w-full h-px bg-slate-100 dark:bg-slate-800 border-t border-dashed border-slate-200 dark:border-slate-800"></div>
+<div class="w-full h-px bg-slate-100 dark:bg-slate-800 border-t border-dashed border-slate-200 dark:border-slate-800"></div>
+</div>
+<svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+<defs>
+<linearGradient id="gradientNew" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#0d59f2" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#0d59f2" stop-opacity="0"></stop>
+</linearGradient>
+</defs>
+<path d="M0,200 L100,180 L200,190 L300,150 L400,160 L500,120 L600,100 L700,110 L800,80 L900,90 L1000,50 L1000,280 L0,280 Z" fill="url(#gradientNew)" stroke="none"></path>
+<path d="M0,200 L100,180 L200,190 L300,150 L400,160 L500,120 L600,100 L700,110 L800,80 L900,90 L1000,50" fill="none" stroke="#0d59f2" stroke-width="2"></path>
+<path d="M0,230 L100,210 L200,220 L300,190 L400,195 L500,160 L600,150 L700,160 L800,130 L900,140 L1000,110" fill="none" stroke="#22c55e" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+</div>
+<div class="flex justify-between text-[10px] text-slate-400 mt-2 font-mono border-t border-slate-200 dark:border-slate-800 pt-2">
+<span>Nov 1</span>
+<span>Nov 5</span>
+<span>Nov 10</span>
+<span>Nov 15</span>
+<span>Nov 20</span>
+<span>Nov 25</span>
+<span>Nov 30</span>
+</div>
+</div>
+<div class="p-5 rounded-lg bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark shadow-sm flex flex-col h-[350px]">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-sm font-semibold text-slate-900 dark:text-white">Active Users per Region</h3>
+<button class="text-xs text-primary hover:underline">Full Report</button>
+</div>
+<div class="flex-1 w-full rounded bg-[#0d1117] relative overflow-hidden flex items-center justify-center border border-slate-200 dark:border-border-dark">
+<div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#64748b 1px, transparent 1px); background-size: 15px 15px;"></div>
+<div class="relative w-full h-full opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+<div class="absolute top-[30%] left-[20%] group">
+<div class="w-4 h-4 bg-primary rounded-full animate-ping absolute opacity-75"></div>
+<div class="w-3 h-3 bg-primary rounded-full relative border-2 border-[#0d1117]"></div>
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">USA: 45k</div>
+</div>
+<div class="absolute top-[25%] left-[52%] group">
+<div class="w-3 h-3 bg-primary rounded-full animate-ping absolute opacity-75 animation-delay-500"></div>
+<div class="w-2.5 h-2.5 bg-primary rounded-full relative border-2 border-[#0d1117]"></div>
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">Germany: 12k</div>
+</div>
+<div class="absolute top-[42%] left-[70%] group">
+<div class="w-6 h-6 bg-purple-500 rounded-full animate-ping absolute opacity-75 animation-delay-700"></div>
+<div class="w-4 h-4 bg-purple-500 rounded-full relative border-2 border-[#0d1117]"></div>
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">India: 85k</div>
+</div>
+<div class="absolute top-[35%] left-[82%] group">
+<div class="w-3 h-3 bg-primary rounded-full animate-ping absolute opacity-75 animation-delay-300"></div>
+<div class="w-2.5 h-2.5 bg-primary rounded-full relative border-2 border-[#0d1117]"></div>
+</div>
+<div class="absolute top-[60%] left-[28%] group">
+<div class="w-2 h-2 bg-primary rounded-full relative border-2 border-[#0d1117]"></div>
+</div>
+</div>
+<div class="absolute bottom-2 left-2 text-[10px] font-mono text-slate-500 bg-[#0d1117]/80 px-2 py-1 rounded">Top Region: APAC (42%)</div>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-4">
+<div class="flex items-center justify-between">
+<span class="text-xs text-slate-500 dark:text-slate-400">United States</span>
+<div class="flex items-center gap-2">
+<div class="w-16 h-1.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[70%]"></div>
+</div>
+<span class="text-[10px] font-mono dark:text-slate-300">35%</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-slate-500 dark:text-slate-400">India</span>
+<div class="flex items-center gap-2">
+<div class="w-16 h-1.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-purple-500 w-[85%]"></div>
+</div>
+<span class="text-[10px] font-mono dark:text-slate-300">42%</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-slate-500 dark:text-slate-400">China</span>
+<div class="flex items-center gap-2">
+<div class="w-16 h-1.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[40%]"></div>
+</div>
+<span class="text-[10px] font-mono dark:text-slate-300">12%</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-slate-500 dark:text-slate-400">Other</span>
+<div class="flex items-center gap-2">
+<div class="w-16 h-1.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-slate-500 w-[20%]"></div>
+</div>
+<span class="text-[10px] font-mono dark:text-slate-300">11%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

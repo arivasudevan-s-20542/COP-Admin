@@ -1,0 +1,402 @@
+$primary-color: #0d59f2;
+$bg-dark: #111318;
+$surface-dark: #1a1d24;
+$surface-hover: #22262f;
+$border-color: #282e39;
+$text-primary: #ffffff;
+$text-secondary: #9ca6ba;
+$text-muted: #586174;
+$success-color: #10b981;
+$warning-color: #f59e0b;
+$danger-color: #ef4444;
+$info-color: #3b82f6;
+$purple-color: #a855f7;
+
+.analytics-container {
+  padding: 1.5rem;
+  min-height: 100%;
+  background: $bg-dark;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.title-icon { font-size: 1.25rem; color: $primary-color; }
+.page-title { font-size: 1.25rem; font-weight: 700; color: $text-primary; margin: 0; }
+.status-badge { font-size: 0.75rem !important; }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-input {
+  width: 220px;
+}
+
+// Feature Cards
+.feature-cards {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+
+  &::-webkit-scrollbar { height: 4px; }
+  &::-webkit-scrollbar-thumb { background: $border-color; border-radius: 4px; }
+}
+
+.feature-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  background: $surface-dark;
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: fit-content;
+  white-space: nowrap;
+
+  &:hover { background: $surface-hover; border-color: rgba($primary-color, 0.3); }
+  &.active {
+    background: rgba($primary-color, 0.12);
+    border-color: $primary-color;
+    .feature-icon i { color: $primary-color; }
+    .feature-name { color: $primary-color; }
+  }
+}
+
+.feature-icon {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px;
+  background: rgba($text-muted, 0.1);
+  i { font-size: 1rem; color: $text-secondary; }
+}
+
+.feature-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.feature-name { font-weight: 600; font-size: 0.875rem; color: $text-primary; text-transform: capitalize; }
+.feature-count { font-size: 0.75rem; color: $text-muted; }
+
+// Content Grid
+.feature-detail-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-column, .table-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+// Cards
+:host ::ng-deep .section-card {
+  background: $surface-dark !important;
+  border: 1px solid $border-color !important;
+  border-radius: 12px !important;
+
+  .p-card-header { padding: 1rem 1.25rem 0; }
+  .p-card-body { padding: 1rem 1.25rem 1.25rem; }
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h3 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i { color: $primary-color; font-size: 0.875rem; }
+  }
+}
+
+.filter-input { width: 180px; font-size: 0.8125rem; }
+
+.chart-wrapper { position: relative; width: 100%; }
+
+// Summary Grid
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: rgba($text-muted, 0.06);
+  border-radius: 6px;
+  transition: background 0.15s;
+  &:hover { background: rgba($text-muted, 0.12); }
+}
+
+.summary-label {
+  font-size: 0.8125rem;
+  color: $text-secondary;
+  text-transform: capitalize;
+}
+
+.summary-value {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: $text-primary;
+  font-variant-numeric: tabular-nums;
+}
+
+// Table
+.key-name { font-weight: 600; color: $info-color; font-size: 0.8125rem; }
+.pattern-cell code {
+  font-size: 0.75rem;
+  color: $purple-color;
+  background: rgba($purple-color, 0.08);
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+}
+.desc-cell { font-size: 0.8125rem; color: $text-secondary; max-width: 250px; }
+.ttl-cell { font-size: 0.8125rem; color: $text-muted; }
+.no-ttl { color: $success-color; }
+.empty-message { text-align: center; color: $text-muted; padding: 2rem !important; }
+
+:host ::ng-deep .type-tag { font-size: 0.6875rem !important; }
+
+.key-row { cursor: pointer; transition: background 0.15s; }
+
+// Skeleton
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+// Dialog content
+.key-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.key-meta {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba($text-muted, 0.05);
+  border-radius: 8px;
+}
+
+.meta-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.meta-label {
+  min-width: 90px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.meta-value { font-size: 0.875rem; color: $text-primary; }
+
+.variable-inputs {
+  h4 {
+    font-size: 0.875rem;
+    color: $text-secondary;
+    margin: 0 0 0.75rem;
+  }
+}
+
+.var-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.var-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  label { font-size: 0.75rem; color: $text-muted; font-family: monospace; }
+}
+
+.query-btn { margin-top: 0.25rem; }
+
+// Result display
+.result-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.result-header {
+  padding: 0.75rem;
+  background: rgba($text-muted, 0.05);
+  border-radius: 6px;
+}
+
+.resolved-key {
+  font-family: monospace;
+  font-size: 0.8125rem;
+  color: $text-secondary;
+  i { color: $warning-color; margin-right: 0.5rem; }
+}
+
+.counter-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.counter-value {
+  font-size: 3rem;
+  font-weight: 800;
+  color: $primary-color;
+  font-variant-numeric: tabular-nums;
+}
+
+.set-display {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.set-size {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 1rem;
+  .big-number { font-size: 2.5rem; font-weight: 800; color: $success-color; }
+  .big-label { font-size: 0.875rem; color: $text-muted; }
+}
+
+.member-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+:host ::ng-deep .member-tag { font-size: 0.75rem !important; }
+
+.sorted-set-display .ss-total {
+  font-size: 0.875rem;
+  color: $text-muted;
+  margin: 0 0 0.5rem;
+}
+
+.hash-field-name {
+  font-weight: 600;
+  color: $warning-color;
+}
+
+.log-list {
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.log-entry {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: $text-secondary;
+  padding: 0.375rem 0.625rem;
+  background: rgba($text-muted, 0.06);
+  border-radius: 4px;
+}
+
+.timeseries-section {
+  margin-top: 0.5rem;
+  h4 {
+    font-size: 0.875rem;
+    color: $text-secondary;
+    margin: 0 0 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    i { color: $primary-color; }
+  }
+}
+
+// PrimeNG overrides
+:host ::ng-deep {
+  .p-datatable {
+    .p-datatable-thead > tr > th {
+      background: rgba($text-muted, 0.05);
+      color: $text-muted;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-color: $border-color;
+      padding: 0.625rem 0.75rem;
+    }
+    .p-datatable-tbody > tr {
+      background: transparent;
+      > td { border-color: $border-color; color: $text-primary; padding: 0.5rem 0.75rem; font-size: 0.8125rem; }
+      &:hover > td { background: rgba($text-muted, 0.05); }
+    }
+  }
+
+  .p-dialog {
+    .p-dialog-header { background: $surface-dark; border-color: $border-color; color: $text-primary; }
+    .p-dialog-content { background: $surface-dark; color: $text-primary; }
+  }
+
+  .p-inputtext {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: $border-color;
+    color: $text-primary;
+    font-size: 0.8125rem;
+    &:focus { border-color: $primary-color; box-shadow: 0 0 0 2px rgba($primary-color, 0.2); }
+  }
+
+  .p-paginator { background: transparent; border: none; }
+}

@@ -1,0 +1,346 @@
+<div class="analytics-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="title-group">
+        <i class="pi pi-chart-bar title-icon"></i>
+        <h1 class="page-title">Analytics Explorer</h1>
+        <p-tag [value]="totalFeatures() + ' features'" severity="info" class="status-badge" />
+        <p-tag [value]="totalKeys() + ' keys'" severity="secondary" class="status-badge" />
+      </div>
+    </div>
+    <div class="header-right">
+      <input pInputText [(ngModel)]="searchQuery" placeholder="Search keys..." class="search-input"
+             (keyup.enter)="globalSearch()" (input)="searchQuery.set($any($event.target).value)" />
+      <button pButton icon="pi pi-search" label="Search" class="p-button-outlined" (click)="globalSearch()"></button>
+      <button pButton icon="pi pi-refresh" label="Reload Registry" class="p-button-outlined p-button-warning"
+              (click)="reloadRegistry()" pTooltip="Hot-reload analytics-keys.json from backend"></button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="skeleton-grid">
+      @for (_ of [1,2,3,4,5,6]; track $index) {
+        <p-skeleton width="100%" height="4rem" />
+      }
+    </div>
+  } @else {
+    <!-- Feature Cards Row -->
+    <div class="feature-cards">
+      @for (feat of features(); track feat.name) {
+        <div class="feature-card" [class.active]="selectedFeature() === feat.name"
+             (click)="selectFeature(feat.name)">
+          <div class="feature-icon">
+            <i [class]="'pi ' + getFeatureIcon(feat.name)"></i>
+          </div>
+          <div class="feature-info">
+            <span class="feature-name">{{ feat.name }}</span>
+            <span class="feature-count">{{ feat.keyCount }} keys</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Search Results -->
+    @if (searchResults().length > 0) {
+      <p-card styleClass="section-card">
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3><i class="pi pi-search"></i> Search Results ({{ searchResults().length }})</h3>
+            <button pButton icon="pi pi-times" class="p-button-text p-button-sm" (click)="searchResults.set([])" ></button>
+          </div>
+        </ng-template>
+        <p-table [value]="searchResults()" [rows]="10" [paginator]="true" styleClass="p-datatable-sm">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Feature</th>
+              <th>Key Name</th>
+              <th>Type</th>
+              <th>Pattern</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-key>
+            <tr>
+              <td><p-tag [value]="key.feature" severity="info" /></td>
+              <td class="key-name">{{ key.name }}</td>
+              <td><p-tag [value]="key.type" [severity]="getTypeSeverity(key.type)" /></td>
+              <td class="pattern-cell"><code>{{ key.pattern }}</code></td>
+              <td class="desc-cell">{{ key.description }}</td>
+              <td>
+                <button pButton icon="pi pi-eye" class="p-button-text p-button-sm"
+                        pTooltip="Query this key" (click)="openKeyDetail(key)"></button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    }
+
+    <!-- Main Content: Feature Detail -->
+    @if (selectedFeature()) {
+      <div class="feature-detail-grid">
+        <!-- Left: Key Types Chart + Summary -->
+        <div class="chart-column">
+          <!-- Key Type Distribution -->
+          @if (featureSummaryChart()) {
+            <p-card styleClass="section-card">
+              <ng-template pTemplate="header">
+                <div class="card-header">
+                  <h3><i class="pi pi-chart-pie"></i> {{ selectedFeature() }} — Key Distribution</h3>
+                </div>
+              </ng-template>
+              <div class="chart-wrapper">
+                <p-chart type="doughnut" [data]="featureSummaryChart()" [options]="doughnutOptions" height="280px" />
+              </div>
+            </p-card>
+          }
+
+          <!-- Live Summary Values (counters) -->
+          @if (!summaryLoading() && getSummaryEntries().length > 0) {
+            <p-card styleClass="section-card">
+              <ng-template pTemplate="header">
+                <div class="card-header">
+                  <h3><i class="pi pi-bolt"></i> Live Values</h3>
+                  <button pButton icon="pi pi-refresh" class="p-button-text p-button-sm"
+                          (click)="selectFeature(selectedFeature())" pTooltip="Refresh"></button>
+                </div>
+              </ng-template>
+              <div class="summary-grid">
+                @for (entry of getSummaryEntries(); track entry[0]) {
+                  <div class="summary-item">
+                    <span class="summary-label">{{ entry[0].replace('_', ' ') }}</span>
+                    <span class="summary-value">{{ formatValue(entry[1], 'counter') }}</span>
+                  </div>
+                }
+              </div>
+            </p-card>
+          }
+          @if (summaryLoading()) {
+            <p-card styleClass="section-card">
+              <p-skeleton width="100%" height="200px" />
+            </p-card>
+          }
+        </div>
+
+        <!-- Right: Keys Table -->
+        <div class="table-column">
+          <p-card styleClass="section-card">
+            <ng-template pTemplate="header">
+              <div class="card-header">
+                <h3><i class="pi pi-key"></i> {{ selectedFeature() }} Keys ({{ filteredKeys().length }})</h3>
+                <input pInputText [(ngModel)]="searchQuery" placeholder="Filter keys..."
+                       class="filter-input" (input)="searchQuery.set($any($event.target).value)" />
+              </div>
+            </ng-template>
+
+            @if (keysLoading()) {
+              @for (_ of [1,2,3,4,5]; track $index) {
+                <p-skeleton width="100%" height="3rem" styleClass="mb-2" />
+              }
+            } @else {
+              <p-table [value]="filteredKeys()" [rows]="15" [paginator]="true" styleClass="p-datatable-sm"
+                       [rowHover]="true" selectionMode="single">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th style="width:25%">Key Name</th>
+                    <th style="width:10%">Type</th>
+                    <th style="width:30%">Pattern</th>
+                    <th style="width:8%">TTL</th>
+                    <th>Description</th>
+                    <th style="width:5%"></th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-key>
+                  <tr class="key-row" (click)="openKeyDetail(key)">
+                    <td class="key-name">{{ key.name }}</td>
+                    <td><p-tag [value]="key.type" [severity]="getTypeSeverity(key.type)" styleClass="type-tag" /></td>
+                    <td class="pattern-cell"><code>{{ key.pattern }}</code></td>
+                    <td class="ttl-cell">
+                      @if (key.ttlDays > 0) {
+                        {{ key.ttlDays }}d
+                      } @else if (key.ttlSeconds > 0) {
+                        {{ key.ttlSeconds }}s
+                      } @else {
+                        <span class="no-ttl">∞</span>
+                      }
+                    </td>
+                    <td class="desc-cell">{{ key.description }}</td>
+                    <td>
+                      <button pButton icon="pi pi-eye" class="p-button-text p-button-sm p-button-rounded"
+                              pTooltip="Query" (click)="openKeyDetail(key); $event.stopPropagation()"></button>
+                    </td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="6" class="empty-message">No keys match your filter</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            }
+          </p-card>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- Key Detail Dialog -->
+  <p-dialog [(visible)]="keyDetailVisible" [modal]="true" [style]="{ width: '80vw', maxWidth: '900px' }"
+            [header]="selectedKey()?.name ?? 'Key Detail'" [draggable]="false">
+    @if (selectedKey(); as key) {
+      <div class="key-detail-content">
+        <!-- Key metadata -->
+        <div class="key-meta">
+          <div class="meta-row">
+            <span class="meta-label">Pattern</span>
+            <code class="meta-value">{{ key.pattern }}</code>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Type</span>
+            <p-tag [value]="key.type" [severity]="getTypeSeverity(key.type)" />
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Feature</span>
+            <span class="meta-value">{{ key.feature }}</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">TTL</span>
+            <span class="meta-value">
+              @if (key.ttlDays > 0) { {{ key.ttlDays }} days }
+              @else if (key.ttlSeconds > 0) { {{ key.ttlSeconds }} seconds }
+              @else { No expiry (permanent) }
+            </span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Description</span>
+            <span class="meta-value">{{ key.description }}</span>
+          </div>
+        </div>
+
+        <!-- Variable inputs -->
+        @if (getVariableKeys().length > 0) {
+          <div class="variable-inputs">
+            <h4>Variables</h4>
+            <div class="var-grid">
+              @for (varName of getVariableKeys(); track varName) {
+                <div class="var-field">
+                  <label>{{ '{' + varName + '}' }}</label>
+                  <input pInputText [value]="variableInputs()[varName]"
+                         (input)="updateVariableInput(varName, $event)"
+                         [placeholder]="varName" />
+                </div>
+              }
+            </div>
+            <button pButton label="Query" icon="pi pi-play" (click)="queryKey()"
+                    [loading]="keyDetailLoading()" class="query-btn"></button>
+          </div>
+        }
+
+        <!-- Result display -->
+        @if (keyDetailLoading()) {
+          <p-skeleton width="100%" height="200px" />
+        } @else if (keyDetailResult(); as result) {
+          <div class="result-section">
+            <div class="result-header">
+              <span class="resolved-key"><i class="pi pi-key"></i> {{ result.resolvedKey }}</span>
+            </div>
+
+            <!-- Counter value -->
+            @if (result.type === 'counter' || result.type === 'value') {
+              <div class="counter-display">
+                <span class="counter-value">{{ formatValue(result.value, result.type) }}</span>
+              </div>
+            }
+
+            <!-- Set value -->
+            @if (result.type === 'set') {
+              <div class="set-display">
+                <div class="set-size">
+                  <span class="big-number">{{ result.value?.size ?? 0 }}</span>
+                  <span class="big-label">unique members</span>
+                </div>
+                @if (result.value?.members && result.value.members.length) {
+                  <div class="member-list">
+                    @for (member of result.value.members.slice(0, 50); track member) {
+                      <p-tag [value]="member" severity="secondary" styleClass="member-tag" />
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Sorted set (leaderboard) -->
+            @if (result.type === 'sorted_set' && getTop50Entries().length > 0) {
+              <div class="sorted-set-display">
+                <p class="ss-total">Total entries: {{ result.value?.size ?? 0 }}</p>
+                <p-table [value]="getTop50Entries()" [rows]="10" [paginator]="true" styleClass="p-datatable-sm">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th style="width:10%">#</th>
+                      <th>Member</th>
+                      <th style="width:20%">Score</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-entry let-i="rowIndex">
+                    <tr>
+                      <td>{{ i + 1 }}</td>
+                      <td>{{ entry[0] }}</td>
+                      <td>{{ entry[1] | number:'1.1-2' }}</td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            }
+
+            <!-- Hash -->
+            @if (result.type === 'hash' && getHashFields().length > 0) {
+              <div class="hash-display">
+                <p-table [value]="getHashFields()" styleClass="p-datatable-sm">
+                  <ng-template pTemplate="header">
+                    <tr><th>Field</th><th>Value</th></tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-field>
+                    <tr>
+                      <td class="hash-field-name">{{ field[0] }}</td>
+                      <td>{{ field[1] }}</td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            }
+
+            <!-- List -->
+            @if (result.type === 'list') {
+              <div class="list-display">
+                <p>{{ result.value?.length ?? 0 }} entries</p>
+                @if (result.value?.items) {
+                  <div class="log-list">
+                    @for (item of result.value.items.slice(0, 50); track $index) {
+                      <div class="log-entry">{{ item }}</div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Time-series chart for counters with {date} -->
+            @if (timeSeriesData()) {
+              <div class="timeseries-section">
+                <h4><i class="pi pi-chart-line"></i> Last 7 Days Trend</h4>
+                @if (timeSeriesLoading()) {
+                  <p-skeleton width="100%" height="250px" />
+                } @else {
+                  <div class="chart-wrapper">
+                    <p-chart type="line" [data]="timeSeriesData()" [options]="chartOptions" height="250px" />
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </p-dialog>
+</div>

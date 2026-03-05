@@ -1,0 +1,295 @@
+<div class="dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title">Overview Dashboard</h1>
+      <p class="dashboard-subtitle">Real-time platform monitoring and analytics</p>
+    </div>
+    <div class="header-actions">
+      <button pButton label="Export" icon="pi pi-download" class="p-button-outlined"></button>
+      <button pButton label="Refresh" icon="pi pi-refresh" (click)="refreshData()"></button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    @if (statsLoading()) {
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="stat-card skeleton-card">
+          <p-skeleton height="100px" />
+        </div>
+      }
+    } @else if (stats()) {
+      <!-- Total Users -->
+      <div class="stat-card">
+        <div class="stat-icon users">
+          <i class="pi pi-users"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ formatNumber(stats()!.totalUsers) }}</span>
+          <span class="stat-label">Total Users</span>
+        </div>
+        <div class="stat-trend positive">
+          <i class="pi pi-arrow-up"></i>
+          <span>12.5%</span>
+        </div>
+      </div>
+
+      <!-- Active Users -->
+      <div class="stat-card">
+        <div class="stat-icon active">
+          <i class="pi pi-user"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ formatNumber(stats()!.activeUsers) }}</span>
+          <span class="stat-label">Active Now</span>
+        </div>
+        <div class="stat-badge">
+          <p-badge value="LIVE" severity="success" />
+        </div>
+      </div>
+
+      <!-- Problems -->
+      <div class="stat-card">
+        <div class="stat-icon problems">
+          <i class="pi pi-book"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ formatNumber(stats()!.totalProblems) }}</span>
+          <span class="stat-label">Problems</span>
+        </div>
+        <div class="stat-trend positive">
+          <i class="pi pi-arrow-up"></i>
+          <span>8 new</span>
+        </div>
+      </div>
+
+      <!-- Submissions -->
+      <div class="stat-card">
+        <div class="stat-icon submissions">
+          <i class="pi pi-code"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ formatNumber(stats()!.totalSubmissions) }}</span>
+          <span class="stat-label">Submissions</span>
+        </div>
+        <div class="stat-trend positive">
+          <i class="pi pi-arrow-up"></i>
+          <span>+2.3K today</span>
+        </div>
+      </div>
+
+      <!-- Success Rate -->
+      <div class="stat-card">
+        <div class="stat-icon success">
+          <i class="pi pi-check-circle"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats()!.successRate }}%</span>
+          <span class="stat-label">Success Rate</span>
+        </div>
+        <p-progressBar 
+          [value]="stats()!.successRate" 
+          [showValue]="false"
+          styleClass="success-bar"
+        />
+      </div>
+
+      <!-- System Health -->
+      <div class="stat-card">
+        <div class="stat-icon" [ngClass]="systemHealthColor()">
+          <i class="pi pi-heart"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value capitalize">{{ stats()!.systemHealth }}</span>
+          <span class="stat-label">System Health</span>
+        </div>
+        <p-tag [value]="stats()!.systemHealth | uppercase" [severity]="systemHealthColor()" />
+      </div>
+    }
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- Submission Trends Chart -->
+    <div class="chart-card large">
+      <div class="card-header">
+        <h3>Submission Trends</h3>
+        <div class="card-actions">
+          <button pButton icon="pi pi-ellipsis-v" class="p-button-text p-button-rounded"></button>
+        </div>
+      </div>
+      @if (chartsLoading()) {
+        <p-skeleton height="300px" />
+      } @else if (submissionTrends()) {
+        <p-chart type="line" [data]="submissionTrends()!" [options]="lineChartOptions" height="300px" />
+      }
+    </div>
+
+    <!-- Problem Distribution -->
+    <div class="chart-card">
+      <div class="card-header">
+        <h3>Problems by Difficulty</h3>
+      </div>
+      @if (chartsLoading()) {
+        <p-skeleton height="250px" />
+      } @else if (problemDistribution()) {
+        <p-chart type="doughnut" [data]="problemDistribution()!" [options]="doughnutChartOptions" height="250px" />
+      }
+    </div>
+
+    <!-- System Metrics -->
+    <div class="metrics-card">
+      <div class="card-header">
+        <h3>System Metrics</h3>
+        @if (metrics()) {
+          <span class="last-updated">Updated {{ getTimeAgo(metrics()!.lastUpdated) }}</span>
+        }
+      </div>
+      @if (metricsLoading()) {
+        <p-skeleton height="200px" />
+      } @else if (metrics()) {
+        <div class="metrics-grid">
+          <div class="metric-item">
+            <div class="metric-header">
+              <span class="metric-label">CPU Usage</span>
+              <span class="metric-value">{{ metrics()!.cpu }}%</span>
+            </div>
+            <p-progressBar [value]="metrics()!.cpu" [showValue]="false" styleClass="cpu-bar" />
+          </div>
+          <div class="metric-item">
+            <div class="metric-header">
+              <span class="metric-label">Memory</span>
+              <span class="metric-value">{{ metrics()!.memory }}%</span>
+            </div>
+            <p-progressBar [value]="metrics()!.memory" [showValue]="false" styleClass="memory-bar" />
+          </div>
+          <div class="metric-item">
+            <div class="metric-header">
+              <span class="metric-label">Disk</span>
+              <span class="metric-value">{{ metrics()!.disk }}%</span>
+            </div>
+            <p-progressBar [value]="metrics()!.disk" [showValue]="false" styleClass="disk-bar" />
+          </div>
+          <div class="metric-item">
+            <div class="metric-header">
+              <span class="metric-label">Network I/O</span>
+              <span class="metric-value">{{ metrics()!.network }}%</span>
+            </div>
+            <p-progressBar [value]="metrics()!.network" [showValue]="false" styleClass="network-bar" />
+          </div>
+        </div>
+        <div class="uptime-info">
+          <i class="pi pi-clock"></i>
+          <span>Uptime: {{ metrics()!.uptime }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Cache Stats -->
+    <div class="cache-card">
+      <div class="card-header">
+        <h3>Cache Performance</h3>
+        <a routerLink="/monitoring/cache" class="view-all">View All →</a>
+      </div>
+      @if (cacheStats()) {
+        <div class="cache-segments">
+          @for (segment of cacheStats()!.segments; track segment.name) {
+            <div class="cache-segment">
+              <div class="segment-header">
+                <span class="segment-name">{{ segment.name }}</span>
+                <span class="segment-rate" [class.high]="segment.hitRate >= 80" [class.medium]="segment.hitRate >= 50 && segment.hitRate < 80" [class.low]="segment.hitRate < 50">
+                  {{ segment.hitRate }}%
+                </span>
+              </div>
+              <p-progressBar [value]="segment.hitRate" [showValue]="false" styleClass="cache-bar" />
+              <div class="segment-stats">
+                <span>Hits: {{ segment.hits }}</span>
+                <span>Misses: {{ segment.misses }}</span>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="memory-info">
+          <span class="memory-label">Free Memory:</span>
+          <span class="memory-value">{{ cacheStats()!.freeMemoryPercent }}%</span>
+        </div>
+      }
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="activity-card">
+      <div class="card-header">
+        <h3>Recent Activity</h3>
+        <a routerLink="/logs" class="view-all">View All →</a>
+      </div>
+      @if (activityLoading()) {
+        <p-skeleton height="300px" />
+      } @else {
+        <div class="activity-list">
+          @for (activity of recentActivity(); track activity.id) {
+            <div class="activity-item">
+              <div class="activity-icon" [ngClass]="activity.type">
+                <i [class]="getActivityIcon(activity.type)"></i>
+              </div>
+              <div class="activity-content">
+                <p class="activity-message">{{ activity.message }}</p>
+                <span class="activity-time">{{ getTimeAgo(activity.timestamp) }}</span>
+              </div>
+              <p-tag [value]="activity.severity || 'info'" [severity]="getActivitySeverity(activity.severity)" />
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Jobs Overview -->
+    <div class="jobs-card">
+      <div class="card-header">
+        <h3>Jobs Overview</h3>
+        <a routerLink="/monitoring/jobs" class="view-all">View All →</a>
+      </div>
+      @if (jobsStats()) {
+        <div class="jobs-summary">
+          <div class="job-stat">
+            <span class="job-count running">{{ jobsStats()!.running }}</span>
+            <span class="job-label">Running</span>
+          </div>
+          <div class="job-stat">
+            <span class="job-count pending">{{ jobsStats()!.pending }}</span>
+            <span class="job-label">Pending</span>
+          </div>
+          <div class="job-stat">
+            <span class="job-count completed">{{ jobsStats()!.completed }}</span>
+            <span class="job-label">Completed</span>
+          </div>
+          <div class="job-stat">
+            <span class="job-count failed">{{ jobsStats()!.failed }}</span>
+            <span class="job-label">Failed</span>
+          </div>
+        </div>
+        <div class="recent-jobs">
+          @for (job of jobsStats()!.recentJobs; track job.id) {
+            <div class="job-item">
+              <span class="job-name">{{ job.name }}</span>
+              <p-tag [value]="job.status" [severity]="job.status === 'running' ? 'info' : job.status === 'completed' ? 'success' : job.status === 'pending' ? 'warn' : 'secondary'" />
+              <span class="job-duration">{{ job.duration }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- User Growth Chart -->
+    <div class="chart-card">
+      <div class="card-header">
+        <h3>User Growth</h3>
+      </div>
+      @if (chartsLoading()) {
+        <p-skeleton height="250px" />
+      } @else if (userGrowth()) {
+        <p-chart type="line" [data]="userGrowth()!" [options]="lineChartOptions" height="250px" />
+      }
+    </div>
+  </div>
+</div>

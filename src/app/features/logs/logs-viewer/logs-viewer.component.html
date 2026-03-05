@@ -1,0 +1,98 @@
+<div class="logs-viewer-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>
+        <i class="pi pi-list"></i>
+        Logs Viewer
+      </h1>
+      <p>View and search application logs in real-time</p>
+    </div>
+    <div class="header-actions">
+      <div class="live-indicator" [class.paused]="isPaused()">
+        <span class="pulse"></span>
+        <span>{{ isPaused() ? 'Paused' : 'Live' }}</span>
+      </div>
+      <button pButton [label]="isPaused() ? 'Resume' : 'Pause'" [icon]="isPaused() ? 'pi pi-play' : 'pi pi-pause'" class="p-button-outlined" (click)="togglePause()"></button>
+      <button pButton label="Export" icon="pi pi-download" class="p-button-outlined" (click)="exportLogs()"></button>
+      <button pButton label="Clear" icon="pi pi-trash" class="p-button-outlined p-button-danger" (click)="clearLogs()"></button>
+    </div>
+  </div>
+
+  <!-- Controls Bar -->
+  <div class="controls-bar">
+    <div class="search-box">
+      <i class="pi pi-search"></i>
+      <input 
+        type="text" 
+        placeholder="Search logs by message, source, or trace ID..." 
+        [value]="searchQuery()"
+        (input)="onSearchChange($event)"
+      />
+    </div>
+    
+    <div class="level-filters">
+      @for (level of levels; track level) {
+        <button 
+          class="level-btn" 
+          [class]="level.toLowerCase()"
+          [class.active]="selectedLevels().has(level)"
+          (click)="toggleLevel(level)"
+        >
+          {{ level }}
+        </button>
+      }
+    </div>
+    
+    <div class="auto-scroll-toggle">
+      <label>
+        <p-checkbox [(ngModel)]="autoScrollEnabled" [binary]="true" (onChange)="toggleAutoScroll()"></p-checkbox>
+        <span>Auto-scroll</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Logs Container -->
+  <div class="logs-container" [class.auto-scroll]="autoScroll()">
+    <div class="logs-header">
+      <span class="col-timestamp">Timestamp</span>
+      <span class="col-level">Level</span>
+      <span class="col-source">Source</span>
+      <span class="col-message">Message</span>
+      <span class="col-actions">Actions</span>
+    </div>
+    
+    <div class="logs-body">
+      @if (filteredLogs().length === 0) {
+        <div class="empty-state">
+          <i class="pi pi-inbox"></i>
+          <span>No logs match your filters</span>
+        </div>
+      } @else {
+        @for (log of filteredLogs(); track log.id) {
+          <div class="log-entry" [class]="log.level.toLowerCase()">
+            <span class="col-timestamp">{{ log.timestamp }}</span>
+            <span class="col-level">
+              <span class="level-badge" [class]="log.level.toLowerCase()">{{ log.level }}</span>
+            </span>
+            <span class="col-source">{{ log.source }}</span>
+            <span class="col-message">
+              {{ log.message }}
+              @if (log.traceId) {
+                <span class="trace-id">{{ log.traceId }}</span>
+              }
+            </span>
+            <span class="col-actions">
+              <button pButton icon="pi pi-copy" class="p-button-rounded p-button-text p-button-sm" pTooltip="Copy" (click)="copyLog(log)"></button>
+            </span>
+          </div>
+        }
+      }
+    </div>
+    
+    <div class="logs-footer">
+      <span class="log-count">{{ filteredLogs().length }} logs displayed</span>
+      <span class="total-count">({{ logs().length }} total)</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,252 @@
+<div class="user-management-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>User Management</h1>
+      <p>Manage users, groups, and permissions</p>
+    </div>
+    <div class="header-actions">
+      <button pButton label="Export" icon="pi pi-download" class="p-button-outlined" (click)="exportAll()"></button>
+      <button pButton label="Add User" icon="pi pi-plus" (click)="addNewUser()"></button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon users">
+        <i class="pi pi-users"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().totalUsers | number }}</span>
+        <span class="stat-label">Total Users</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon active">
+        <i class="pi pi-circle-fill"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().activeToday | number }}</span>
+        <span class="stat-label">Active Today</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon new">
+        <i class="pi pi-user-plus"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().newThisWeek | number }}</span>
+        <span class="stat-label">New This Week</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon premium">
+        <i class="pi pi-star-fill"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().premiumUsers | number }}</span>
+        <span class="stat-label">Premium Users</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="pi pi-search"></i>
+      <input 
+        type="text" 
+        placeholder="Search by name, email, or ID..." 
+        [value]="searchQuery()"
+        (input)="onSearchChange($event)"
+      />
+    </div>
+    
+    <div class="filter-buttons">
+      <div class="filter-group">
+        <span class="filter-label">Role:</span>
+        @for (role of roles; track role) {
+          <button 
+            class="filter-btn" 
+            [class.active]="selectedRole() === role"
+            (click)="onRoleFilter(role)"
+          >
+            {{ role | titlecase }}
+          </button>
+        }
+      </div>
+      
+      <div class="filter-group">
+        <span class="filter-label">Status:</span>
+        @for (status of statuses; track status) {
+          <button 
+            class="filter-btn" 
+            [class.active]="selectedStatus() === status"
+            (click)="onStatusFilter(status)"
+          >
+            {{ status | titlecase }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Actions Bar -->
+  @if (selectedUsers().length > 0) {
+    <div class="bulk-actions-bar">
+      <span class="selected-count">{{ selectedUsers().length }} users selected</span>
+      <div class="bulk-buttons">
+        <button pButton label="Send Email" icon="pi pi-envelope" class="p-button-outlined p-button-sm" (click)="bulkEmail()"></button>
+        <button pButton label="Export" icon="pi pi-download" class="p-button-outlined p-button-sm" (click)="exportSelected()"></button>
+        <button pButton label="Suspend" icon="pi pi-ban" class="p-button-outlined p-button-warning p-button-sm" (click)="bulkSuspend()"></button>
+        <button pButton label="Delete" icon="pi pi-trash" class="p-button-outlined p-button-danger p-button-sm" (click)="bulkDelete()"></button>
+      </div>
+    </div>
+  }
+
+  <!-- Users Table -->
+  <div class="users-table-card">
+    <p-table 
+      [value]="filteredUsers()" 
+      [paginator]="true" 
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      styleClass="p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 50px">
+            <p-checkbox 
+              [binary]="true" 
+              [(ngModel)]="allSelected"
+              (onChange)="toggleSelectAll()"
+            ></p-checkbox>
+          </th>
+          <th>User</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Problems</th>
+          <th>Contests</th>
+          <th>Last Active</th>
+          <th style="width: 120px">Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td>
+            <p-checkbox 
+              [binary]="true" 
+              [(ngModel)]="user.selected"
+              (onChange)="toggleUserSelection(user)"
+            ></p-checkbox>
+          </td>
+          <td>
+            <div class="user-cell">
+              <p-avatar 
+                [label]="user.avatar" 
+                shape="circle"
+                [style]="{ 'background-color': getAvatarColor(user.name), 'color': '#fff' }"
+              ></p-avatar>
+              <div class="user-info">
+                <span class="user-name">{{ user.name }}</span>
+                <span class="user-email">{{ user.email }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <p-tag [value]="user.role | titlecase" [severity]="getRoleSeverity(user.role)"></p-tag>
+          </td>
+          <td>
+            <p-tag [value]="user.status | titlecase" [severity]="getStatusSeverity(user.status)"></p-tag>
+          </td>
+          <td>
+            <span class="metric-value">{{ user.problemsSolved | number }}</span>
+          </td>
+          <td>
+            <span class="metric-value">{{ user.contestsJoined }}</span>
+          </td>
+          <td>
+            <span class="last-active">{{ user.lastActive }}</span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button pButton icon="pi pi-eye" class="p-button-rounded p-button-text p-button-sm" pTooltip="View" (click)="viewUser(user)"></button>
+              <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit" (click)="editUser(user)"></button>
+              <button pButton icon="pi pi-ellipsis-v" class="p-button-rounded p-button-text p-button-sm" pTooltip="More"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="empty-message">
+            <i class="pi pi-users"></i>
+            <span>No users found matching your criteria</span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- User Detail Dialog -->
+<p-dialog 
+  header="User Details" 
+  [(visible)]="showUserDialog" 
+  [modal]="true" 
+  [style]="{ width: '500px' }"
+  [dismissableMask]="true"
+>
+  @if (selectedUser()) {
+    <div class="user-detail-dialog">
+      <div class="user-detail-header">
+        <p-avatar 
+          [label]="selectedUser()!.avatar" 
+          size="xlarge"
+          shape="circle"
+          [style]="{ 'background-color': getAvatarColor(selectedUser()!.name), 'color': '#fff' }"
+        ></p-avatar>
+        <div class="user-detail-info">
+          <h3>{{ selectedUser()!.name }}</h3>
+          <p>{{ selectedUser()!.email }}</p>
+          <div class="user-tags">
+            <p-tag [value]="selectedUser()!.role | titlecase" [severity]="getRoleSeverity(selectedUser()!.role)"></p-tag>
+            <p-tag [value]="selectedUser()!.status | titlecase" [severity]="getStatusSeverity(selectedUser()!.status)"></p-tag>
+          </div>
+        </div>
+      </div>
+      
+      <div class="user-detail-stats">
+        <div class="detail-stat">
+          <span class="detail-label">Problems Solved</span>
+          <span class="detail-value">{{ selectedUser()!.problemsSolved | number }}</span>
+        </div>
+        <div class="detail-stat">
+          <span class="detail-label">Contests Joined</span>
+          <span class="detail-value">{{ selectedUser()!.contestsJoined }}</span>
+        </div>
+        <div class="detail-stat">
+          <span class="detail-label">Country</span>
+          <span class="detail-value">{{ selectedUser()!.country }}</span>
+        </div>
+        <div class="detail-stat">
+          <span class="detail-label">Member Since</span>
+          <span class="detail-value">{{ selectedUser()!.createdAt }}</span>
+        </div>
+      </div>
+      
+      <div class="user-detail-actions">
+        <button pButton label="Edit Profile" icon="pi pi-pencil" class="p-button-outlined"></button>
+        <button pButton label="Send Message" icon="pi pi-envelope" class="p-button-outlined"></button>
+        @if (selectedUser()!.status !== 'suspended') {
+          <button pButton label="Suspend" icon="pi pi-ban" class="p-button-outlined p-button-danger"></button>
+        } @else {
+          <button pButton label="Unsuspend" icon="pi pi-check" class="p-button-outlined p-button-success"></button>
+        }
+      </div>
+    </div>
+  }
+</p-dialog>

@@ -1,0 +1,273 @@
+<div class="jobs-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="title-section">
+        <h1 class="page-title">Infrastructure & Jobs</h1>
+        <div class="environment-info">
+          <i class="pi pi-server"></i>
+          <span>Environment: {{ environment() }}</span>
+          <span class="separator">|</span>
+          <span>Region: {{ region() }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-secondary" (click)="configure()">
+        <i class="pi pi-cog"></i>
+        <span>Configure</span>
+      </button>
+      <button class="btn-primary" (click)="manageAlerts()">
+        <i class="pi pi-bell"></i>
+        <span>Manage Alerts</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-item" [class.healthy]="systemHealthy()">
+      <i class="pi pi-check-circle"></i>
+      <span>{{ systemHealthy() ? 'System Healthy' : 'Issues Detected' }}</span>
+    </div>
+    <div class="status-item">
+      <i class="pi pi-clock"></i>
+      <span>Updated: {{ lastUpdated() }}</span>
+    </div>
+  </div>
+
+  <!-- Main Grid -->
+  <div class="main-grid">
+    <!-- Left Column: Jobs & Workers -->
+    <div class="left-column">
+      <!-- Job Stats -->
+      <div class="stats-row">
+        @for (stat of jobStats(); track stat.label) {
+          <div class="stat-card" [class]="'stat-' + stat.progressColor">
+            <div class="stat-icon-bg">
+              <i [class]="stat.icon"></i>
+            </div>
+            <p class="stat-label">{{ stat.label }}</p>
+            <div class="stat-value-row">
+              <span class="stat-value">{{ stat.value }}</span>
+              <span class="stat-change" [class]="stat.changeType">
+                <i class="pi" [class.pi-arrow-up]="stat.changeType === 'positive'" [class.pi-arrow-down]="stat.changeType === 'negative'" [class.pi-minus]="stat.changeType === 'neutral'"></i>
+                {{ stat.change }}
+              </span>
+            </div>
+            <div class="stat-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" [class]="'fill-' + stat.progressColor" [style.width.%]="stat.progress"></div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Workers List -->
+      <div class="workers-card">
+        <div class="card-header">
+          <div class="header-info">
+            <h3 class="card-title">Worker Nodes Health</h3>
+            <p class="card-subtitle">Evaluation worker pool status</p>
+          </div>
+          <div class="header-actions">
+            <button class="icon-btn" (click)="refreshWorkers()" pTooltip="Refresh">
+              <i class="pi pi-refresh"></i>
+            </button>
+            <button class="btn-outline" (click)="viewAllNodes()">
+              View All Nodes
+            </button>
+          </div>
+        </div>
+
+        <!-- Workers Table -->
+        <div class="workers-table">
+          <div class="table-header">
+            <div class="col-node">Node ID</div>
+            <div class="col-status">Status</div>
+            <div class="col-load">Load (CPU)</div>
+            <div class="col-actions">Actions</div>
+          </div>
+          @for (worker of workers(); track worker.id) {
+            <div class="table-row">
+              <div class="col-node">
+                <div class="node-icon">
+                  <i class="pi pi-desktop"></i>
+                </div>
+                <div class="node-info">
+                  <span class="node-id">{{ worker.nodeId }}</span>
+                  <span class="node-meta">{{ worker.version }} • {{ worker.uptime }} uptime</span>
+                </div>
+              </div>
+              <div class="col-status">
+                <p-tag [value]="getWorkerStatusLabel(worker.status)" [severity]="getWorkerStatusSeverity(worker.status)" class="status-tag"></p-tag>
+              </div>
+              <div class="col-load">
+                <div class="load-info">
+                  <div class="load-header">
+                    <span>CPU</span>
+                    <span class="load-value" [class]="getCpuBarClass(worker.cpuUsage)">{{ worker.cpuUsage }}%</span>
+                  </div>
+                  <div class="load-bar">
+                    <div class="load-fill" [class]="getCpuBarClass(worker.cpuUsage)" [style.width.%]="worker.cpuUsage"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-actions">
+                <button class="action-btn" (click)="viewWorkerLogs(worker)" pTooltip="View Logs">
+                  <i class="pi pi-file-edit"></i>
+                </button>
+                <button class="action-btn" (click)="restartWorker(worker)" pTooltip="Restart">
+                  <i class="pi pi-replay"></i>
+                </button>
+                <button class="action-btn danger" (click)="terminateWorker(worker)" pTooltip="Terminate">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Redis -->
+    <div class="right-column">
+      <div class="redis-card">
+        <div class="redis-header">
+          <div class="redis-icon">
+            <i class="pi pi-database"></i>
+          </div>
+          <div class="redis-info">
+            <h3 class="redis-title">Redis Cluster Performance</h3>
+            <p class="redis-subtitle">Main Cache • 16GB Cluster</p>
+          </div>
+        </div>
+
+        <div class="redis-body">
+          <!-- Hit Rate Gauge -->
+          <div class="hit-rate-section">
+            <div class="gauge-container">
+              <svg class="gauge" viewBox="0 0 36 36">
+                <circle class="gauge-bg" cx="18" cy="18" r="16" fill="none" stroke-width="3"/>
+                <circle class="gauge-fill" cx="18" cy="18" r="16" fill="none" stroke-width="3"
+                  [attr.stroke-dasharray]="redisStats().hitRate + ' 100'"
+                  transform="rotate(-90 18 18)"/>
+              </svg>
+              <div class="gauge-text">
+                <span class="gauge-value">{{ redisStats().hitRate }}%</span>
+                <span class="gauge-label">Hit Rate</span>
+              </div>
+            </div>
+            <div class="hit-stats">
+              <div class="hit-stat">
+                <div class="hit-stat-header">
+                  <span class="hit-stat-label">Hits</span>
+                  <span class="hit-stat-value">{{ redisStats().hitsPerSec }}</span>
+                </div>
+                <div class="hit-stat-bar">
+                  <div class="hit-stat-fill hits" [style.width.%]="redisStats().hitRate"></div>
+                </div>
+              </div>
+              <div class="hit-stat">
+                <div class="hit-stat-header">
+                  <span class="hit-stat-label">Misses</span>
+                  <span class="hit-stat-value">{{ redisStats().missesPerSec }}</span>
+                </div>
+                <div class="hit-stat-bar">
+                  <div class="hit-stat-fill misses" [style.width.%]="100 - redisStats().hitRate"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Redis Metrics Grid -->
+          <div class="redis-metrics">
+            <div class="metric-box">
+              <p class="metric-label">Memory Usage</p>
+              <p class="metric-value">{{ redisStats().memoryUsed }}</p>
+              <div class="metric-bar-container">
+                <div class="metric-bar">
+                  <div class="metric-fill warning" [style.width.%]="redisStats().memoryUsage"></div>
+                </div>
+                <span class="metric-percent">{{ redisStats().memoryUsage }}%</span>
+              </div>
+            </div>
+            <div class="metric-box">
+              <p class="metric-label">Eviction Rate</p>
+              <p class="metric-value">{{ redisStats().evictionRate }} <span class="metric-unit">ev/s</span></p>
+              <div class="metric-bar">
+                <div class="metric-fill success" [style.width.%]="redisStats().evictionRate"></div>
+              </div>
+            </div>
+            <div class="metric-box full-width">
+              <div class="metric-header">
+                <p class="metric-label">Latency Spike (1h)</p>
+                <span class="latency-badge">Avg: {{ redisStats().avgLatency }}</span>
+              </div>
+              <div class="latency-chart">
+                @for (spike of latencySpikes(); track $index) {
+                  <div class="spike-bar" [style.height.%]="spike" [class.spike-warning]="spike > 60"></div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Anomaly Feed -->
+  <div class="anomaly-card">
+    <div class="anomaly-header">
+      <div class="anomaly-title-section">
+        <h3 class="anomaly-title">Anomaly Feed</h3>
+        <span class="anomaly-badge">{{ newAnomaliesCount() }} New</span>
+      </div>
+      <div class="filter-buttons">
+        <span class="filter-label">Filter:</span>
+        <button class="filter-btn" [class.active]="selectedFilter() === 'critical'" (click)="setFilter('critical')">Critical</button>
+        <button class="filter-btn" [class.active]="selectedFilter() === 'warning'" (click)="setFilter('warning')">Warning</button>
+        <button class="filter-btn" [class.active]="selectedFilter() === 'info'" (click)="setFilter('info')">Info</button>
+      </div>
+    </div>
+
+    <div class="anomaly-table">
+      <p-table [value]="filteredAnomalies()" styleClass="anomaly-datatable">
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="col-timestamp">Timestamp</th>
+            <th class="col-severity">Severity</th>
+            <th class="col-service">Service</th>
+            <th class="col-message">Error Message</th>
+            <th class="col-trace">Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-anomaly>
+          <tr>
+            <td class="timestamp-cell">{{ anomaly.timestamp }}</td>
+            <td>
+              <span class="severity-badge" [class]="getSeverityClass(anomaly.severity)">
+                {{ anomaly.severity | uppercase }}
+              </span>
+            </td>
+            <td class="service-cell">{{ anomaly.service }}</td>
+            <td class="message-cell">{{ anomaly.message }}</td>
+            <td>
+              <button class="trace-btn" (click)="traceAnomaly(anomaly)">Trace</button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <div class="anomaly-footer">
+      <button class="view-all-link" (click)="viewAllLogs()">
+        View all logs
+        <i class="pi pi-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+</div>

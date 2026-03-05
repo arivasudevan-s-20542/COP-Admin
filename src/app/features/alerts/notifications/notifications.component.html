@@ -1,0 +1,123 @@
+<div class="notifications-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Notification Center</h1>
+      <p>View and manage system notifications and alerts</p>
+    </div>
+    <div class="header-actions">
+      <button pButton label="Mark All Read" icon="pi pi-check" class="p-button-outlined" (click)="markAllAsRead()" [disabled]="stats().unread === 0"></button>
+      <button pButton label="Clear All" icon="pi pi-trash" class="p-button-outlined p-button-danger" (click)="clearAll()"></button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon total">
+        <i class="pi pi-inbox"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().total }}</span>
+        <span class="stat-label">Total Notifications</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon unread">
+        <i class="pi pi-envelope"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().unread }}</span>
+        <span class="stat-label">Unread</span>
+      </div>
+    </div>
+    <div class="stat-card critical">
+      <div class="stat-icon critical">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().critical }}</span>
+        <span class="stat-label">Critical Alerts</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon today">
+        <i class="pi pi-calendar"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().today }}</span>
+        <span class="stat-label">Today</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="notifications-layout">
+    <!-- Filters Sidebar -->
+    <div class="filters-sidebar">
+      <h3>Filters</h3>
+      @for (filter of filters; track filter.value) {
+        <button 
+          class="filter-item" 
+          [class.active]="selectedFilter() === filter.value"
+          (click)="selectFilter(filter.value)"
+        >
+          <span class="filter-label">{{ filter.label }}</span>
+          <span class="filter-count">{{ filter.count }}</span>
+        </button>
+      }
+    </div>
+
+    <!-- Notifications List -->
+    <div class="notifications-list">
+      @if (filteredNotifications.length === 0) {
+        <div class="empty-state">
+          <i class="pi pi-inbox"></i>
+          <h3>No notifications</h3>
+          <p>You're all caught up!</p>
+        </div>
+      } @else {
+        @for (notification of filteredNotifications; track notification.id) {
+          <div class="notification-item" [class.unread]="!notification.read" [class]="notification.type">
+            <div class="notification-icon" [class]="notification.type">
+              <i [class]="getTypeIcon(notification.type)"></i>
+            </div>
+            
+            <div class="notification-content">
+              <div class="notification-header">
+                <h4>{{ notification.title }}</h4>
+                <span class="notification-time">{{ notification.timestamp }}</span>
+              </div>
+              <p class="notification-message">{{ notification.message }}</p>
+              <div class="notification-meta">
+                <p-tag [value]="notification.type | titlecase" [severity]="getTypeSeverity(notification.type)" styleClass="small-tag"></p-tag>
+                <span class="notification-source">{{ notification.source }}</span>
+              </div>
+              
+              @if (notification.metadata) {
+                <div class="notification-metadata">
+                  @for (item of notification.metadata | keyvalue; track item.key) {
+                    <span class="meta-item">
+                      <span class="meta-key">{{ item.key }}:</span>
+                      <span class="meta-value">{{ item.value }}</span>
+                    </span>
+                  }
+                </div>
+              }
+            </div>
+            
+            <div class="notification-actions">
+              @if (!notification.read) {
+                <button pButton icon="pi pi-check" class="p-button-rounded p-button-text p-button-sm" pTooltip="Mark as read" (click)="markAsRead(notification)"></button>
+              }
+              <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm" pTooltip="Delete" (click)="deleteNotification(notification)"></button>
+            </div>
+            
+            @if (!notification.read) {
+              <div class="unread-indicator"></div>
+            }
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>

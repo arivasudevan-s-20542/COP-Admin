@@ -1,0 +1,941 @@
+<div class="problem-editor-container">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  @if (currentProblem()) {
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-left">
+        <p-button icon="pi pi-arrow-left" [text]="true" [rounded]="true" (onClick)="goBack()"></p-button>
+        <div class="header-info">
+          <h1>
+            <i class="pi pi-pencil"></i>
+            {{ isEditMode() ? 'Edit Problem' : 'Create Problem' }}
+          </h1>
+          <p>{{ currentProblem()!.title || 'Untitled Problem' }}</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        @if (hasUnsavedChanges()) {
+          <span class="unsaved-indicator">
+            <i class="pi pi-circle-fill"></i> Unsaved changes
+          </span>
+        }
+        <p-tag 
+          [value]="currentProblem()!.status | titlecase" 
+          [severity]="getStatusSeverity(currentProblem()!.status)"
+        ></p-tag>
+        <p-button 
+          [label]="showPreviewMode() ? 'Edit Mode' : 'Preview'" 
+          [icon]="showPreviewMode() ? 'pi pi-pencil' : 'pi pi-eye'" 
+          [outlined]="true" 
+          (onClick)="preview()"
+          [severity]="showPreviewMode() ? 'info' : 'secondary'"
+        ></p-button>
+        <p-button 
+          label="Save Draft" 
+          icon="pi pi-save" 
+          [outlined]="true" 
+          (onClick)="saveDraft()"
+          [loading]="isSaving()"
+        ></p-button>
+        <p-button 
+          label="Submit for Review" 
+          icon="pi pi-send" 
+          (onClick)="submitForReview()"
+        ></p-button>
+        @if (currentProblem()!.status === 'review') {
+          <p-button 
+            label="Publish" 
+            icon="pi pi-check-circle" 
+            severity="success"
+            (onClick)="publish()"
+          ></p-button>
+        }
+      </div>
+    </div>
+
+    <!-- Preview Mode -->
+    @if (showPreviewMode()) {
+      <div class="preview-container">
+        <div class="preview-header">
+          <h2><i class="pi pi-eye"></i> Preview Mode</h2>
+          <p>This is how the problem will appear to users</p>
+        </div>
+        
+        <div class="preview-content">
+          <!-- Problem Header -->
+          <div class="preview-problem-header">
+            <div class="preview-title-row">
+              <h1 class="preview-title">{{ currentProblem()!.title || 'Untitled Problem' }}</h1>
+              <p-tag 
+                [value]="currentProblem()!.difficulty | titlecase" 
+                [severity]="getDifficultySeverity()"
+              ></p-tag>
+            </div>
+            <div class="preview-meta">
+              <span class="meta-item"><i class="pi pi-folder"></i> {{ currentProblem()!.category }}</span>
+              @if (currentProblem()!.isPremium) {
+                <span class="meta-item premium"><i class="pi pi-star-fill"></i> Premium</span>
+              }
+            </div>
+            <div class="preview-tags">
+              @for (tag of currentProblem()!.tags; track tag) {
+                <span class="preview-tag">{{ tag }}</span>
+              }
+            </div>
+            @if (currentProblem()!.companies.length > 0) {
+              <div class="preview-companies">
+                <span class="companies-label">Companies:</span>
+                @for (company of currentProblem()!.companies; track company) {
+                  <span class="company-badge">{{ company }}</span>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Description -->
+          <div class="preview-section">
+            <h3>Description</h3>
+            <div class="preview-html-content" [innerHTML]="currentProblem()!.description"></div>
+          </div>
+
+          <!-- Examples -->
+          @if (currentProblem()!.examples.length > 0) {
+            <div class="preview-section">
+              <h3>Examples</h3>
+              @for (example of currentProblem()!.examples; track example.id; let i = $index) {
+                <div class="preview-example">
+                  <h4>Example {{ i + 1 }}:</h4>
+                  <div class="example-io">
+                    <div class="io-item">
+                      <strong>Input:</strong>
+                      <code>{{ example.input }}</code>
+                    </div>
+                    <div class="io-item">
+                      <strong>Output:</strong>
+                      <code>{{ example.output }}</code>
+                    </div>
+                    @if (example.explanation) {
+                      <div class="io-item explanation">
+                        <strong>Explanation:</strong>
+                        <span>{{ example.explanation }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Constraints -->
+          @if (currentProblem()!.constraints) {
+            <div class="preview-section">
+              <h3>Constraints</h3>
+              <div class="preview-html-content constraints-list" [innerHTML]="currentProblem()!.constraints"></div>
+            </div>
+          }
+
+          <!-- Hints -->
+          @if (currentProblem()!.hints.length > 0) {
+            <div class="preview-section">
+              <h3>Hints</h3>
+              <div class="preview-hints">
+                @for (hint of currentProblem()!.hints; track hint; let i = $index) {
+                  <details class="hint-accordion">
+                    <summary>Hint {{ i + 1 }}</summary>
+                    <p>{{ hint }}</p>
+                  </details>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    } @else {
+      <!-- Editor Tabs (PrimeNG p-tabs) -->
+      <p-tabs [value]="activeTab()" (valueChange)="setActiveTab($any($event))" styleClass="editor-tabs">
+      <p-tablist>
+        <p-tab value="description">
+          <i class="pi pi-file-edit"></i>
+          Description
+        </p-tab>
+        <p-tab value="testcases">
+          <i class="pi pi-check-circle"></i>
+          Test Cases
+          <span class="count-badge">{{ currentProblem()!.testCases.length }}</span>
+        </p-tab>
+        <p-tab value="templates">
+          <i class="pi pi-code"></i>
+          Code Templates
+        </p-tab>
+        <p-tab value="editorial">
+          <i class="pi pi-book"></i>
+          Editorial
+        </p-tab>
+        <p-tab value="settings">
+          <i class="pi pi-cog"></i>
+          Settings
+        </p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <!-- Description Tab -->
+        <p-tabpanel value="description">
+          <div class="description-tab">
+            <div class="form-grid">
+              <!-- Left Column -->
+              <div class="form-column">
+                <div class="form-group">
+                  <label>Problem Title <span class="required">*</span></label>
+                  <input 
+                    pInputText 
+                    [ngModel]="currentProblem()!.title"
+                    (ngModelChange)="updateField('title', $event)"
+                    placeholder="e.g., Two Sum"
+                    class="w-full"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label>URL Slug</label>
+                  <div class="slug-preview">
+                    <span class="slug-prefix">/problems/</span>
+                    <input 
+                      pInputText 
+                      [ngModel]="currentProblem()!.slug"
+                      (ngModelChange)="updateField('slug', $event)"
+                      placeholder="two-sum"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Difficulty <span class="required">*</span></label>
+                    <p-select 
+                      [options]="difficulties"
+                      [ngModel]="currentProblem()!.difficulty"
+                      (ngModelChange)="updateField('difficulty', $event)"
+                      optionLabel="label"
+                      optionValue="value"
+                      styleClass="w-full"
+                    ></p-select>
+                  </div>
+                  <div class="form-group">
+                    <label>Category <span class="required">*</span></label>
+                    <p-select 
+                      [options]="categories"
+                      [ngModel]="currentProblem()!.category"
+                      (ngModelChange)="updateField('category', $event)"
+                      optionLabel="label"
+                      optionValue="value"
+                      styleClass="w-full"
+                    ></p-select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Topics/Tags</label>
+                  <div class="tags-input">
+                    <div class="tags-list">
+                      @for (tag of currentProblem()!.tags; track tag; let i = $index) {
+                        <p-chip [label]="tag" [removable]="true" (onRemove)="removeTag(i)"></p-chip>
+                      }
+                    </div>
+                    <div class="tag-input-row">
+                      <input 
+                        pInputText 
+                        [(ngModel)]="newTag" 
+                        placeholder="Add tag and press Enter..."
+                        (keyup.enter)="addTag()"
+                      />
+                      <p-button icon="pi pi-plus" [rounded]="true" [text]="true" (onClick)="addTag()"></p-button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Problem Description <span class="required">*</span></label>
+                  <p-editor 
+                    [ngModel]="currentProblem()!.description"
+                    (ngModelChange)="updateField('description', $event)"
+                    [style]="{ height: '300px' }"
+                    placeholder="Describe the problem in detail..."
+                  >
+                    <ng-template pTemplate="header">
+                      <span class="ql-formats">
+                        <select class="ql-header">
+                          <option value="1">Heading</option>
+                          <option value="2">Subheading</option>
+                          <option selected>Normal</option>
+                        </select>
+                      </span>
+                      <span class="ql-formats">
+                        <button type="button" class="ql-bold"></button>
+                        <button type="button" class="ql-italic"></button>
+                        <button type="button" class="ql-underline"></button>
+                        <button type="button" class="ql-strike"></button>
+                      </span>
+                      <span class="ql-formats">
+                        <select class="ql-color" title="Text Color"></select>
+                        <select class="ql-background" title="Background Color"></select>
+                      </span>
+                      <span class="ql-formats">
+                        <button type="button" class="ql-list" value="ordered"></button>
+                        <button type="button" class="ql-list" value="bullet"></button>
+                      </span>
+                      <span class="ql-formats">
+                        <button type="button" class="ql-code-block"></button>
+                        <button type="button" class="ql-blockquote"></button>
+                      </span>
+                      <span class="ql-formats">
+                        <button type="button" class="ql-link"></button>
+                        <button type="button" class="ql-image"></button>
+                      </span>
+                      <span class="ql-formats">
+                        <button type="button" class="ql-clean" title="Clear Formatting"></button>
+                      </span>
+                    </ng-template>
+                  </p-editor>
+                </div>
+
+                <div class="form-group">
+                  <label>Constraints</label>
+                  <p-editor 
+                    [ngModel]="currentProblem()!.constraints"
+                    (ngModelChange)="updateField('constraints', $event)"
+                    [style]="{ height: '150px' }"
+                    placeholder="e.g., 1 <= nums.length <= 10^4"
+                  >
+                    <ng-template pTemplate="header">
+                      <span class="ql-formats">
+                        <button type="button" class="ql-bold"></button>
+                        <button type="button" class="ql-italic"></button>
+                        <button type="button" class="ql-underline"></button>
+                      </span>
+                      <span class="ql-formats">
+                        <select class="ql-color" title="Text Color"></select>
+                        <select class="ql-background" title="Background Color"></select>
+                      </span>
+                      <span class="ql-formats">
+                        <button type="button" class="ql-list" value="ordered"></button>
+                        <button type="button" class="ql-list" value="bullet"></button>
+                      </span>
+                      <span class="ql-formats">
+                        <button type="button" class="ql-code-block"></button>
+                      </span>
+                      <span class="ql-formats">
+                        <button type="button" class="ql-clean" title="Clear Formatting"></button>
+                      </span>
+                    </ng-template>
+                  </p-editor>
+                </div>
+              </div>
+
+              <!-- Right Column - Examples & Companies -->
+              <div class="form-column">
+                <div class="examples-section">
+                  <div class="section-header">
+                    <h3><i class="pi pi-list"></i> Examples</h3>
+                    <p-button label="Add Example" icon="pi pi-plus" size="small" (onClick)="openExampleDialog()"></p-button>
+                  </div>
+                  
+                  @if (currentProblem()!.examples.length === 0) {
+                    <div class="empty-state small">
+                      <i class="pi pi-inbox"></i>
+                      <span>No examples added yet</span>
+                      <p-button label="Add Example" [text]="true" (onClick)="openExampleDialog()"></p-button>
+                    </div>
+                  } @else {
+                    <div class="examples-list">
+                      @for (example of currentProblem()!.examples; track example.id; let i = $index) {
+                        <div class="example-card">
+                          <div class="example-header">
+                            <span class="example-label">Example {{ i + 1 }}</span>
+                            <div class="example-actions">
+                              <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" size="small" (onClick)="openExampleDialog(example)"></p-button>
+                              <p-button icon="pi pi-trash" [text]="true" [rounded]="true" size="small" severity="danger" (onClick)="deleteExample(example.id)"></p-button>
+                            </div>
+                          </div>
+                          <div class="example-content">
+                            <div class="io-block">
+                              <span class="io-label">Input:</span>
+                              <code>{{ example.input }}</code>
+                            </div>
+                            <div class="io-block">
+                              <span class="io-label">Output:</span>
+                              <code>{{ example.output }}</code>
+                            </div>
+                            @if (example.explanation) {
+                              <div class="io-block explanation">
+                                <span class="io-label">Explanation:</span>
+                                <span>{{ example.explanation }}</span>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <!-- Companies Section -->
+                <div class="companies-section">
+                  <div class="section-header">
+                    <h3><i class="pi pi-building"></i> Companies</h3>
+                  </div>
+                  <div class="companies-input">
+                    <div class="companies-list">
+                      @for (company of currentProblem()!.companies; track company; let i = $index) {
+                        <p-chip [label]="company" [removable]="true" (onRemove)="removeCompany(i)" styleClass="company-chip"></p-chip>
+                      }
+                    </div>
+                    <div class="company-suggestions">
+                      @for (company of companies; track company) {
+                        @if (!currentProblem()!.companies.includes(company)) {
+                          <p-button 
+                            [label]="company" 
+                            [outlined]="true" 
+                            size="small" 
+                            (onClick)="newCompany = company; addCompany()"
+                          ></p-button>
+                        }
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Hints Section -->
+                <div class="hints-section">
+                  <div class="section-header">
+                    <h3><i class="pi pi-lightbulb"></i> Hints</h3>
+                  </div>
+                <div class="hints-list">
+                    @for (hint of currentProblem()!.hints; track hint; let i = $index) {
+                      <div class="hint-item">
+                        <span class="hint-number">{{ i + 1 }}</span>
+                        <span class="hint-text">{{ hint }}</span>
+                        <p-button icon="pi pi-times" [text]="true" [rounded]="true" size="small" (onClick)="removeHint(i)"></p-button>
+                      </div>
+                    }
+                  </div>
+                  <div class="add-hint-row">
+                    <input 
+                      pInputText 
+                      [(ngModel)]="newHint" 
+                      placeholder="Add a hint..."
+                      (keyup.enter)="addHint()"
+                      class="w-full"
+                    />
+                    <p-button icon="pi pi-plus" [rounded]="true" (onClick)="addHint()"></p-button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-tabpanel>
+
+        <!-- Test Cases Tab -->
+        <p-tabpanel value="testcases">
+          <div class="testcases-tab">
+            <div class="section-header">
+              <div>
+                <h3>Test Cases</h3>
+                <p>Define input/output pairs to validate solutions</p>
+              </div>
+              <p-button label="Add Test Case" icon="pi pi-plus" (onClick)="openTestCaseDialog()"></p-button>
+            </div>
+            
+            @if (currentProblem()!.testCases.length === 0) {
+              <div class="empty-state">
+                <i class="pi pi-inbox"></i>
+                <span>No test cases added yet</span>
+                <p>Test cases are used to validate submitted solutions</p>
+                <p-button label="Add Test Case" (onClick)="openTestCaseDialog()"></p-button>
+              </div>
+            } @else {
+              <p-table [value]="currentProblem()!.testCases" styleClass="p-datatable-sm">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th style="width: 60px">#</th>
+                    <th>Input</th>
+                    <th>Expected Output</th>
+                    <th style="width: 100px">Visibility</th>
+                    <th style="width: 80px">Weight</th>
+                    <th style="width: 100px">Actions</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-testCase let-i="rowIndex">
+                  <tr>
+                    <td><code>{{ i + 1 }}</code></td>
+                    <td><code class="truncate">{{ testCase.input }}</code></td>
+                    <td><code class="truncate">{{ testCase.expectedOutput }}</code></td>
+                    <td>
+                      <p-tag 
+                        [value]="testCase.isHidden ? 'Hidden' : 'Visible'" 
+                        [severity]="testCase.isHidden ? 'warn' : 'success'"
+                        [icon]="testCase.isHidden ? 'pi pi-eye-slash' : 'pi pi-eye'"
+                      ></p-tag>
+                    </td>
+                    <td>{{ testCase.weight }}x</td>
+                    <td>
+                      <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" size="small" (onClick)="openTestCaseDialog(testCase)"></p-button>
+                      <p-button icon="pi pi-trash" [text]="true" [rounded]="true" size="small" severity="danger" (onClick)="deleteTestCase(testCase.id)"></p-button>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+
+              <div class="testcase-summary">
+                <div class="summary-item">
+                  <span class="label">Total:</span>
+                  <span class="value">{{ currentProblem()!.testCases.length }}</span>
+                </div>
+                <div class="summary-item">
+                  <span class="label">Visible:</span>
+                  <span class="value">{{ getVisibleTestCasesCount() }}</span>
+                </div>
+                <div class="summary-item">
+                  <span class="label">Hidden:</span>
+                  <span class="value">{{ getHiddenTestCasesCount() }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </p-tabpanel>
+
+        <!-- Code Templates Tab -->
+        <p-tabpanel value="templates">
+          <div class="templates-tab">
+            <div class="section-header">
+              <div>
+                <h3>Code Templates</h3>
+                <p>Define starter code for each supported language</p>
+              </div>
+            </div>
+            
+            <div class="language-selector">
+              @for (lang of languages; track lang.value) {
+                <p-button 
+                  [label]="lang.label" 
+                  [outlined]="selectedTemplateLanguage() !== lang.value"
+                  [severity]="selectedTemplateLanguage() === lang.value ? 'info' : 'secondary'"
+                  (onClick)="selectedTemplateLanguage.set(lang.value)"
+                ></p-button>
+              }
+            </div>
+            
+            @if (getTemplateForLanguage(selectedTemplateLanguage())) {
+              <div class="template-editor-container">
+                <div class="template-header">
+                  <span class="language-label">
+                    <i class="pi pi-code"></i>
+                    {{ getLanguageLabel(selectedTemplateLanguage()) }}
+                  </span>
+                </div>
+                <textarea 
+                  class="code-textarea"
+                  [ngModel]="getTemplateForLanguage(selectedTemplateLanguage())?.template"
+                  (ngModelChange)="updateTemplate(selectedTemplateLanguage(), $event)"
+                  rows="20"
+                  spellcheck="false"
+                  placeholder="// Enter starter code here..."
+                ></textarea>
+              </div>
+            }
+          </div>
+        </p-tabpanel>
+
+        <!-- Editorial Tab -->
+        <p-tabpanel value="editorial">
+          <div class="editorial-tab">
+            <div class="section-header">
+              <div>
+                <h3>Editorial</h3>
+                <p>Write a detailed explanation and solution for this problem</p>
+              </div>
+            </div>
+
+            <div class="editorial-sections">
+              <!-- Approach -->
+              <div class="editorial-section">
+                <h4><i class="pi pi-compass"></i> Approach</h4>
+                <p-editor 
+                  [ngModel]="currentProblem()!.editorial.approach"
+                  (ngModelChange)="updateEditorial('approach', $event)"
+                  [style]="{ height: '200px' }"
+                  placeholder="Describe the overall approach to solve this problem..."
+                >
+                  <ng-template pTemplate="header">
+                    <span class="ql-formats">
+                      <select class="ql-header">
+                        <option value="1">Heading</option>
+                        <option value="2">Subheading</option>
+                        <option selected>Normal</option>
+                      </select>
+                    </span>
+                    <span class="ql-formats">
+                      <button type="button" class="ql-bold"></button>
+                      <button type="button" class="ql-italic"></button>
+                      <button type="button" class="ql-underline"></button>
+                    </span>
+                    <span class="ql-formats">
+                      <select class="ql-color"></select>
+                      <select class="ql-background"></select>
+                    </span>
+                    <span class="ql-formats">
+                      <button type="button" class="ql-list" value="ordered"></button>
+                      <button type="button" class="ql-list" value="bullet"></button>
+                    </span>
+                    <span class="ql-formats">
+                      <button type="button" class="ql-code-block"></button>
+                    </span>
+                    <span class="ql-formats">
+                      <button type="button" class="ql-clean"></button>
+                    </span>
+                  </ng-template>
+                </p-editor>
+              </div>
+
+              <!-- Intuition -->
+              <div class="editorial-section">
+                <h4><i class="pi pi-lightbulb"></i> Intuition</h4>
+                <p-editor 
+                  [ngModel]="currentProblem()!.editorial.intuition"
+                  (ngModelChange)="updateEditorial('intuition', $event)"
+                  [style]="{ height: '200px' }"
+                  placeholder="Explain the intuition behind the solution..."
+                >
+                  <ng-template pTemplate="header">
+                    <span class="ql-formats">
+                      <select class="ql-header">
+                        <option value="1">Heading</option>
+                        <option value="2">Subheading</option>
+                        <option selected>Normal</option>
+                      </select>
+                    </span>
+                    <span class="ql-formats">
+                      <button type="button" class="ql-bold"></button>
+                      <button type="button" class="ql-italic"></button>
+                      <button type="button" class="ql-underline"></button>
+                    </span>
+                    <span class="ql-formats">
+                      <select class="ql-color"></select>
+                      <select class="ql-background"></select>
+                    </span>
+                    <span class="ql-formats">
+                      <button type="button" class="ql-list" value="ordered"></button>
+                      <button type="button" class="ql-list" value="bullet"></button>
+                    </span>
+                    <span class="ql-formats">
+                      <button type="button" class="ql-code-block"></button>
+                    </span>
+                    <span class="ql-formats">
+                      <button type="button" class="ql-clean"></button>
+                    </span>
+                  </ng-template>
+                </p-editor>
+              </div>
+
+              <!-- Algorithm -->
+              <div class="editorial-section">
+                <h4><i class="pi pi-sitemap"></i> Algorithm</h4>
+                <p-editor 
+                  [ngModel]="currentProblem()!.editorial.algorithm"
+                  (ngModelChange)="updateEditorial('algorithm', $event)"
+                  [style]="{ height: '250px' }"
+                  placeholder="Step-by-step algorithm explanation..."
+                >
+                  <ng-template pTemplate="header">
+                    <span class="ql-formats">
+                      <select class="ql-header">
+                        <option value="1">Heading</option>
+                        <option value="2">Subheading</option>
+                        <option selected>Normal</option>
+                      </select>
+                    </span>
+                    <span class="ql-formats">
+                      <button type="button" class="ql-bold"></button>
+                      <button type="button" class="ql-italic"></button>
+                      <button type="button" class="ql-underline"></button>
+                    </span>
+                    <span class="ql-formats">
+                      <select class="ql-color"></select>
+                      <select class="ql-background"></select>
+                    </span>
+                    <span class="ql-formats">
+                      <button type="button" class="ql-list" value="ordered"></button>
+                      <button type="button" class="ql-list" value="bullet"></button>
+                    </span>
+                    <span class="ql-formats">
+                      <button type="button" class="ql-code-block"></button>
+                    </span>
+                    <span class="ql-formats">
+                      <button type="button" class="ql-clean"></button>
+                    </span>
+                  </ng-template>
+                </p-editor>
+              </div>
+
+              <!-- Complexity Analysis -->
+              <div class="editorial-section complexity-section">
+                <h4><i class="pi pi-chart-line"></i> Complexity Analysis</h4>
+                <div class="complexity-inputs">
+                  <div class="form-group">
+                    <label>Time Complexity</label>
+                    <input 
+                      pInputText 
+                      [ngModel]="currentProblem()!.editorial.complexity.time"
+                      (ngModelChange)="updateComplexity('time', $event)"
+                      placeholder="e.g., O(n)"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Space Complexity</label>
+                    <input 
+                      pInputText 
+                      [ngModel]="currentProblem()!.editorial.complexity.space"
+                      (ngModelChange)="updateComplexity('space', $event)"
+                      placeholder="e.g., O(1)"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Solution Code -->
+              <div class="editorial-section solution-section">
+                <div class="section-header">
+                  <h4><i class="pi pi-code"></i> Solution Code</h4>
+                  <p-button label="Add Solution" icon="pi pi-plus" size="small" (onClick)="openSolutionDialog()"></p-button>
+                </div>
+                
+                @if (currentProblem()!.editorial.solutionCode.length === 0) {
+                  <div class="empty-state small">
+                    <i class="pi pi-code"></i>
+                    <span>No solution code added</span>
+                    <p-button label="Add Solution" [text]="true" (onClick)="openSolutionDialog()"></p-button>
+                  </div>
+                } @else {
+                  <div class="solutions-grid">
+                    @for (solution of currentProblem()!.editorial.solutionCode; track solution.language) {
+                      <div class="solution-card">
+                        <div class="solution-header">
+                          <span class="language-badge">{{ getLanguageLabel(solution.language) }}</span>
+                          <div class="solution-actions">
+                            <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" size="small" (onClick)="openSolutionDialog(solution)"></p-button>
+                            <p-button icon="pi pi-trash" [text]="true" [rounded]="true" size="small" severity="danger" (onClick)="deleteSolution(solution.language)"></p-button>
+                          </div>
+                        </div>
+                        <pre class="solution-code"><code>{{ solution.code }}</code></pre>
+                        @if (solution.explanation) {
+                          <div class="solution-explanation">{{ solution.explanation }}</div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </p-tabpanel>
+
+        <!-- Settings Tab -->
+        <p-tabpanel value="settings">
+          <div class="settings-tab">
+            <div class="settings-grid">
+              <div class="settings-card">
+                <h3><i class="pi pi-clock"></i> Execution Limits</h3>
+                <div class="settings-form">
+                  <div class="form-group">
+                    <label>Time Limit (ms)</label>
+                    <p-inputNumber 
+                      [ngModel]="currentProblem()!.timeLimit"
+                      (ngModelChange)="updateField('timeLimit', $event)"
+                      [min]="100"
+                      [max]="30000"
+                      [step]="100"
+                      suffix=" ms"
+                    ></p-inputNumber>
+                  </div>
+                  <div class="form-group">
+                    <label>Memory Limit (MB)</label>
+                    <p-inputNumber 
+                      [ngModel]="currentProblem()!.memoryLimit"
+                      (ngModelChange)="updateField('memoryLimit', $event)"
+                      [min]="16"
+                      [max]="1024"
+                      [step]="16"
+                      suffix=" MB"
+                    ></p-inputNumber>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="settings-card">
+                <h3><i class="pi pi-flag"></i> Problem Status</h3>
+                <div class="settings-form">
+                  <div class="form-group">
+                    <label>Status</label>
+                    <p-select 
+                      [options]="statusOptions"
+                      [ngModel]="currentProblem()!.status"
+                      (ngModelChange)="updateField('status', $event)"
+                      optionLabel="label"
+                      optionValue="value"
+                      styleClass="w-full"
+                    ></p-select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="settings-card">
+                <h3><i class="pi pi-star"></i> Premium Settings</h3>
+                <div class="settings-form">
+                  <div class="form-group toggle-group">
+                    <label>Premium Problem</label>
+                    <p-toggleswitch 
+                      [ngModel]="currentProblem()!.isPremium"
+                      (ngModelChange)="updateField('isPremium', $event)"
+                    ></p-toggleswitch>
+                    <small>Premium problems require subscription</small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="settings-card full-width">
+                <h3><i class="pi pi-info-circle"></i> Problem Information</h3>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="info-label">Problem ID</span>
+                    <span class="info-value">{{ currentProblem()!.id || 'Not assigned' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Slug</span>
+                    <span class="info-value">{{ currentProblem()!.slug || 'Not set' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Created</span>
+                    <span class="info-value">{{ isEditMode() ? 'Jan 15, 2025' : 'Not saved yet' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Last Modified</span>
+                    <span class="info-value">{{ isEditMode() ? 'Jan 20, 2025' : 'Not saved yet' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+    }
+  }
+
+  <!-- Test Case Dialog -->
+  <p-dialog 
+    header="{{ editingTestCase() ? 'Edit' : 'Add' }} Test Case" 
+    [(visible)]="showTestCaseDialog" 
+    [modal]="true"
+    [style]="{ width: '650px' }"
+    styleClass="dark-dialog"
+  >
+    <div class="dialog-form">
+      <div class="form-group">
+        <label>Input <span class="required">*</span></label>
+        <textarea pTextarea [(ngModel)]="newTestCase.input" rows="5" placeholder="Test case input..." class="w-full code-input"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Expected Output <span class="required">*</span></label>
+        <textarea pTextarea [(ngModel)]="newTestCase.expectedOutput" rows="5" placeholder="Expected output..." class="w-full code-input"></textarea>
+      </div>
+      <p-divider></p-divider>
+      <div class="form-row">
+        <div class="form-group toggle-group">
+          <p-toggleswitch [(ngModel)]="newTestCase.isHidden"></p-toggleswitch>
+          <div class="toggle-label">
+            <label>Hidden Test Case</label>
+            <small>Hidden test cases are not shown to users</small>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Weight</label>
+          <p-inputNumber [(ngModel)]="newTestCase.weight" [min]="1" [max]="10" [showButtons]="true"></p-inputNumber>
+        </div>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button label="Cancel" [text]="true" (onClick)="showTestCaseDialog.set(false)"></p-button>
+      <p-button label="Save" icon="pi pi-check" (onClick)="saveTestCase()"></p-button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Example Dialog -->
+  <p-dialog 
+    header="{{ editingExample() ? 'Edit' : 'Add' }} Example" 
+    [(visible)]="showExampleDialog" 
+    [modal]="true"
+    [style]="{ width: '650px' }"
+    styleClass="dark-dialog"
+  >
+    <div class="dialog-form">
+      <div class="form-group">
+        <label>Input <span class="required">*</span></label>
+        <textarea pTextarea [(ngModel)]="newExample.input" rows="3" placeholder="Example input..." class="w-full code-input"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Output <span class="required">*</span></label>
+        <textarea pTextarea [(ngModel)]="newExample.output" rows="3" placeholder="Expected output..." class="w-full code-input"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Explanation <span class="optional">(Optional)</span></label>
+        <textarea pTextarea [(ngModel)]="newExample.explanation" rows="4" placeholder="Explain how the output is derived..." class="w-full"></textarea>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button label="Cancel" [text]="true" (onClick)="showExampleDialog.set(false)"></p-button>
+      <p-button label="Save" icon="pi pi-check" (onClick)="saveExample()"></p-button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Solution Code Dialog -->
+  <p-dialog 
+    header="{{ editingSolution() ? 'Edit' : 'Add' }} Solution Code" 
+    [(visible)]="showSolutionDialog" 
+    [modal]="true"
+    [style]="{ width: '800px' }"
+    styleClass="dark-dialog solution-dialog"
+  >
+    <div class="dialog-form">
+      <div class="form-group">
+        <label>Language <span class="required">*</span></label>
+        <p-select 
+          [options]="languages"
+          [(ngModel)]="newSolution.language"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+          [disabled]="!!editingSolution()"
+        ></p-select>
+      </div>
+      <div class="form-group">
+        <label>Solution Code <span class="required">*</span></label>
+        <textarea 
+          class="code-textarea"
+          [(ngModel)]="newSolution.code" 
+          rows="15" 
+          placeholder="// Paste your solution code here..."
+          spellcheck="false"
+        ></textarea>
+      </div>
+      <div class="form-group">
+        <label>Explanation <span class="optional">(Optional)</span></label>
+        <textarea pTextarea [(ngModel)]="newSolution.explanation" rows="3" placeholder="Brief explanation of this solution..." class="w-full"></textarea>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button label="Cancel" [text]="true" (onClick)="showSolutionDialog.set(false)"></p-button>
+      <p-button label="Save Solution" icon="pi pi-check" (onClick)="saveSolution()"></p-button>
+    </ng-template>
+  </p-dialog>
+</div>

@@ -1,0 +1,160 @@
+<div class="problems-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-info">
+      <h1>Problems & Submissions</h1>
+      <p>Real-time overview of system performance and problem statistics.</p>
+    </div>
+    <div class="live-indicator">
+      <span class="pulse-dot"></span>
+      <span>Live updates active</span>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    @for (stat of stats(); track stat.label) {
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">{{ stat.label }}</span>
+          <span class="stat-trend" [class.positive]="stat.trend.positive">{{ stat.trend.value }}</span>
+        </div>
+        <p class="stat-value">{{ stat.value }}</p>
+      </div>
+    }
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-grid">
+    <!-- Submission Outcomes -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Submission Outcomes</h3>
+        <select class="time-select">
+          <option>Last 24 Hours</option>
+          <option>Last 7 Days</option>
+        </select>
+      </div>
+      <div class="outcomes-list">
+        @for (outcome of submissionOutcomes(); track outcome.label) {
+          <div class="outcome-row">
+            <span class="outcome-label">{{ outcome.label }}</span>
+            <div class="outcome-bar">
+              <div class="bar-fill" [class]="outcome.color" [style.width.%]="outcome.percentage"></div>
+            </div>
+            <span class="outcome-value">{{ outcome.percentage }}%</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Execution Time Distribution -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Execution Time (ms)</h3>
+        <span class="avg-badge">Avg: {{ avgExecutionTime() }}ms</span>
+      </div>
+      <div class="histogram">
+        @for (bucket of executionTimeBuckets(); track bucket.range) {
+          <div class="histogram-bar-wrapper">
+            <div class="histogram-bar">
+              <div class="bar-value" [style.height.%]="bucket.percentage"></div>
+            </div>
+            <span class="bucket-label">{{ bucket.range }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Controls -->
+  <div class="table-controls">
+    <div class="search-filters">
+      <!-- Search -->
+      <div class="search-input">
+        <i class="pi pi-search"></i>
+        <input 
+          type="text" 
+          placeholder="Search by Problem ID or Title" 
+          [(ngModel)]="searchQuery"
+        />
+      </div>
+      <!-- Filters -->
+      <select class="filter-select" [(ngModel)]="selectedDifficulty">
+        @for (diff of difficulties; track diff) {
+          <option [value]="diff">{{ diff }}</option>
+        }
+      </select>
+      <select class="filter-select" [(ngModel)]="selectedLanguage">
+        @for (lang of languages; track lang) {
+          <option [value]="lang">{{ lang }}</option>
+        }
+      </select>
+    </div>
+    <div class="action-buttons">
+      <button class="primary-btn" (click)="createNewProblem()">
+        <i class="pi pi-plus"></i>
+        New Problem
+      </button>
+      <button class="icon-btn" (click)="exportProblems()" pTooltip="Export">
+        <i class="pi pi-download"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Problems Table -->
+  <div class="problems-table-card">
+    <p-table [value]="problems()" styleClass="p-datatable-sm" [scrollable]="true">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 35%">Problem</th>
+          <th>Difficulty</th>
+          <th>Volume (24h)</th>
+          <th>Acceptance</th>
+          <th class="text-right">Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-problem>
+        <tr class="problem-row">
+          <td>
+            <div class="problem-info">
+              <div class="problem-title-row">
+                <span class="problem-title">{{ problem.title }}</span>
+                <i class="pi pi-external-link hover-icon" (click)="openProblem(problem)"></i>
+              </div>
+              <span class="problem-id">ID: #{{ problem.id }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="difficulty-badge" [class]="getDifficultyClass(problem.difficulty)">
+              {{ problem.difficulty }}
+            </span>
+          </td>
+          <td>
+            <div class="volume-cell">
+              <div class="sparkline">
+                @for (val of problem.sparklineData; track $index) {
+                  <div class="spark-bar" [style.height.%]="val"></div>
+                }
+              </div>
+              <span class="volume-label">{{ problem.volumeDisplay }} today</span>
+            </div>
+          </td>
+          <td>
+            <div class="acceptance-cell">
+              <span class="acceptance-value">{{ problem.acceptance }}%</span>
+              <div class="acceptance-bar">
+                <div class="bar-fill" [class]="getAcceptanceColor(problem.acceptance)" [style.width.%]="problem.acceptance"></div>
+              </div>
+            </div>
+          </td>
+          <td class="text-right">
+            <button class="more-btn" (click)="editProblem(problem)">
+              <i class="pi pi-ellipsis-h"></i>
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

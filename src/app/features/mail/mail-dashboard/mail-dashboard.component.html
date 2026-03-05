@@ -1,0 +1,528 @@
+<div class="mail-dashboard-container">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+  
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1><i class="pi pi-envelope"></i> Mail Management</h1>
+      <p class="subtitle">Manage email campaigns, mail groups, and monitor delivery</p>
+    </div>
+    <div class="header-actions">
+      <p-button label="Refresh" icon="pi pi-refresh" [outlined]="true" (onClick)="refreshData()" [loading]="loading()"></p-button>
+      <p-button label="New Campaign" icon="pi pi-plus" (onClick)="openComposeDialog()"></p-button>
+    </div>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon sent"><i class="pi pi-send"></i></div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().totalSent | number }}</span>
+        <span class="stat-label">Total Emails Sent</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon open"><i class="pi pi-envelope-open"></i></div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().avgOpenRate }}%</span>
+        <span class="stat-label">Avg Open Rate</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon click"><i class="pi pi-external-link"></i></div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().avgClickRate }}%</span>
+        <span class="stat-label">Avg Click Rate</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon groups"><i class="pi pi-users"></i></div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().totalGroups }}</span>
+        <span class="stat-label">Active Groups</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Service Health Banner -->
+  @if (serviceHealth()) {
+    <div class="health-banner" [class]="'health-' + serviceHealth()!.status">
+      <div class="health-status">
+        <i class="pi" [class.pi-check-circle]="serviceHealth()!.status === 'healthy'" [class.pi-exclamation-triangle]="serviceHealth()!.status !== 'healthy'"></i>
+        <span class="status-text">{{ serviceHealth()!.status | titlecase }}</span>
+        <span class="provider">{{ serviceHealth()!.provider }}</span>
+      </div>
+      <div class="health-metrics">
+        <span class="metric"><i class="pi pi-clock"></i> Uptime: {{ serviceHealth()!.uptime }}%</span>
+        <span class="metric"><i class="pi pi-check"></i> Success: {{ serviceHealth()!.successRate }}%</span>
+        <span class="metric"><i class="pi pi-hourglass"></i> Queue: {{ serviceHealth()!.queueSize }}</span>
+      </div>
+    </div>
+  }
+
+  <!-- Main Tabs -->
+  <p-tabs value="0" styleClass="mail-tabs">
+    <p-tablist>
+      <p-tab value="0">
+        <i class="pi pi-send"></i>
+        <span>Campaigns</span>
+        <p-badge [value]="campaigns().length.toString()" severity="info"></p-badge>
+      </p-tab>
+      <p-tab value="1">
+        <i class="pi pi-users"></i>
+        <span>Mail Groups</span>
+        <p-badge [value]="mailGroups().length.toString()" severity="info"></p-badge>
+      </p-tab>
+      <p-tab value="2">
+        <i class="pi pi-file"></i>
+        <span>Templates</span>
+        <p-badge [value]="templates().length.toString()" severity="info"></p-badge>
+      </p-tab>
+    </p-tablist>
+    <p-tabpanels>
+      <p-tabpanel value="0">
+      
+      <!-- Campaigns Tab Content -->
+      <p-card styleClass="campaigns-card">
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3>Email Campaigns</h3>
+            <div class="header-actions">
+              <p-select [options]="statusOptions" [(ngModel)]="filterStatus" placeholder="Filter by status" styleClass="status-filter"></p-select>
+            </div>
+          </div>
+        </ng-template>
+
+        <p-table [value]="campaigns()" [paginator]="true" [rows]="10" styleClass="campaigns-table">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Campaign</th>
+              <th>Status</th>
+              <th>Recipients</th>
+              <th>Open Rate</th>
+              <th>Click Rate</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-campaign>
+            <tr>
+              <td>
+                <div class="campaign-cell">
+                  <span class="campaign-name">{{ campaign.name }}</span>
+                  <span class="campaign-subject">{{ campaign.subject }}</span>
+                </div>
+              </td>
+              <td><p-tag [value]="campaign.status" [severity]="getStatusSeverity(campaign.status)"></p-tag></td>
+              <td>
+                <span class="recipients">{{ campaign.recipients | number }}</span>
+              </td>
+              <td>
+                <div class="rate-cell">
+                  <span class="rate-value">{{ getOpenRate(campaign) }}%</span>
+                  <div class="rate-bar">
+                    <div class="rate-fill open" [style.width.%]="getOpenRate(campaign)"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="rate-cell">
+                  <span class="rate-value">{{ getClickRate(campaign) }}%</span>
+                  <div class="rate-bar">
+                    <div class="rate-fill click" [style.width.%]="getClickRate(campaign)"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="timestamp">{{ campaign.sentAt || campaign.scheduledAt || campaign.createdAt }}</span>
+              </td>
+              <td>
+                <div class="actions-cell">
+                  <button pButton icon="pi pi-chart-bar" class="p-button-text p-button-sm" pTooltip="View Stats" (click)="viewCampaignStatus(campaign)"></button>
+                  <button pButton icon="pi pi-copy" class="p-button-text p-button-sm" pTooltip="Duplicate" (click)="duplicateCampaign(campaign)"></button>
+                  @if (campaign.status === 'scheduled') {
+                    <button pButton icon="pi pi-times" class="p-button-text p-button-warning p-button-sm" pTooltip="Cancel" (click)="cancelScheduled(campaign)"></button>
+                  }
+                  @if (campaign.status === 'draft') {
+                    <button pButton icon="pi pi-trash" class="p-button-text p-button-danger p-button-sm" pTooltip="Delete" (click)="deleteCampaign(campaign)"></button>
+                  }
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="7" class="empty-message">
+                <i class="pi pi-inbox"></i>
+                <span>No campaigns found</span>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+      </p-tabpanel>
+
+      <p-tabpanel value="1">
+      
+      <!-- Mail Groups Tab Content -->
+      <div class="groups-layout">
+        <!-- Groups List -->
+        <p-card styleClass="groups-list-card">
+          <ng-template pTemplate="header">
+            <div class="card-header">
+              <h3>Mail Groups</h3>
+              <button pButton icon="pi pi-plus" class="p-button-sm" pTooltip="New Group" (click)="openGroupDialog()"></button>
+            </div>
+          </ng-template>
+
+          <div class="groups-list">
+            @for (group of mailGroups(); track group.id) {
+              <div class="group-item" [class.active]="selectedGroup()?.id === group.id" [class.inactive]="!group.isActive" (click)="selectGroup(group)">
+                <div class="group-icon">
+                  <i class="pi pi-users"></i>
+                </div>
+                <div class="group-info">
+                  <span class="group-name">{{ group.name }}</span>
+                  <span class="group-meta">{{ group.memberCount | number }} members</span>
+                </div>
+                <div class="group-status">
+                  <p-tag [value]="group.isActive ? 'Active' : 'Inactive'" [severity]="group.isActive ? 'success' : 'secondary'" styleClass="p-tag-sm"></p-tag>
+                </div>
+              </div>
+            }
+          </div>
+        </p-card>
+
+        <!-- Group Details -->
+        @if (selectedGroup()) {
+          <p-card styleClass="group-details-card">
+            <ng-template pTemplate="header">
+              <div class="card-header">
+                <div class="group-title">
+                  <h3>{{ selectedGroup()!.name }}</h3>
+                  <span class="description">{{ selectedGroup()!.description }}</span>
+                </div>
+                <div class="header-actions">
+                  <button pButton icon="pi pi-pencil" class="p-button-outlined p-button-sm" pTooltip="Edit" (click)="openGroupDialog(selectedGroup()!)"></button>
+                  <button pButton icon="pi pi-send" class="p-button-sm" label="Send Email" (click)="openSendToGroupDialog()"></button>
+                  <button pButton icon="pi pi-trash" class="p-button-danger p-button-outlined p-button-sm" pTooltip="Delete" (click)="deleteGroup(selectedGroup()!)"></button>
+                </div>
+              </div>
+            </ng-template>
+
+            <div class="members-section">
+              <div class="members-header">
+                <span class="members-count">{{ groupMembers().length }} Members</span>
+                <button pButton icon="pi pi-user-plus" class="p-button-sm p-button-outlined" label="Add Member" (click)="openMemberDialog()"></button>
+              </div>
+
+              <p-table [value]="groupMembers()" [paginator]="true" [rows]="5" styleClass="members-table">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Added</th>
+                    <th>Actions</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-member>
+                  <tr [class.inactive-member]="!member.isActive">
+                    <td>
+                      <div class="member-email">
+                        <i class="pi pi-envelope"></i>
+                        {{ member.email }}
+                      </div>
+                    </td>
+                    <td>{{ member.name }}</td>
+                    <td>
+                      <p-tag [value]="member.isActive ? 'Active' : 'Inactive'" [severity]="member.isActive ? 'success' : 'secondary'" styleClass="p-tag-sm"></p-tag>
+                    </td>
+                    <td>{{ member.addedAt }}</td>
+                    <td>
+                      <div class="actions-cell">
+                        <button pButton [icon]="member.isActive ? 'pi pi-ban' : 'pi pi-check'" class="p-button-text p-button-sm" [pTooltip]="member.isActive ? 'Deactivate' : 'Activate'" (click)="toggleMemberStatus(member)"></button>
+                        <button pButton icon="pi pi-trash" class="p-button-text p-button-danger p-button-sm" pTooltip="Remove" (click)="removeMember(member)"></button>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </p-card>
+        } @else {
+          <p-card styleClass="group-placeholder-card">
+            <div class="placeholder-content">
+              <i class="pi pi-users"></i>
+              <span>Select a mail group to view details</span>
+            </div>
+          </p-card>
+        }
+      </div>
+      </p-tabpanel>
+
+      <p-tabpanel value="2">
+      
+      <!-- Templates Tab Content -->
+      <p-card styleClass="templates-card">
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <h3>Email Templates</h3>
+            <button pButton label="New Template" icon="pi pi-plus" class="p-button-sm"></button>
+          </div>
+        </ng-template>
+
+        <div class="templates-grid">
+          @for (template of templates(); track template.id) {
+            <div class="template-card">
+              <div class="template-header">
+                <p-tag [value]="template.category" severity="info" styleClass="p-tag-sm"></p-tag>
+              </div>
+              <div class="template-body">
+                <h4>{{ template.name }}</h4>
+                <p class="subject">{{ template.subject }}</p>
+              </div>
+              <div class="template-actions">
+                <button pButton icon="pi pi-eye" class="p-button-text p-button-sm" pTooltip="Preview" (click)="previewTemplate(template)"></button>
+                <button pButton icon="pi pi-pencil" class="p-button-text p-button-sm" pTooltip="Edit" (click)="editTemplate(template)"></button>
+                <button pButton icon="pi pi-copy" class="p-button-text p-button-sm" pTooltip="Duplicate" (click)="duplicateTemplate(template)"></button>
+              </div>
+            </div>
+          }
+        </div>
+      </p-card>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>
+
+<!-- Compose Campaign Dialog -->
+<p-dialog header="Create Email Campaign" [(visible)]="showComposeDialog" [modal]="true" [style]="{width: '900px'}" styleClass="mail-dialog compose-dialog">
+  <div class="compose-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Campaign Name</label>
+        <input type="text" pInputText [(ngModel)]="composeForm.name" placeholder="Enter campaign name" class="w-full">
+      </div>
+      <div class="form-group">
+        <label>Template (Optional)</label>
+        <p-select [options]="templates()" [(ngModel)]="composeForm.templateId" optionLabel="name" optionValue="id"
+                  placeholder="Select a template" (onChange)="applyTemplate($event.value)" styleClass="w-full"></p-select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Target Audience</label>
+        <p-multiselect [options]="audienceOptions" [(ngModel)]="composeForm.recipients" optionLabel="label" optionValue="value"
+                       placeholder="Select audience segments" styleClass="w-full"></p-multiselect>
+      </div>
+      <div class="form-group">
+        <label>Mail Groups</label>
+        <p-multiselect [options]="getGroupOptions()" [(ngModel)]="composeForm.groupIds" optionLabel="label" optionValue="value"
+                       placeholder="Select mail groups" styleClass="w-full"></p-multiselect>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Email Subject</label>
+      <input type="text" pInputText [(ngModel)]="composeForm.subject" placeholder="Enter email subject line" class="w-full">
+    </div>
+
+    <div class="form-group">
+      <label>Email Content</label>
+      <p-editor [(ngModel)]="composeForm.content" [style]="{'height':'300px'}" styleClass="email-editor">
+        <ng-template pTemplate="header">
+          <span class="ql-formats">
+            <button type="button" class="ql-bold"></button>
+            <button type="button" class="ql-italic"></button>
+            <button type="button" class="ql-underline"></button>
+          </span>
+          <span class="ql-formats">
+            <button type="button" class="ql-list" value="ordered"></button>
+            <button type="button" class="ql-list" value="bullet"></button>
+          </span>
+          <span class="ql-formats">
+            <button type="button" class="ql-link"></button>
+            <button type="button" class="ql-image"></button>
+          </span>
+          <span class="ql-formats">
+            <select class="ql-header">
+              <option value="1">Heading 1</option>
+              <option value="2">Heading 2</option>
+              <option value="">Normal</option>
+            </select>
+          </span>
+        </ng-template>
+      </p-editor>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Schedule (Optional)</label>
+        <input type="datetime-local" pInputText [(ngModel)]="composeForm.scheduledTime" class="w-full">
+      </div>
+      <div class="form-group preview-group">
+        <button pButton label="Preview" icon="pi pi-eye" class="p-button-outlined" (click)="previewEmail()" [disabled]="!composeForm.templateId && !composeForm.content"></button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-actions">
+      <button pButton label="Save Draft" icon="pi pi-save" class="p-button-outlined" (click)="saveDraft()"></button>
+      <div class="right-actions">
+        <button pButton label="Schedule" icon="pi pi-clock" class="p-button-secondary" (click)="scheduleCampaign()" [disabled]="!composeForm.scheduledTime"></button>
+        <button pButton label="Send Now" icon="pi pi-send" (click)="sendNow()"></button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Preview Dialog -->
+<p-dialog header="Email Preview" [(visible)]="showPreviewDialog" [modal]="true" [style]="{width: '700px'}" styleClass="mail-dialog preview-dialog">
+  <div class="preview-container">
+    <div class="preview-subject">
+      <strong>Subject:</strong> {{ previewSubject() || composeForm.subject }}
+    </div>
+    <div class="preview-content" [innerHTML]="previewContent()"></div>
+  </div>
+</p-dialog>
+
+<!-- Template Edit Dialog -->
+<p-dialog header="Edit Template" [(visible)]="showTemplateEditDialog" [modal]="true" [style]="{width: '800px'}" styleClass="mail-dialog template-edit-dialog">
+  <div class="template-edit-form">
+    <div class="form-group">
+      <label>Template Name</label>
+      <input type="text" pInputText [(ngModel)]="templateEditForm.name" class="w-full">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Subject Line</label>
+        <input type="text" pInputText [(ngModel)]="templateEditForm.subject" class="w-full">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <p-select [options]="templateCategories" [(ngModel)]="templateEditForm.category" placeholder="Select category" styleClass="w-full"></p-select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Template Content</label>
+      <p-editor [(ngModel)]="templateEditForm.content" [style]="{'height':'300px'}" styleClass="email-editor"></p-editor>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" icon="pi pi-times" class="p-button-outlined" (click)="showTemplateEditDialog.set(false)"></button>
+    <button pButton label="Save Template" icon="pi pi-check" (click)="saveTemplate()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Campaign Status Dialog -->
+<p-dialog header="Campaign Statistics" [(visible)]="showStatusDialog" [modal]="true" [style]="{width: '600px'}" styleClass="status-dialog">
+  @if (selectedCampaign()) {
+    <div class="status-content">
+      <div class="campaign-header">
+        <h3>{{ selectedCampaign()!.name }}</h3>
+        <p-tag [value]="selectedCampaign()!.status" [severity]="getStatusSeverity(selectedCampaign()!.status)"></p-tag>
+      </div>
+      
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-label">Recipients</span>
+          <span class="stat-value">{{ selectedCampaign()!.recipients | number }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Opened</span>
+          <span class="stat-value">{{ selectedCampaign()!.opened | number }} ({{ getOpenRate(selectedCampaign()!) }}%)</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Clicked</span>
+          <span class="stat-value">{{ selectedCampaign()!.clicked | number }} ({{ getClickRate(selectedCampaign()!) }}%)</span>
+        </div>
+      </div>
+      
+      <div class="progress-bars">
+        <div class="progress-item">
+          <span class="progress-label">Open Rate</span>
+          <p-progressBar [value]="getOpenRate(selectedCampaign()!)" [showValue]="true"></p-progressBar>
+        </div>
+        <div class="progress-item">
+          <span class="progress-label">Click Rate</span>
+          <p-progressBar [value]="getClickRate(selectedCampaign()!)" [showValue]="true"></p-progressBar>
+        </div>
+      </div>
+      
+      @if (selectedCampaign()!.trackingId) {
+        <div class="tracking-info">
+          <span class="tracking-label">Tracking ID:</span>
+          <code>{{ selectedCampaign()!.trackingId }}</code>
+        </div>
+      }
+    </div>
+  }
+</p-dialog>
+
+<!-- Group Dialog -->
+<p-dialog [header]="editingGroup() ? 'Edit Mail Group' : 'Create Mail Group'" [(visible)]="showGroupDialog" [modal]="true" [style]="{width: '500px'}" styleClass="group-dialog">
+  <div class="group-form">
+    <div class="form-group">
+      <label>Group Name</label>
+      <input type="text" pInputText [(ngModel)]="groupForm.name" placeholder="Enter group name" class="w-full">
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea pInputText [(ngModel)]="groupForm.description" rows="3" placeholder="Enter group description" class="w-full"></textarea>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" class="p-button-text" (click)="showGroupDialog.set(false)"></button>
+    <button pButton [label]="editingGroup() ? 'Update' : 'Create'" icon="pi pi-check" (click)="saveGroup()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Add Member Dialog -->
+<p-dialog header="Add Member" [(visible)]="showMemberDialog" [modal]="true" [style]="{width: '450px'}" styleClass="member-dialog">
+  <div class="member-form">
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" pInputText [(ngModel)]="memberForm.email" placeholder="user@example.com" class="w-full">
+    </div>
+    <div class="form-group">
+      <label>Name (Optional)</label>
+      <input type="text" pInputText [(ngModel)]="memberForm.name" placeholder="User name" class="w-full">
+    </div>
+    <div class="form-group">
+      <label>Metadata (JSON, Optional)</label>
+      <textarea pInputText [(ngModel)]="memberForm.metadata" rows="2" placeholder='{"role": "premium"}' class="w-full"></textarea>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" class="p-button-text" (click)="showMemberDialog.set(false)"></button>
+    <button pButton label="Add Member" icon="pi pi-user-plus" (click)="addMember()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Send to Group Dialog -->
+<p-dialog header="Send Email to Group" [(visible)]="showSendToGroupDialog" [modal]="true" [style]="{width: '700px'}" styleClass="send-group-dialog">
+  @if (selectedGroup()) {
+    <div class="send-group-info">
+      <p><i class="pi pi-users"></i> Sending to: <strong>{{ selectedGroup()!.name }}</strong> ({{ selectedGroup()!.memberCount }} members)</p>
+    </div>
+    <div class="send-form">
+      <div class="form-group">
+        <label>Subject</label>
+        <input type="text" pInputText [(ngModel)]="sendToGroupForm.subject" placeholder="Email subject" class="w-full">
+      </div>
+      <div class="form-group">
+        <label>HTML Content</label>
+        <p-editor [(ngModel)]="sendToGroupForm.htmlContent" [style]="{'height':'250px'}" styleClass="email-editor"></p-editor>
+      </div>
+    </div>
+  }
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" class="p-button-text" (click)="showSendToGroupDialog.set(false)"></button>
+    <button pButton label="Send Email" icon="pi pi-send" (click)="sendToGroup()" [loading]="loading()"></button>
+  </ng-template>
+</p-dialog>

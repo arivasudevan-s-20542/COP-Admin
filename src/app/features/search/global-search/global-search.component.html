@@ -1,0 +1,138 @@
+<div class="search-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Global Search</h1>
+    <p class="subtitle">Search across all platform resources</p>
+  </div>
+
+  <!-- Search Box -->
+  <div class="search-section">
+    <div class="search-box-large">
+      <i class="pi pi-search search-icon"></i>
+      <input type="text" pInputText placeholder="Search users, problems, contests, submissions..." 
+             [value]="searchQuery()" (input)="onSearch($event)" class="search-input">
+      @if (isSearching()) {
+        <i class="pi pi-spin pi-spinner loading-icon"></i>
+      }
+    </div>
+    <p-select [options]="filters" [(ngModel)]="selectedFilter" (onChange)="onFilterChange($event)"
+                styleClass="filter-dropdown" placeholder="Filter by type"></p-select>
+  </div>
+
+  <div class="search-content">
+    <!-- Results Section -->
+    @if (searchQuery() && searchResults().length > 0) {
+      <div class="results-section">
+        <div class="results-header">
+          <h3>Search Results</h3>
+          <span class="result-count">{{ searchResults().length }} results found</span>
+        </div>
+        <div class="results-list">
+          @for (result of searchResults(); track result.id) {
+            <a [href]="result.link" class="result-item">
+              <div class="result-icon" [ngClass]="result.type">
+                <i class="pi {{ result.icon }}"></i>
+              </div>
+              <div class="result-content">
+                <div class="result-header">
+                  <span class="result-title">{{ result.title }}</span>
+                  <p-tag [value]="getTypeLabel(result.type)" [severity]="getTypeSeverity(result.type)" 
+                         [style]="{fontSize: '0.65rem'}"></p-tag>
+                </div>
+                <span class="result-description">{{ result.description }}</span>
+                <span class="result-metadata">{{ result.metadata }}</span>
+              </div>
+              <i class="pi pi-arrow-right result-arrow"></i>
+            </a>
+          }
+        </div>
+      </div>
+    } @else if (searchQuery() && searchResults().length === 0 && !isSearching()) {
+      <div class="no-results">
+        <i class="pi pi-search"></i>
+        <h3>No results found</h3>
+        <p>Try adjusting your search or filter to find what you're looking for</p>
+      </div>
+    } @else {
+      <!-- Quick Links & Recent Searches -->
+      <div class="default-content">
+        <!-- Quick Links -->
+        <div class="quick-links-section">
+          <h3>Quick Access</h3>
+          <div class="quick-links-grid">
+            @for (link of quickLinks; track link.label) {
+              <a [href]="link.link" class="quick-link-card">
+                <div class="quick-link-icon">
+                  <i class="pi {{ link.icon }}"></i>
+                </div>
+                <div class="quick-link-info">
+                  <span class="quick-link-label">{{ link.label }}</span>
+                  <span class="quick-link-count">{{ link.count }}</span>
+                </div>
+                <i class="pi pi-arrow-right"></i>
+              </a>
+            }
+          </div>
+        </div>
+
+        <!-- Recent Searches -->
+        @if (recentSearches().length > 0) {
+          <div class="recent-section">
+            <div class="recent-header">
+              <h3>Recent Searches</h3>
+              <button pButton label="Clear All" class="p-button-text p-button-sm" 
+                      (click)="clearRecentSearches()"></button>
+            </div>
+            <div class="recent-list">
+              @for (search of recentSearches(); track search.query) {
+                <div class="recent-item" (click)="useRecentSearch(search)">
+                  <i class="pi pi-history"></i>
+                  <div class="recent-content">
+                    <span class="recent-query">{{ search.query }}</span>
+                    <span class="recent-meta">{{ search.resultCount }} results · {{ search.timestamp }}</span>
+                  </div>
+                  <i class="pi pi-arrow-up-right"></i>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Search Tips -->
+        <div class="tips-section">
+          <h3>Search Tips</h3>
+          <div class="tips-grid">
+            <div class="tip-card">
+              <i class="pi pi-user"></i>
+              <div class="tip-content">
+                <span class="tip-title">Search Users</span>
+                <span class="tip-desc">Search by username, email, or user ID</span>
+              </div>
+            </div>
+            <div class="tip-card">
+              <i class="pi pi-code"></i>
+              <div class="tip-content">
+                <span class="tip-title">Search Problems</span>
+                <span class="tip-desc">Search by title, difficulty, or topic</span>
+              </div>
+            </div>
+            <div class="tip-card">
+              <i class="pi pi-trophy"></i>
+              <div class="tip-content">
+                <span class="tip-title">Search Contests</span>
+                <span class="tip-desc">Search by contest name or ID</span>
+              </div>
+            </div>
+            <div class="tip-card">
+              <i class="pi pi-filter"></i>
+              <div class="tip-content">
+                <span class="tip-title">Use Filters</span>
+                <span class="tip-desc">Narrow down results by type</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

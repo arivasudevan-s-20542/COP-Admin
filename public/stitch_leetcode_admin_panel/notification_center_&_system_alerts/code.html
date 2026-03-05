@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Notification Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#0d59f2",
+              "background-light": "#f5f6f8",
+              "background-dark": "#101622",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display overflow-hidden h-screen w-screen">
+<!-- Main Dashboard Background (Blurred/Dimmed Context) -->
+<div class="absolute inset-0 z-0 flex flex-col h-full w-full pointer-events-none select-none transition-all duration-300 filter brightness-[0.4] blur-[2px]">
+<!-- Top Nav (Reused) -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#282e39] px-10 py-3 bg-[#111318]">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-white">
+<div class="size-8 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">code_blocks</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Admin Console</h2>
+</div>
+<div class="flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-[#9ca6ba] flex border-none bg-[#282e39] items-center justify-center pl-4 rounded-l-lg border-r-0">
+<span class="material-symbols-outlined text-[24px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border-none bg-[#282e39] focus:border-none h-full placeholder:text-[#9ca6ba] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" placeholder="Search" value=""/>
+</div>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<div class="flex items-center gap-9">
+<span class="text-white text-sm font-medium leading-normal opacity-70">Dashboard</span>
+<span class="text-white text-sm font-medium leading-normal opacity-70">Users</span>
+<span class="text-white text-sm font-medium leading-normal opacity-70">Contests</span>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg h-10 bg-[#282e39] text-white px-2.5">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 bg-[#282e39]" data-alt="User avatar placeholder"></div>
+</div>
+</div>
+</header>
+<!-- Dummy Content to fill background -->
+<div class="p-10 grid grid-cols-3 gap-6 opacity-50">
+<div class="col-span-2 h-64 bg-[#1a202c] rounded-xl border border-[#282e39]"></div>
+<div class="col-span-1 h-64 bg-[#1a202c] rounded-xl border border-[#282e39]"></div>
+<div class="col-span-1 h-48 bg-[#1a202c] rounded-xl border border-[#282e39]"></div>
+<div class="col-span-1 h-48 bg-[#1a202c] rounded-xl border border-[#282e39]"></div>
+<div class="col-span-1 h-48 bg-[#1a202c] rounded-xl border border-[#282e39]"></div>
+</div>
+</div>
+<!-- Overlay Wrapper -->
+<div class="relative z-10 flex h-full w-full justify-end">
+<!-- Sliding Notification Drawer -->
+<div class="h-full w-full max-w-[500px] bg-[#111318] border-l border-[#282e39] shadow-2xl flex flex-col animate-[slideIn_0.3s_ease-out]">
+<!-- Drawer Header -->
+<div class="flex items-center justify-between px-6 py-5 border-b border-[#282e39]">
+<div>
+<h3 class="text-white text-xl font-bold leading-tight">System Alerts</h3>
+<p class="text-[#9ca6ba] text-sm mt-1">Updates on platform health</p>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-primary text-sm font-medium hover:text-blue-400 transition-colors">Mark all read</button>
+<div class="h-6 w-[1px] bg-[#282e39]"></div>
+<label class="inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="relative w-9 h-5 bg-gray-600 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+<span class="ms-2 text-xs font-medium text-[#9ca6ba]">Mute</span>
+</label>
+<button class="text-[#9ca6ba] hover:text-white transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+</div>
+<!-- Filters -->
+<div class="px-6 py-4 border-b border-[#282e39] bg-[#161b24]">
+<div class="flex gap-2 overflow-x-auto no-scrollbar">
+<button class="flex h-8 items-center justify-center gap-x-2 rounded-lg bg-[#282e39] hover:bg-[#343b48] px-3 transition-colors">
+<span class="material-symbols-outlined text-white text-[18px]">grid_view</span>
+<span class="text-white text-sm font-medium">All</span>
+</button>
+<button class="flex h-8 items-center justify-center gap-x-2 rounded-lg bg-red-900/30 border border-red-900/50 px-3 transition-colors">
+<span class="material-symbols-outlined text-red-500 text-[18px]">warning</span>
+<span class="text-red-400 text-sm font-medium">Critical (3)</span>
+</button>
+<button class="flex h-8 items-center justify-center gap-x-2 rounded-lg bg-[#282e39] hover:bg-[#343b48] px-3 transition-colors">
+<span class="material-symbols-outlined text-amber-500 text-[18px]">error</span>
+<span class="text-white text-sm font-medium">Warning (5)</span>
+</button>
+<button class="flex h-8 items-center justify-center gap-x-2 rounded-lg bg-[#282e39] hover:bg-[#343b48] px-3 transition-colors">
+<span class="material-symbols-outlined text-primary text-[18px]">info</span>
+<span class="text-white text-sm font-medium">Info</span>
+</button>
+</div>
+</div>
+<!-- Notification Feed -->
+<div class="flex-1 overflow-y-auto p-6 space-y-4">
+<!-- Date Separator -->
+<div class="flex items-center gap-4 py-2">
+<div class="h-[1px] flex-1 bg-[#282e39]"></div>
+<span class="text-xs font-medium text-[#9ca6ba] uppercase tracking-wider">Today</span>
+<div class="h-[1px] flex-1 bg-[#282e39]"></div>
+</div>
+<!-- Alert Item: Critical -->
+<div class="group relative flex flex-col gap-3 rounded-xl border border-[#282e39] bg-[#1a202c] p-4 pl-5 transition-all hover:bg-[#1f2633] overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-red-500"></div>
+<div class="flex justify-between items-start">
+<div class="flex gap-3">
+<div class="mt-0.5 rounded-full bg-red-500/10 p-1.5 text-red-500">
+<span class="material-symbols-outlined text-[20px]">dangerous</span>
+</div>
+<div>
+<h4 class="text-white font-semibold text-[15px] leading-tight">Submission Engine Latency Spike</h4>
+<p class="text-[#9ca6ba] text-xs mt-1">Service ID: <span class="font-mono text-gray-400">SUB-882</span></p>
+</div>
+</div>
+<span class="text-[#9ca6ba] text-xs whitespace-nowrap">2m ago</span>
+</div>
+<p class="text-gray-300 text-sm pl-[3.25rem] leading-relaxed">
+                        500+ pending submissions in queue. Queue processing time exceeding 4500ms threshold.
+                    </p>
+<div class="flex items-center justify-between pl-[3.25rem] pt-2">
+<a class="text-primary text-sm font-medium hover:underline flex items-center gap-1" href="#">
+                            Go to Logs <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+<button class="flex h-8 items-center justify-center rounded border border-[#282e39] hover:border-gray-500 hover:bg-[#282e39] bg-transparent px-4 text-xs font-semibold text-white transition-colors">
+                            Acknowledge
+                        </button>
+</div>
+</div>
+<!-- Alert Item: Critical -->
+<div class="group relative flex flex-col gap-3 rounded-xl border border-[#282e39] bg-[#1a202c] p-4 pl-5 transition-all hover:bg-[#1f2633] overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-red-500"></div>
+<div class="flex justify-between items-start">
+<div class="flex gap-3">
+<div class="mt-0.5 rounded-full bg-red-500/10 p-1.5 text-red-500">
+<span class="material-symbols-outlined text-[20px]">dns</span>
+</div>
+<div>
+<h4 class="text-white font-semibold text-[15px] leading-tight">API Gateway 502 Errors</h4>
+<p class="text-[#9ca6ba] text-xs mt-1">Region: <span class="font-mono text-gray-400">US-EAST-1</span></p>
+</div>
+</div>
+<span class="text-[#9ca6ba] text-xs whitespace-nowrap">12m ago</span>
+</div>
+<p class="text-gray-300 text-sm pl-[3.25rem] leading-relaxed">
+                        Elevated error rate detected on /contest/submit endpoint. 
+                    </p>
+<div class="flex items-center justify-between pl-[3.25rem] pt-2">
+<a class="text-primary text-sm font-medium hover:underline flex items-center gap-1" href="#">
+                            View Metrics <span class="material-symbols-outlined text-[14px]">bar_chart</span>
+</a>
+<button class="flex h-8 items-center justify-center rounded border border-[#282e39] hover:border-gray-500 hover:bg-[#282e39] bg-transparent px-4 text-xs font-semibold text-white transition-colors">
+                            Acknowledge
+                        </button>
+</div>
+</div>
+<!-- Alert Item: Warning -->
+<div class="group relative flex flex-col gap-3 rounded-xl border border-[#282e39] bg-[#1a202c] p-4 pl-5 transition-all hover:bg-[#1f2633] overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-amber-500"></div>
+<div class="flex justify-between items-start">
+<div class="flex gap-3">
+<div class="mt-0.5 rounded-full bg-amber-500/10 p-1.5 text-amber-500">
+<span class="material-symbols-outlined text-[20px]">memory</span>
+</div>
+<div>
+<h4 class="text-white font-semibold text-[15px] leading-tight">High Memory Usage</h4>
+<p class="text-[#9ca6ba] text-xs mt-1">Node: <span class="font-mono text-gray-400">worker-04</span></p>
+</div>
+</div>
+<span class="text-[#9ca6ba] text-xs whitespace-nowrap">45m ago</span>
+</div>
+<p class="text-gray-300 text-sm pl-[3.25rem] leading-relaxed">
+                        Memory utilization &gt; 85%. Automated scaling policy triggered but pending allocation.
+                    </p>
+<div class="flex items-center justify-between pl-[3.25rem] pt-2">
+<a class="text-primary text-sm font-medium hover:underline flex items-center gap-1" href="#">
+                            Check Nodes <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+<button class="flex h-8 items-center justify-center rounded border border-[#282e39] hover:border-gray-500 hover:bg-[#282e39] bg-transparent px-4 text-xs font-semibold text-white transition-colors">
+                            Acknowledge
+                        </button>
+</div>
+</div>
+<!-- Date Separator -->
+<div class="flex items-center gap-4 py-2 mt-4">
+<div class="h-[1px] flex-1 bg-[#282e39]"></div>
+<span class="text-xs font-medium text-[#9ca6ba] uppercase tracking-wider">Yesterday</span>
+<div class="h-[1px] flex-1 bg-[#282e39]"></div>
+</div>
+<!-- Alert Item: Info -->
+<div class="group relative flex flex-col gap-3 rounded-xl border border-[#282e39] bg-[#1a202c] p-4 pl-5 transition-all hover:bg-[#1f2633] overflow-hidden opacity-75 hover:opacity-100">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex justify-between items-start">
+<div class="flex gap-3">
+<div class="mt-0.5 rounded-full bg-blue-500/10 p-1.5 text-primary">
+<span class="material-symbols-outlined text-[20px]">info</span>
+</div>
+<div>
+<h4 class="text-white font-semibold text-[15px] leading-tight">Scheduled Maintenance Completed</h4>
+<p class="text-[#9ca6ba] text-xs mt-1">System</p>
+</div>
+</div>
+<span class="text-[#9ca6ba] text-xs whitespace-nowrap">Yesterday</span>
+</div>
+<p class="text-gray-300 text-sm pl-[3.25rem] leading-relaxed">
+                        Weekly database vacuuming completed successfully in 4m 12s.
+                    </p>
+<div class="flex items-center justify-end pl-[3.25rem] pt-2">
+<button class="text-[#9ca6ba] hover:text-white text-xs flex items-center gap-1">
+                            Dismiss
+                        </button>
+</div>
+</div>
+</div>
+<!-- Drawer Footer -->
+<div class="p-4 border-t border-[#282e39] bg-[#111318]">
+<button class="flex w-full items-center justify-center rounded-lg bg-[#282e39] hover:bg-[#343b48] h-10 text-sm font-bold text-white transition-all">
+                    View All Activity Log
+                </button>
+</div>
+</div>
+</div>
+<!-- Toast Notification (Floating) -->
+<div class="fixed bottom-8 right-[540px] z-50 animate-[bounceIn_0.5s_ease-out]">
+<div class="flex items-start gap-4 rounded-xl bg-[#1a202c] border border-red-500/30 p-4 shadow-2xl max-w-sm">
+<div class="relative">
+<div class="absolute -top-1 -right-1 size-2 bg-red-500 rounded-full animate-pulse"></div>
+<div class="flex items-center justify-center rounded-lg bg-red-500/10 size-10 text-red-500">
+<span class="material-symbols-outlined text-[24px]">gpp_maybe</span>
+</div>
+</div>
+<div class="flex-1">
+<p class="text-white text-sm font-semibold">New Critical Error</p>
+<p class="text-[#9ca6ba] text-xs mt-1 leading-snug">Payment Gateway Timeout detected on checkout service.</p>
+<div class="flex gap-3 mt-3">
+<button class="text-xs font-semibold text-white bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded transition-colors">Investigate</button>
+<button class="text-xs font-medium text-[#9ca6ba] hover:text-white py-1.5 transition-colors">Dismiss</button>
+</div>
+</div>
+<button class="text-[#9ca6ba] hover:text-white transition-colors -mr-1 -mt-1">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</div>
+<style>
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes bounceIn {
+            0% { transform: translateY(20px); opacity: 0; }
+            60% { transform: translateY(-5px); opacity: 1; }
+            100% { transform: translateY(0); }
+        }
+    </style>
+</body></html>

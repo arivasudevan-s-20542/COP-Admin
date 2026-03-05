@@ -1,0 +1,210 @@
+<div class="audit-logs-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Audit Logs</h1>
+      <p class="subtitle">Track all system activities and user actions</p>
+    </div>
+    <div class="header-actions">
+      <button pButton label="Export" icon="pi pi-download" class="p-button-outlined" (click)="exportLogs()"></button>
+      <button pButton label="Refresh" icon="pi pi-refresh" (click)="loadAuditLogs()"></button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon total">
+        <i class="pi pi-list"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().totalEvents | number }}</span>
+        <span class="stat-label">Total Events</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon today">
+        <i class="pi pi-calendar"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().todayEvents | number }}</span>
+        <span class="stat-label">Today's Events</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon failed">
+        <i class="pi pi-times-circle"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().failedEvents }}</span>
+        <span class="stat-label">Failed Events</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon users">
+        <i class="pi pi-users"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().uniqueUsers | number }}</span>
+        <span class="stat-label">Unique Users</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="pi pi-search"></i>
+      <input type="text" pInputText placeholder="Search by action, user, or resource..." 
+             [value]="searchQuery()" (input)="onSearchChange($event)">
+    </div>
+    <p-select [options]="categories" [(ngModel)]="selectedCategory" 
+                (onChange)="onCategoryChange($event)" placeholder="Filter by category"
+                styleClass="category-dropdown"></p-select>
+    <p-datepicker [(ngModel)]="dateRange" selectionMode="range" [showIcon]="true"
+                placeholder="Date range" dateFormat="yy-mm-dd" styleClass="date-range-picker"></p-datepicker>
+  </div>
+
+  <!-- Logs Table -->
+  <p-card styleClass="logs-card">
+    <p-table [value]="filteredLogs" [paginator]="true" [rows]="10" 
+             [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 25, 50]"
+             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} logs"
+             styleClass="audit-table">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Timestamp</th>
+          <th>Action</th>
+          <th>Category</th>
+          <th>Actor</th>
+          <th>Resource</th>
+          <th>IP Address</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-log>
+        <tr>
+          <td>
+            <span class="timestamp">{{ log.timestamp }}</span>
+          </td>
+          <td>
+            <div class="action-cell">
+              <i class="pi {{ getActionIcon(log.action) }}"></i>
+              <span>{{ log.action }}</span>
+            </div>
+          </td>
+          <td>
+            <p-tag [value]="log.category" [severity]="getCategorySeverity(log.category)"></p-tag>
+          </td>
+          <td>
+            <div class="actor-cell">
+              <div class="actor-avatar">{{ log.actor.name.charAt(0) }}</div>
+              <div class="actor-info">
+                <span class="actor-name">{{ log.actor.name }}</span>
+                <span class="actor-role">{{ log.actor.role }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="resource-cell">
+              <span class="resource-type">{{ log.resource }}</span>
+              <span class="resource-id">{{ log.resourceId }}</span>
+            </div>
+          </td>
+          <td>
+            <code class="ip-address">{{ log.ipAddress }}</code>
+          </td>
+          <td>
+            <p-tag [value]="log.status" [severity]="getStatusSeverity(log.status)"></p-tag>
+          </td>
+          <td>
+            <button pButton icon="pi pi-eye" class="p-button-text p-button-sm" 
+                    pTooltip="View Details" (click)="viewDetails(log)"></button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="empty-message">
+            <i class="pi pi-inbox"></i>
+            <span>No audit logs found</span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>
+
+<!-- Detail Dialog -->
+<p-dialog header="Audit Log Details" [(visible)]="showDetailDialog" [modal]="true" 
+          [style]="{width: '600px'}" styleClass="audit-detail-dialog">
+  @if (selectedLog()) {
+    <div class="detail-content">
+      <div class="detail-header">
+        <div class="action-badge">
+          <i class="pi {{ getActionIcon(selectedLog()!.action) }}"></i>
+          <span>{{ selectedLog()!.action }}</span>
+        </div>
+        <p-tag [value]="selectedLog()!.status" [severity]="getStatusSeverity(selectedLog()!.status)"></p-tag>
+      </div>
+      
+      <div class="detail-section">
+        <h4>Event Information</h4>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="label">Event ID</span>
+            <span class="value">{{ selectedLog()!.id }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Timestamp</span>
+            <span class="value">{{ selectedLog()!.timestamp }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Category</span>
+            <p-tag [value]="selectedLog()!.category" [severity]="getCategorySeverity(selectedLog()!.category)"></p-tag>
+          </div>
+          <div class="detail-item">
+            <span class="label">Resource</span>
+            <span class="value">{{ selectedLog()!.resource }} / {{ selectedLog()!.resourceId }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="detail-section">
+        <h4>Actor Information</h4>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="label">Name</span>
+            <span class="value">{{ selectedLog()!.actor.name }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Email</span>
+            <span class="value">{{ selectedLog()!.actor.email }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Role</span>
+            <span class="value">{{ selectedLog()!.actor.role }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">IP Address</span>
+            <code class="value">{{ selectedLog()!.ipAddress }}</code>
+          </div>
+        </div>
+      </div>
+      
+      <div class="detail-section">
+        <h4>User Agent</h4>
+        <code class="user-agent">{{ selectedLog()!.userAgent }}</code>
+      </div>
+      
+      <div class="detail-section">
+        <h4>Additional Details</h4>
+        <pre class="json-details">{{ formatJson(selectedLog()!.details) }}</pre>
+      </div>
+    </div>
+  }
+  <ng-template pTemplate="footer">
+    <button pButton label="Close" (click)="showDetailDialog.set(false)"></button>
+  </ng-template>
+</p-dialog>

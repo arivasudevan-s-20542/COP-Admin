@@ -1,0 +1,481 @@
+// Dark theme variables
+$bg-primary: #1e293b;
+$bg-secondary: #0f172a;
+$bg-card: #1e293b;
+$bg-hover: #334155;
+$border-color: #334155;
+$text-primary: #f8fafc;
+$text-secondary: #94a3b8;
+$text-muted: #64748b;
+$primary-color: #0d59f2;
+$success-color: #22c55e;
+$warning-color: #f59e0b;
+$danger-color: #ef4444;
+$info-color: #3b82f6;
+
+.audit-logs-container {
+  padding: 1.5rem;
+  min-height: 100vh;
+  background: $bg-secondary;
+}
+
+// Page Header
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+
+  .header-content {
+    h1 {
+      margin: 0 0 0.25rem 0;
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: $text-secondary;
+      font-size: 0.9rem;
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 0.75rem;
+
+    ::ng-deep .p-button {
+      &.p-button-outlined {
+        border-color: $border-color;
+        color: $text-secondary;
+
+        &:hover {
+          background: $bg-hover;
+          border-color: $primary-color;
+          color: $text-primary;
+        }
+      }
+    }
+  }
+}
+
+// Stats Grid
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-card {
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $primary-color;
+    transform: translateY(-2px);
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 1.25rem;
+    }
+
+    &.total {
+      background: rgba($info-color, 0.15);
+      color: $info-color;
+    }
+
+    &.today {
+      background: rgba($success-color, 0.15);
+      color: $success-color;
+    }
+
+    &.failed {
+      background: rgba($danger-color, 0.15);
+      color: $danger-color;
+    }
+
+    &.users {
+      background: rgba($primary-color, 0.15);
+      color: $primary-color;
+    }
+  }
+
+  .stat-content {
+    display: flex;
+    flex-direction: column;
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: $text-muted;
+    }
+  }
+}
+
+// Filters Section
+.filters-section {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+
+  .search-box {
+    flex: 1;
+    min-width: 280px;
+    position: relative;
+
+    i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $text-muted;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.75rem;
+      background: $bg-card;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      color: $text-primary;
+      font-size: 0.9rem;
+
+      &::placeholder {
+        color: $text-muted;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 3px rgba($primary-color, 0.15);
+      }
+    }
+  }
+
+  ::ng-deep {
+    .category-dropdown, .date-range-picker {
+      .p-dropdown, .p-calendar {
+        background: $bg-card;
+        border: 1px solid $border-color;
+        border-radius: 8px;
+
+        &:hover {
+          border-color: $primary-color;
+        }
+
+        .p-dropdown-label, .p-inputtext {
+          color: $text-primary;
+          padding: 0.75rem 1rem;
+        }
+      }
+    }
+  }
+}
+
+// Logs Card
+::ng-deep .logs-card {
+  .p-card {
+    background: $bg-card;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+
+    .p-card-body {
+      padding: 0;
+    }
+
+    .p-card-content {
+      padding: 0;
+    }
+  }
+}
+
+// Audit Table
+::ng-deep .audit-table {
+  .p-datatable {
+    .p-datatable-header {
+      background: transparent;
+      border: none;
+      padding: 1rem;
+    }
+
+    .p-datatable-thead > tr > th {
+      background: $bg-secondary;
+      color: $text-secondary;
+      border: none;
+      border-bottom: 1px solid $border-color;
+      padding: 1rem;
+      font-weight: 500;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .p-datatable-tbody > tr {
+      background: $bg-card;
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: $bg-hover;
+      }
+
+      > td {
+        border: none;
+        border-bottom: 1px solid $border-color;
+        padding: 1rem;
+        color: $text-primary;
+      }
+    }
+
+    .p-paginator {
+      background: $bg-secondary;
+      border: none;
+      border-top: 1px solid $border-color;
+      padding: 1rem;
+
+      .p-paginator-pages .p-paginator-page {
+        color: $text-secondary;
+
+        &.p-highlight {
+          background: $primary-color;
+          color: white;
+        }
+      }
+    }
+  }
+}
+
+.timestamp {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: $text-secondary;
+}
+
+.action-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  i {
+    color: $text-muted;
+    font-size: 0.9rem;
+  }
+
+  span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+  }
+}
+
+.actor-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  .actor-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $primary-color, lighten($primary-color, 15%));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: white;
+  }
+
+  .actor-info {
+    display: flex;
+    flex-direction: column;
+
+    .actor-name {
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .actor-role {
+      font-size: 0.75rem;
+      color: $text-muted;
+    }
+  }
+}
+
+.resource-cell {
+  display: flex;
+  flex-direction: column;
+
+  .resource-type {
+    font-weight: 500;
+    font-size: 0.85rem;
+  }
+
+  .resource-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: $text-muted;
+  }
+}
+
+.ip-address {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  background: $bg-secondary;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  color: $text-secondary;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 3rem !important;
+  color: $text-muted;
+
+  i {
+    display: block;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+}
+
+// Detail Dialog
+::ng-deep .audit-detail-dialog {
+  .p-dialog {
+    background: $bg-card;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+
+    .p-dialog-header {
+      background: $bg-card;
+      border-bottom: 1px solid $border-color;
+      color: $text-primary;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .p-dialog-content {
+      background: $bg-card;
+      padding: 1.5rem;
+    }
+
+    .p-dialog-footer {
+      background: $bg-card;
+      border-top: 1px solid $border-color;
+      padding: 1rem 1.5rem;
+    }
+  }
+}
+
+.detail-content {
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid $border-color;
+
+    .action-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      font-weight: 500;
+      color: $text-primary;
+
+      i {
+        color: $primary-color;
+      }
+    }
+  }
+
+  .detail-section {
+    margin-bottom: 1.5rem;
+
+    h4 {
+      margin: 0 0 0.75rem 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: $text-primary;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .label {
+        font-size: 0.75rem;
+        color: $text-muted;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .value {
+        color: $text-primary;
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .user-agent {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: $bg-secondary;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: $text-secondary;
+    word-break: break-all;
+  }
+
+  .json-details {
+    margin: 0;
+    padding: 1rem;
+    background: $bg-secondary;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: $success-color;
+    overflow-x: auto;
+    white-space: pre-wrap;
+  }
+}

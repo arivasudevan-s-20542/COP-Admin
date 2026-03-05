@@ -1,0 +1,198 @@
+<div class="network-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-info">
+      <h1>Network Traffic & Rate Limiting</h1>
+      <p>Real-time traffic analysis, WAF controls, and anomaly detection.</p>
+    </div>
+    <div class="header-actions">
+      <div class="status-indicator" [class]="systemStatus()">
+        <span class="status-dot"></span>
+        Live System Status: {{ systemStatus() | titlecase }}
+      </div>
+      <button class="export-btn">
+        <i class="pi pi-download"></i>
+        Export Logs
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    @for (stat of stats(); track stat.label) {
+      <div class="stat-card">
+        <div class="stat-icon-bg">
+          <i [class]="stat.icon + ' ' + stat.iconColor"></i>
+        </div>
+        <p class="stat-label">{{ stat.label }}</p>
+        <div class="stat-value-row">
+          <h3 class="stat-value">{{ stat.value }}</h3>
+          <span class="stat-trend" [class.positive]="stat.trend.positive" [class.negative]="!stat.trend.positive">
+            <i [class]="stat.trend.direction === 'up' ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"></i>
+            {{ stat.trend.value }}
+          </span>
+        </div>
+        <div class="stat-progress">
+          <div class="progress-fill" [class]="stat.progressColor" [style.width.%]="stat.progress"></div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-grid">
+    <!-- Traffic Volume Chart -->
+    <div class="chart-card traffic-chart">
+      <div class="chart-header">
+        <h3>
+          <i class="pi pi-chart-line text-primary"></i>
+          Inbound Traffic Volume
+        </h3>
+        <span class="time-badge">Last 1 Hour</span>
+      </div>
+      <div class="chart-wrapper">
+        @if (trafficChartData()) {
+          <p-chart type="bar" [data]="trafficChartData()" [options]="trafficChartOptions()" height="300"></p-chart>
+        }
+      </div>
+      <div class="chart-footer">
+        <span>14:00</span>
+        <span>14:10</span>
+        <span>14:20</span>
+        <span>14:30</span>
+        <span>14:40</span>
+        <span>14:50</span>
+      </div>
+    </div>
+
+    <!-- Attack Origins Map -->
+    <div class="chart-card attack-origins">
+      <div class="chart-header">
+        <h3>
+          <i class="pi pi-globe text-purple-400"></i>
+          Attack Origins
+        </h3>
+      </div>
+      <div class="map-placeholder">
+        <div class="map-grid"></div>
+        <div class="hotspot critical" style="top: 30%; left: 75%"></div>
+        <div class="hotspot warning" style="top: 45%; left: 25%"></div>
+        <div class="hotspot info" style="top: 60%; left: 50%"></div>
+      </div>
+      <div class="origins-footer">
+        <span class="origins-list">Most Active: 
+          @for (origin of attackOrigins(); track origin.code) {
+            <strong>{{ origin.code }}</strong>{{ !$last ? ', ' : '' }}
+          }
+        </span>
+        <span class="risk-badge">High Risk</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Section -->
+  <div class="bottom-grid">
+    <!-- Anomalous IPs Table -->
+    <div class="anomaly-card">
+      <div class="card-header">
+        <h3>
+          <i class="pi pi-exclamation-triangle text-red-500"></i>
+          Top Scrapers / Anomalies
+        </h3>
+        <button class="view-all-btn">View All</button>
+      </div>
+      <p-table [value]="anomalousIPs()" styleClass="p-datatable-sm" [scrollable]="true">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>IP Address</th>
+            <th>User Agent / Trace</th>
+            <th class="text-right">Velocity</th>
+            <th class="text-center">Risk</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td>
+              <span class="ip-address">{{ item.ip }}</span>
+            </td>
+            <td>
+              <span class="user-agent" [pTooltip]="item.userAgent">{{ item.userAgent }}</span>
+            </td>
+            <td class="text-right">
+              <span class="velocity">{{ item.velocity }}</span>
+            </td>
+            <td class="text-center">
+              <span class="risk-tag" [class]="getRiskColor(item.riskLevel)">
+                {{ item.riskLevel | titlecase }} ({{ item.riskScore }})
+              </span>
+            </td>
+            <td class="text-right">
+              <div class="action-buttons">
+                <button class="action-btn throttle" pTooltip="Throttle" (click)="throttleIP(item.ip)">
+                  <i class="pi pi-gauge"></i>
+                </button>
+                <button class="action-btn block" pTooltip="Block Globally" (click)="blockIP(item.ip)">
+                  <i class="pi pi-ban"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- Rate Limit Config -->
+    <div class="config-card">
+      <div class="config-header">
+        <h3>
+          <i class="pi pi-sliders-h"></i>
+          Rate Limit Config
+        </h3>
+        <p>Adjust API thresholds for user tiers.</p>
+      </div>
+      <div class="config-body">
+        <!-- Free Tier -->
+        <div class="config-item">
+          <div class="config-label">
+            <label>Free Tier Limit</label>
+            <span>Requests per minute</span>
+          </div>
+          <div class="config-input">
+            <input type="number" [(ngModel)]="freeTierLimit" [ngModelOptions]="{standalone: true}" />
+            <button class="history-btn"><i class="pi pi-history"></i></button>
+          </div>
+        </div>
+
+        <!-- Premium Tier -->
+        <div class="config-item">
+          <div class="config-label">
+            <label>Premium Tier Limit</label>
+            <span>Requests per minute</span>
+          </div>
+          <div class="config-input">
+            <input type="number" [(ngModel)]="premiumTierLimit" [ngModelOptions]="{standalone: true}" />
+            <button class="history-btn"><i class="pi pi-history"></i></button>
+          </div>
+        </div>
+
+        <!-- Global Burst -->
+        <div class="config-item">
+          <div class="config-label">
+            <label>Global Burst Cap</label>
+            <span>Requests per second</span>
+          </div>
+          <div class="config-input">
+            <input type="number" [(ngModel)]="globalBurstCap" [ngModelOptions]="{standalone: true}" />
+            <button class="history-btn"><i class="pi pi-history"></i></button>
+          </div>
+        </div>
+
+        <div class="config-actions">
+          <button class="reset-btn" (click)="resetRateLimits()">Reset</button>
+          <button class="apply-btn" (click)="applyRateLimits()">Apply Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,175 @@
+<div class="tickets-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Support Tickets</h1>
+      <p class="subtitle">Manage support tickets and user inquiries</p>
+    </div>
+    <button pButton label="Export" icon="pi pi-download" class="p-button-outlined"></button>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon total"><i class="pi pi-ticket"></i></div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().total | number }}</span>
+        <span class="stat-label">Total Tickets</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon open"><i class="pi pi-exclamation-circle"></i></div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().open }}</span>
+        <span class="stat-label">Open</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon progress"><i class="pi pi-spin pi-cog"></i></div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().inProgress }}</span>
+        <span class="stat-label">In Progress</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon time"><i class="pi pi-clock"></i></div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().avgResponseTime }}</span>
+        <span class="stat-label">Avg Response</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="pi pi-search"></i>
+      <input type="text" pInputText placeholder="Search tickets..." [value]="searchQuery()" (input)="onSearchChange($event)">
+    </div>
+    <p-select [options]="statusOptions" [(ngModel)]="selectedStatus" (onChange)="onStatusChange($event)" placeholder="Filter by status" styleClass="status-dropdown"></p-select>
+  </div>
+
+  <!-- Tickets Table -->
+  <p-card styleClass="tickets-card">
+    <p-table [value]="filteredTickets" [paginator]="true" [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 25, 50]" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} tickets" styleClass="tickets-table">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Ticket</th>
+          <th>User</th>
+          <th>Category</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Assignee</th>
+          <th>Updated</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-ticket>
+        <tr>
+          <td>
+            <div class="ticket-cell">
+              <span class="ticket-id">{{ ticket.id }}</span>
+              <span class="ticket-subject">{{ ticket.subject }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="user-cell">
+              <div class="user-avatar">{{ getInitials(ticket.user.name) }}</div>
+              <div class="user-info">
+                <span class="user-name">{{ ticket.user.name }}</span>
+                <span class="user-email">{{ ticket.user.email }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="category-cell">
+              <i class="pi {{ getCategoryIcon(ticket.category) }}"></i>
+              <span>{{ ticket.category }}</span>
+            </div>
+          </td>
+          <td><p-tag [value]="ticket.priority" [severity]="getPrioritySeverity(ticket.priority)"></p-tag></td>
+          <td><p-tag [value]="ticket.status" [severity]="getStatusSeverity(ticket.status)"></p-tag></td>
+          <td>
+            @if (ticket.assignee) {
+              <span class="assignee">{{ ticket.assignee }}</span>
+            } @else {
+              <p-select [options]="assignees" placeholder="Assign" (onChange)="assignTicket(ticket, $event.value)" styleClass="assign-dropdown" appendTo="body"></p-select>
+            }
+          </td>
+          <td><span class="timestamp">{{ ticket.updatedAt }}</span></td>
+          <td>
+            <div class="actions-cell">
+              <button pButton icon="pi pi-eye" class="p-button-text p-button-sm" pTooltip="View" (click)="viewTicket(ticket)"></button>
+              <button pButton icon="pi pi-check" class="p-button-text p-button-success p-button-sm" pTooltip="Resolve" (click)="updateStatus(ticket, 'resolved')"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="empty-message">
+            <i class="pi pi-inbox"></i>
+            <span>No tickets found</span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>
+
+<!-- Ticket Detail Dialog -->
+<p-dialog header="Ticket Details" [(visible)]="showTicketDialog" [modal]="true" [style]="{width: '650px'}" styleClass="ticket-dialog">
+  @if (selectedTicket()) {
+    <div class="ticket-detail">
+      <div class="ticket-header">
+        <div class="ticket-title">
+          <span class="ticket-id">{{ selectedTicket()!.id }}</span>
+          <h3>{{ selectedTicket()!.subject }}</h3>
+        </div>
+        <div class="ticket-badges">
+          <p-tag [value]="selectedTicket()!.priority" [severity]="getPrioritySeverity(selectedTicket()!.priority)"></p-tag>
+          <p-tag [value]="selectedTicket()!.status" [severity]="getStatusSeverity(selectedTicket()!.status)"></p-tag>
+        </div>
+      </div>
+
+      <div class="ticket-info-grid">
+        <div class="info-item">
+          <span class="label">Submitted by</span>
+          <div class="user-cell">
+            <div class="user-avatar small">{{ getInitials(selectedTicket()!.user.name) }}</div>
+            <span>{{ selectedTicket()!.user.name }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <span class="label">Category</span>
+          <div class="category-cell">
+            <i class="pi {{ getCategoryIcon(selectedTicket()!.category) }}"></i>
+            <span>{{ selectedTicket()!.category }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <span class="label">Created</span>
+          <span>{{ selectedTicket()!.createdAt }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Assignee</span>
+          <span>{{ selectedTicket()!.assignee || 'Unassigned' }}</span>
+        </div>
+      </div>
+
+      <div class="ticket-description">
+        <h4>Description</h4>
+        <p>{{ selectedTicket()!.description }}</p>
+      </div>
+
+      <div class="reply-section">
+        <h4>Reply</h4>
+        <textarea pInputTextarea [(ngModel)]="replyMessage" rows="3" placeholder="Type your reply..." class="reply-input"></textarea>
+        <div class="reply-actions">
+          <p-select [options]="['open', 'in-progress', 'waiting', 'resolved', 'closed']" [(ngModel)]="selectedTicket()!.status" placeholder="Update Status"></p-select>
+          <button pButton label="Send Reply" icon="pi pi-send" (click)="sendReply()"></button>
+        </div>
+      </div>
+    </div>
+  }
+</p-dialog>
