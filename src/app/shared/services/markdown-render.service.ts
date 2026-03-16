@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 
 export interface CodeBlock {
   language: string;
@@ -31,12 +31,13 @@ export class MarkdownRenderService {
   constructor(private sanitizer: DomSanitizer) {}
 
   /**
-   * Render markdown content to HTML
+   * Render markdown content to HTML string (safe HTML)
    * Supports: headings, bold, italic, lists, code blocks, multi-tab code blocks,
    * inline code, blockquotes, links, images, horizontal rules, math expressions
+   * Returns sanitized HTML string (XSS-safe)
    */
-  render(markdown: string): SafeHtml {
-    if (!markdown) return this.sanitizer.bypassSecurityTrustHtml('');
+  render(markdown: string): string {
+    if (!markdown) return '';
     
     // Reset block counter for fresh render
     this.blockIdCounter = 0;
@@ -59,7 +60,8 @@ export class MarkdownRenderService {
     html = this.processLists(html);
     html = this.processParagraphs(html);
     
-    return this.sanitizer.bypassSecurityTrustHtml(html);
+    // Sanitize to prevent XSS before returning
+    return this.sanitizer.sanitize(1, html) || '';  // 1 = SecurityContext.HTML
   }
 
   /**

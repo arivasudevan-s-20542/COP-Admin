@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SecurityContext } from '@angular/platform-browser';
 import { MarkdownRenderService } from '../services/markdown-render.service';
 
 /**
@@ -16,10 +16,11 @@ export class MarkdownPipe implements PipeTransform {
     private sanitizer: DomSanitizer
   ) {}
 
-  transform(value: string | null | undefined): SafeHtml {
+  transform(value: string | null | undefined): string {
     if (!value) {
-      return this.sanitizer.bypassSecurityTrustHtml('');
+      return '';
     }
+    // render() now returns sanitized HTML string (safe)
     return this.markdownService.render(value);
   }
 }

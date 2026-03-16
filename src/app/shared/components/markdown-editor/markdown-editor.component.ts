@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 import { TooltipModule } from 'primeng/tooltip';
 import { MarkdownRenderService } from '../../services/markdown-render.service';
 
@@ -339,7 +339,7 @@ export class MarkdownEditorComponent implements ControlValueAccessor, OnDestroy,
   private tabSwitchingInitialized = false;
 
   value = '';
-  renderedHtml = signal<SafeHtml>('');
+  renderedHtml = signal<string>('');
   mode = signal<MarkdownEditorMode>('split');
 
   private onChange: (value: string) => void = () => {};
@@ -410,7 +410,9 @@ export class MarkdownEditorComponent implements ControlValueAccessor, OnDestroy,
 
   renderMarkdown(): void {
     const html = this.markdownService.renderToString(this.value);
-    this.renderedHtml.set(this.sanitizer.bypassSecurityTrustHtml(html));
+    // renderToString now returns sanitized HTML, safely bind it
+    const sanitized = this.sanitizer.sanitize(1, html) || '';  // 1 = SecurityContext.HTML
+    this.renderedHtml.set(sanitized);
   }
 
   handlePreviewClick(event: MouseEvent): void {
