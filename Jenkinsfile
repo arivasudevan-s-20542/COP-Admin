@@ -64,10 +64,6 @@ pipeline {
         }
 
         stage('Deploy') {
-            when {
-                branch 'main'
-                not { changeRequest() }
-            }
             steps {
                 sh '''
                     set -e
