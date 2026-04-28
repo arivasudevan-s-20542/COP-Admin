@@ -14,10 +14,7 @@
 name: CI/CD — zcop-admin
 
 on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:  # Disabled — using Jenkins CI/CD now
 
 jobs:
   # ── 1. Build ──────────────────────────────────────────────────────────────

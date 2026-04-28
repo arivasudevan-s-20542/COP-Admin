@@ -32,7 +32,7 @@ URL paths reflect the real Spring Boot controllers in the `zcop` backend.
 ## Base URL
 
 ```
-Production: https://zcop.com         (environment.apiUrl = '')
+Production: https://cruscible.com         (environment.apiUrl = '')
 Development: http://localhost:8080   (environment.apiUrl = 'http://localhost:8080')
 ```
 
@@ -126,7 +126,7 @@ POST /api/auth/login
 **Request:**
 ```json
 {
-  "email": "admin@zcop.com",
+  "email": "admin@cruscible.com",
   "password": "string",
   "rememberMe": false
 }
@@ -142,7 +142,7 @@ POST /api/auth/login
     "expiresIn": 3600,
     "user": {
       "id": "usr_123",
-      "email": "admin@zcop.com",
+      "email": "admin@cruscible.com",
       "name": "Admin User",
       "role": "SUPER_ADMIN",
       "avatar": "https://...",

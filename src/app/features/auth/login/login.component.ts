@@ -51,7 +51,7 @@ import { ToastService } from '../../../core/services/toast.service';
               type="email" 
               [(ngModel)]="email"
               name="email"
-              placeholder="admin@zcop.com"
+              placeholder="admin@cruscible.com"
               class="w-full"
               [disabled]="isLoading()"
             />
